@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Supervisão Elétrica Global - Serraria VJ Rauber</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
@@ -16,69 +13,68 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#f0fdf4',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              900: '#14532d',
-            },
             darkcard: '#1e293b',
             darkbg: '#0f172a',
-            bordercard: '#334155'
           }
         }
       }
     }
   </script>
-  <style>
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.03); }
-    }
-    .badge-pulse { animation: pulse-slow 3s infinite ease-in-out; }
-  </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
   <!-- TOP NAVIGATION / HEADER -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3.5">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+  <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
           <i class="fa-solid fa-bolt text-xl"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-lg font-bold text-white tracking-wide">Serraria VJ Rauber</h1>
             <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Terceira Tela • Visão Global
+              Tela Global • T1 + T2
             </span>
           </div>
           <p class="text-xs text-slate-400">
-            Consolidação em Tempo Real: Transformadores 01 & 02 (1.000 kVA Instalados) • Analisadores ISSO Blue Box D1000A
+            Consolidação: Transformadores 01 & 02 (1.000 kVA) • Analisadores ISSO D1000A
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-        <div class="text-right hidden md:block">
-          <div class="text-xs text-slate-400">Status Nuvem Whitebox:</div>
-          <div class="text-xs font-medium text-emerald-400 flex items-center gap-1.5 justify-end">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Online (Ciclo 15 min)
+      <!-- MENU DE NAVEGAÇÃO UNIFICADO + STATUS -->
+      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
+        <!-- Atalhos para as 3 telas -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+          <span class="px-2.5 py-1.5 rounded bg-emerald-600 text-white font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-layer-group"></i> Global
+          </span>
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" title="Abrir painel individual na Whitebox"
+             class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
+            Trafo 1 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+          </a>
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" title="Abrir painel individual na Whitebox"
+             class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
+            Trafo 2 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
+          </a>
+        </div>
+
+        <!-- Status Comunicação -->
+        <div id="commStatusBox" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 flex items-center gap-2 text-xs">
+          <span id="commDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div>
+            <div id="commText" class="font-medium text-emerald-400 leading-tight">Whitebox Online</div>
+            <div class="text-[10px] text-slate-400 leading-tight">Ciclo 15m (amostras 1m)</div>
           </div>
         </div>
 
-        <button onclick="toggleScenario()" id="scenarioBtn" class="text-xs px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition flex items-center gap-1.5 shadow">
-          <i class="fa-solid fa-moon"></i>
-          <span>Simular Madrugada</span>
-        </button>
-
-        <button onclick="refreshData()" class="text-xs px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition flex items-center gap-1.5">
-          <i class="fa-solid fa-rotate text-slate-400" id="syncIcon"></i>
-          <span id="lastUpdateText">Atualizado agora</span>
-        </button>
+        <!-- Botões de Simulação -->
+        <div class="flex items-center gap-1.5">
+          <button onclick="setMode('day')" id="btnDay" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition">Dia</button>
+          <button onclick="setMode('night')" id="btnNight" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">Madrugada</button>
+          <button onclick="setMode('offline')" id="btnOffline" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition" title="Simular falha de comunicação">Falha</button>
+        </div>
       </div>
     </div>
   </header>
@@ -86,7 +82,7 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
 
-    <!-- ALERT BANNER: CONFORMIDADE ANEEL / RESOLUÇÃO 1000 -->
+    <!-- ALERT BANNER -->
     <div id="alertBanner" class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4 transition-all">
       <div class="flex items-center gap-3">
         <div id="alertIcon" class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
@@ -95,258 +91,274 @@
         <div>
           <h2 id="alertTitle" class="text-sm font-semibold text-emerald-300">Instalação em Conformidade Regulamentar (ANEEL)</h2>
           <p id="alertDesc" class="text-xs text-slate-300">
-            Fator de potência global resultante acima de 0,92. Sem cobrança de excedente reativo no momento.
+            Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.
           </p>
         </div>
       </div>
-      <div class="hidden sm:block text-right">
+      <div class="hidden sm:block text-right flex-shrink-0">
         <span class="text-xs text-slate-400">Meta Regulamentar</span>
         <div class="text-sm font-bold text-white">≥ 0,920</div>
       </div>
     </div>
 
-    <!-- CARDS DE DESTAQUE CONSOLIDADO GLOBAL (SOMA T1 + T2) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- CARDS DE DESTAQUE CONSOLIDADO GLOBAL (5 CARDS) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
-      <!-- CARD 1: FATOR DE POTÊNCIA GLOBAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg relative overflow-hidden">
+      <!-- CARD 1: FP GLOBAL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Fator de Potência Global</span>
-          <span id="fpBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">FP Global</span>
+          <span id="fpBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
             INDUTIVO
           </span>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span id="fpValue" class="text-3xl font-extrabold text-white tracking-tight">0.942</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span id="fpValue" class="text-2xl font-extrabold text-white">0.942</span>
           <span class="text-xs text-slate-400">/ 1.000</span>
         </div>
-        <div class="mt-3 w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+        <div class="mt-2.5 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
           <div id="fpBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 94.2%"></div>
         </div>
-        <div class="mt-2 flex justify-between text-[11px] text-slate-400">
+        <div class="mt-2 text-[11px] text-slate-400 flex justify-between">
           <span>Meta: 0.920</span>
-          <span id="fpStatus" class="text-emerald-400 font-medium">Margem Segura (+0.022)</span>
+          <span id="fpStatus" class="text-emerald-400 font-medium">+0.022</span>
         </div>
       </div>
 
       <!-- CARD 2: POTÊNCIA ATIVA TOTAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Potência Ativa Total</span>
-          <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-chart-line"></i>
-          </div>
+          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Ativa</span>
+          <i class="fa-solid fa-bolt text-blue-400 text-xs"></i>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span id="pTotalValue" class="text-3xl font-extrabold text-white tracking-tight">418.5</span>
-          <span class="text-sm font-semibold text-slate-400">kW</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span id="pTotalValue" class="text-2xl font-extrabold text-white">418.5</span>
+          <span class="text-xs font-semibold text-slate-400">kW</span>
         </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-2">
-          <span>Trafo 1: <strong id="pT1Val" class="text-slate-200">224.2 kW</strong></span>
-          <span>Trafo 2: <strong id="pT2Val" class="text-slate-200">194.3 kW</strong></span>
+        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+          <span>T1: <strong id="pT1Val" class="text-slate-200">224.2</strong></span>
+          <span>T2: <strong id="pT2Val" class="text-slate-200">194.3</strong></span>
         </div>
       </div>
 
       <!-- CARD 3: POTÊNCIA REATIVA TOTAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Potência Reativa Total</span>
-          <div class="w-6 h-6 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-wave-square"></i>
-          </div>
+          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Reativa</span>
+          <i class="fa-solid fa-wave-square text-amber-400 text-xs"></i>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span id="qTotalValue" class="text-3xl font-extrabold text-white tracking-tight">149.2</span>
-          <span class="text-sm font-semibold text-slate-400">kvar</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span id="qTotalValue" class="text-2xl font-extrabold text-white">149.2</span>
+          <span class="text-xs font-semibold text-slate-400">kvar</span>
         </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-2">
-          <span>Trafo 1: <strong id="qT1Val" class="text-slate-200">81.0 kvar</strong></span>
-          <span>Trafo 2: <strong id="qT2Val" class="text-slate-200">68.2 kvar</strong></span>
+        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+          <span>T1: <strong id="qT1Val" class="text-slate-200">81.0</strong></span>
+          <span>T2: <strong id="qT2Val" class="text-slate-200">68.2</strong></span>
         </div>
       </div>
 
-      <!-- CARD 4: POTÊNCIA APARENTE & DEMANDA -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <!-- CARD 4: POTÊNCIA APARENTE TOTAL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Potência Aparente (Soma)</span>
-          <div class="w-6 h-6 rounded bg-purple-500/10 text-purple-400 flex items-center justify-center text-xs">
-            <i class="fa-solid fa-gauge-high"></i>
-          </div>
+          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Aparente</span>
+          <i class="fa-solid fa-gauge-high text-purple-400 text-xs"></i>
         </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <span id="sTotalValue" class="text-3xl font-extrabold text-white tracking-tight">444.3</span>
-          <span class="text-sm font-semibold text-slate-400">kVA</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span id="sTotalValue" class="text-2xl font-extrabold text-white">444.3</span>
+          <span class="text-xs font-semibold text-slate-400">kVA</span>
         </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-2">
-          <span>Carregamento: <strong id="loadPct" class="text-slate-200">44.4%</strong></span>
-          <span>Demanda 15m: <strong id="demandVal" class="text-emerald-400">432 kW</strong></span>
+        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+          <span>Carga: <strong id="loadPct" class="text-slate-200">44.4%</strong></span>
+          <span>Cap: <strong class="text-slate-300">1.000 kVA</strong></span>
+        </div>
+      </div>
+
+      <!-- CARD 5: DEMANDA & CONSUMO GLOBAL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Demanda & Consumo</span>
+          <i class="fa-solid fa-clock text-emerald-400 text-xs"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span id="demandVal" class="text-2xl font-extrabold text-white">432</span>
+          <span class="text-xs font-semibold text-slate-400">kW (15m)</span>
+        </div>
+        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+          <span>Máx: <strong class="text-amber-300">485 kW</strong></span>
+          <span>Hoje: <strong class="text-emerald-400">4.820 kWh</strong></span>
         </div>
       </div>
 
     </div>
 
-    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 -->
+    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 (TENSÕES ENTRE FASES R-S, S-T, T-R) -->
     <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
       <div class="px-5 py-4 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-server text-blue-400"></i>
-            Medições Individuais por Transformador (ISSO Blue Box D1000A)
+            Medições Individuais por Transformador (Tensões Entre Fases R-S, S-T, T-R)
           </h3>
-          <p class="text-xs text-slate-400">Valores sincronizados via API Whitebox no mesmo intervalo de integração</p>
+          <p class="text-xs text-slate-400">Última leitura efetiva e status de cada analisador ISSO Blue Box D1000A</p>
         </div>
-        <span class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
-          Sensores Rogowski: 3x 1.000 A por unidade
-        </span>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+            <i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1" id="t1SyncDot"></i> T1: <span id="t1LastSync">17:15:02</span>
+          </span>
+          <span class="text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+            <i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1" id="t2SyncDot"></i> T2: <span id="t2LastSync">17:15:04</span>
+          </span>
+        </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950/60 text-slate-400 border-b border-slate-800">
             <tr>
-              <th class="px-5 py-3 font-semibold">EQUIPAMENTO</th>
-              <th class="px-5 py-3 font-semibold">TENSÃO MÉDIA</th>
-              <th class="px-5 py-3 font-semibold">CORRENTE MÉDIA</th>
-              <th class="px-5 py-3 font-semibold text-blue-400">P. ATIVA (kW)</th>
-              <th class="px-5 py-3 font-semibold text-amber-400">P. REATIVA (kvar)</th>
-              <th class="px-5 py-3 font-semibold text-purple-400">P. APARENTE (kVA)</th>
-              <th class="px-5 py-3 font-semibold">FP INDIVIDUAL</th>
-              <th class="px-5 py-3 font-semibold text-right">BANCO EMBRASUL</th>
+              <th class="px-4 py-3 font-semibold">EQUIPAMENTO</th>
+              <th class="px-4 py-3 font-semibold">TENSÕES ENTRE FASES (R-S / S-T / T-R)</th>
+              <th class="px-4 py-3 font-semibold">CORRENTES (R / S / T)</th>
+              <th class="px-4 py-3 font-semibold text-blue-400">P. ATIVA</th>
+              <th class="px-4 py-3 font-semibold text-amber-400">P. REATIVA</th>
+              <th class="px-4 py-3 font-semibold text-purple-400">P. APARENTE</th>
+              <th class="px-4 py-3 font-semibold">FP INDIV.</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-800 text-slate-200">
             <!-- LINHA TRAFO 1 -->
             <tr class="hover:bg-slate-800/40 transition">
-              <td class="px-5 py-3.5 flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <div>
-                  <div class="font-bold text-white">Trafo 01 (500 kVA)</div>
-                  <div class="text-[11px] text-slate-500">ID Whitebox: D1000A_TR1</div>
+              <td class="px-4 py-3.5">
+                <div class="flex items-center gap-2">
+                  <span id="t1StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <div>
+                    <div class="font-bold text-white">Trafo 01 (500 kVA)</div>
+                    <div class="text-[10px] text-slate-500">ISSO D1000A • 3x 1000A</div>
+                  </div>
                 </div>
               </td>
-              <td class="px-5 py-3.5"><span id="t1V">221.4</span> V</td>
-              <td class="px-5 py-3.5"><span id="t1I">585.1</span> A</td>
-              <td class="px-5 py-3.5 font-bold text-blue-400"><span id="t1P">224.2</span> kW</td>
-              <td class="px-5 py-3.5 font-bold text-amber-400"><span id="t1Q">81.0</span> kvar</td>
-              <td class="px-5 py-3.5 font-bold text-purple-400"><span id="t1S">238.4</span> kVA</td>
-              <td class="px-5 py-3.5">
+              <td class="px-4 py-3.5 font-mono text-[11px]">
+                <span id="t1Vrs">221.4</span> / <span id="t1Vst">219.8</span> / <span id="t1Vtr">222.1</span> V
+                <div class="text-[10px] text-slate-400">Média: <strong id="t1Vavg" class="text-slate-200">221.1 V</strong></div>
+              </td>
+              <td class="px-4 py-3.5 font-mono text-[11px]">
+                <span id="t1Ir">580</span> / <span id="t1Is">592</span> / <span id="t1It">583</span> A
+              </td>
+              <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t1P">224.2</span> kW</td>
+              <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t1Q">81.0</span> kvar</td>
+              <td class="px-4 py-3.5 font-bold text-purple-400"><span id="t1S">238.4</span> kVA</td>
+              <td class="px-4 py-3.5">
                 <span id="t1FpBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-400">
                   <span id="t1Fp">0.940</span> (Ind)
-                </span>
-              </td>
-              <td class="px-5 py-3.5 text-right font-medium text-slate-300">
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 45 kvar ativo
                 </span>
               </td>
             </tr>
 
             <!-- LINHA TRAFO 2 -->
             <tr class="hover:bg-slate-800/40 transition">
-              <td class="px-5 py-3.5 flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <div>
-                  <div class="font-bold text-white">Trafo 02 (500 kVA)</div>
-                  <div class="text-[11px] text-slate-500">ID Whitebox: D1000A_TR2</div>
+              <td class="px-4 py-3.5">
+                <div class="flex items-center gap-2">
+                  <span id="t2StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <div>
+                    <div class="font-bold text-white">Trafo 02 (500 kVA)</div>
+                    <div class="text-[10px] text-slate-500">ISSO D1000A • 3x 1000A</div>
+                  </div>
                 </div>
               </td>
-              <td class="px-5 py-3.5"><span id="t2V">220.8</span> V</td>
-              <td class="px-5 py-3.5"><span id="t2I">507.3</span> A</td>
-              <td class="px-5 py-3.5 font-bold text-blue-400"><span id="t2P">194.3</span> kW</td>
-              <td class="px-5 py-3.5 font-bold text-amber-400"><span id="t2Q">68.2</span> kvar</td>
-              <td class="px-5 py-3.5 font-bold text-purple-400"><span id="t2S">205.9</span> kVA</td>
-              <td class="px-5 py-3.5">
+              <td class="px-4 py-3.5 font-mono text-[11px]">
+                <span id="t2Vrs">218.2</span> / <span id="t2Vst">220.5</span> / <span id="t2Vtr">221.0</span> V
+                <div class="text-[10px] text-slate-400">Média: <strong id="t2Vavg" class="text-slate-200">219.9 V</strong></div>
+              </td>
+              <td class="px-4 py-3.5 font-mono text-[11px]">
+                <span id="t2Ir">501</span> / <span id="t2Is">512</span> / <span id="t2It">509</span> A
+              </td>
+              <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t2P">194.3</span> kW</td>
+              <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t2Q">68.2</span> kvar</td>
+              <td class="px-4 py-3.5 font-bold text-purple-400"><span id="t2S">205.9</span> kVA</td>
+              <td class="px-4 py-3.5">
                 <span id="t2FpBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-400">
                   <span id="t2Fp">0.944</span> (Ind)
-                </span>
-              </td>
-              <td class="px-5 py-3.5 text-right font-medium text-slate-300">
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 30 kvar ativo
                 </span>
               </td>
             </tr>
 
             <!-- LINHA TOTAL CONSOLIDADO -->
             <tr class="bg-slate-950/80 font-bold border-t-2 border-slate-700">
-              <td class="px-5 py-3.5 text-emerald-400 flex items-center gap-2">
-                <i class="fa-solid fa-calculator"></i> TOTAL GLOBAL (INSTALAÇÃO)
+              <td class="px-4 py-3.5 text-emerald-400 flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> TOTAL GLOBAL
               </td>
-              <td class="px-5 py-3.5 text-slate-400">Média: 221.1 V</td>
-              <td class="px-5 py-3.5 text-slate-300"><span id="totI">1092.4</span> A</td>
-              <td class="px-5 py-3.5 text-blue-300 text-sm"><span id="tableTotP">418.5</span> kW</td>
-              <td class="px-5 py-3.5 text-amber-300 text-sm"><span id="tableTotQ">149.2</span> kvar</td>
-              <td class="px-5 py-3.5 text-purple-300 text-sm"><span id="tableTotS">444.3</span> kVA</td>
-              <td class="px-5 py-3.5">
+              <td class="px-4 py-3.5 text-slate-400 text-[11px]">Acompanhar comparativo abaixo ↓</td>
+              <td class="px-4 py-3.5 text-slate-300 font-mono text-[11px]">Soma: <span id="totI">3.261</span> A</td>
+              <td class="px-4 py-3.5 text-blue-300 text-sm"><span id="tableTotP">418.5</span> kW</td>
+              <td class="px-4 py-3.5 text-amber-300 text-sm"><span id="tableTotQ">149.2</span> kvar</td>
+              <td class="px-4 py-3.5 text-purple-300 text-sm"><span id="tableTotS">444.3</span> kVA</td>
+              <td class="px-4 py-3.5">
                 <span id="tableFpBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500 text-slate-950 shadow">
                   <span id="tableTotFp">0.942</span> IND
                 </span>
               </td>
-              <td class="px-5 py-3.5 text-right text-emerald-400">75 kvar em operação</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- SEÇÃO DE GRÁFICOS HISTÓRICOS (ÚLTIMAS 24 HORAS & MADRUGADA) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- GRÁFICOS HISTÓRICOS: FATOR DE POTÊNCIA + COMPARATIVO DE TENSÕES ENTRE FASES -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <!-- GRÁFICO 1: EVOLUÇÃO DO FATOR DE POTÊNCIA (2 COLUNAS) -->
-      <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+      <!-- GRÁFICO 1: FATOR DE POTÊNCIA GLOBAL -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-chart-area text-emerald-400"></i>
-              Histórico de Fator de Potência Global (Últimas 24 Horas)
+              Histórico de Fator de Potência Global (24h)
             </h3>
-            <p class="text-xs text-slate-400">Com faixa sombreada de análise crítica da Madrugada (00h00 às 06h00)</p>
+            <p class="text-xs text-slate-400">Identificação de desvios na madrugada e horário de ponta</p>
           </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="inline-flex items-center gap-1 text-slate-300">
-              <span class="w-3 h-0.5 bg-emerald-400"></span> FP Global
-            </span>
-            <span class="inline-flex items-center gap-1 text-red-400">
-              <span class="w-3 h-0.5 bg-red-500 border border-red-500 border-dashed"></span> Limite 0.92
-            </span>
-          </div>
+          <select id="periodSelectFp" onchange="changeChartPeriod()" class="text-xs bg-slate-800 border border-slate-700 text-slate-200 rounded px-2 py-1">
+            <option value="24h">Últimas 24 horas</option>
+            <option value="7d">Últimos 7 dias</option>
+            <option value="30d">Últimos 30 dias</option>
+          </select>
         </div>
-        <div class="h-64 w-full">
+        <div class="h-60 w-full">
           <canvas id="fpChart"></canvas>
         </div>
-        <div class="mt-3 p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> Resolução ANEEL 1.000: Madrugada avalia <strong>excedente capacitivo</strong>; dia avalia <strong>indutivo</strong>.</span>
+        <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span>Linha tracejada: Limite ANEEL (0,920)</span>
           <button onclick="downloadCSV()" class="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1">
-            <i class="fa-solid fa-download"></i> Exportar CSV
+            <i class="fa-solid fa-file-excel"></i> Exportar CSV/Excel
           </button>
         </div>
       </div>
 
-      <!-- GRÁFICO 2: BALANÇO DE ENERGIA E DEMANDA (1 COLUNA) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-1">
-            <i class="fa-solid fa-pie-chart text-purple-400"></i>
-            Distribuição de Carga
-          </h3>
-          <p class="text-xs text-slate-400 mb-4">Divisão de potência entre os dois transformadores</p>
-          <div class="h-48 w-full flex items-center justify-center">
-            <canvas id="loadDonutChart"></canvas>
+      <!-- GRÁFICO 2: COMPARATIVO DE TENSÕES ENTRE FASES (TRAFO 1 VS TRAFO 2) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-wave-square text-blue-400"></i>
+              Comparativo de Tensão Média Entre Fases (T1 vs T2)
+            </h3>
+            <p class="text-xs text-slate-400">Amostragem de 1 min para detectar quedas simultâneas ou isoladas</p>
+          </div>
+          <div class="flex items-center gap-3 text-[11px]">
+            <span class="flex items-center gap-1 text-blue-400"><span class="w-2.5 h-0.5 bg-blue-400"></span> Trafo 1</span>
+            <span class="flex items-center gap-1 text-amber-400"><span class="w-2.5 h-0.5 bg-amber-400"></span> Trafo 2</span>
           </div>
         </div>
-
-        <div class="border-t border-slate-800 pt-3 space-y-2 text-xs">
-          <div class="flex justify-between text-slate-300">
-            <span>Consumo Acumulado Hoje:</span>
-            <strong class="text-white">4.820 kWh</strong>
+        <div class="h-60 w-full">
+          <canvas id="voltageChart"></canvas>
+        </div>
+        <!-- REGISTRO DE MÍNIMA E MÁXIMA DE TENSÃO COM DATA E HORA -->
+        <div class="mt-3 pt-2.5 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
+          <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">Mínima Registrada:</span>
+            <span class="text-red-400 font-semibold">208.4 V <span class="text-slate-500 font-normal">(T2 • 14:12)</span></span>
           </div>
-          <div class="flex justify-between text-slate-300">
-            <span>Pico Máximo de Demanda:</span>
-            <strong class="text-white">485 kW (14:30)</strong>
-          </div>
-          <div class="flex justify-between text-slate-300">
-            <span>Economia Estimada s/ Multas:</span>
-            <strong class="text-emerald-400">R$ 3.420 / mês</strong>
+          <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400">Máxima Registrada:</span>
+            <span class="text-emerald-400 font-semibold">227.8 V <span class="text-slate-500 font-normal">(T1 • 03:45)</span></span>
           </div>
         </div>
       </div>
@@ -355,69 +367,126 @@
 
   </main>
 
-  <!-- JAVASCRIPT LOGIC & SIMULATOR -->
+  <!-- JAVASCRIPT -->
   <script>
-    let isNightMode = false;
     let fpChartInstance = null;
-    let loadDonutInstance = null;
+    let voltageChartInstance = null;
 
-    // Normal Day Scenario (Carga Intermitente Serraria)
-    const dayData = {
-      t1: { v: 221.4, i: 585.1, p: 224.2, q: 81.0, s: 238.4, fp: 0.940, type: 'IND' },
-      t2: { v: 220.8, i: 507.3, p: 194.3, q: 68.2, s: 205.9, fp: 0.944, type: 'IND' },
-      demand: 432
+    const scenarios = {
+      day: {
+        offline: false,
+        night: false,
+        t1: { vrs: 221.4, vst: 219.8, vtr: 222.1, ir: 580, is: 592, it: 583, p: 224.2, q: 81.0, fp: 0.940, sync: '17:15:02' },
+        t2: { vrs: 218.2, vst: 220.5, vtr: 221.0, ir: 501, is: 512, it: 509, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
+        demand: 432
+      },
+      night: {
+        offline: false,
+        night: true,
+        t1: { vrs: 225.4, vst: 226.1, vtr: 225.8, ir: 108, is: 112, it: 110, p: 14.5, q: -32.0, fp: 0.413, sync: '03:15:02' },
+        t2: { vrs: 224.9, vst: 225.3, vtr: 225.0, ir: 94, is: 97, it: 96, p: 12.0, q: -26.5, fp: 0.412, sync: '03:15:04' },
+        demand: 28
+      },
+      offline: {
+        offline: true,
+        night: false,
+        t1: { vrs: 221.4, vst: 219.8, vtr: 222.1, ir: 580, is: 592, it: 583, p: 224.2, q: 81.0, fp: 0.940, sync: '16:15:02 (Atrasado)' },
+        t2: { vrs: 218.2, vst: 220.5, vtr: 221.0, ir: 501, is: 512, it: 509, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
+        demand: 432
+      }
     };
 
-    // Night Mode Scenario (Madrugada - Máquinas desligadas, perigo de sobrecompensação capacitiva)
-    const nightData = {
-      t1: { v: 225.2, i: 110.4, p: 14.5, q: -32.0, s: 35.1, fp: 0.413, type: 'CAP' },
-      t2: { v: 224.9, i: 95.8, p: 12.0, q: -26.5, s: 29.1, fp: 0.412, type: 'CAP' },
-      demand: 28
-    };
+    function setMode(mode) {
+      ['btnDay', 'btnNight', 'btnOffline'].forEach(id => {
+        document.getElementById(id).className = "text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition";
+      });
+      const activeBtn = mode === 'day' ? 'btnDay' : (mode === 'night' ? 'btnNight' : 'btnOffline');
+      document.getElementById(activeBtn).className = "text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition";
+      if (mode === 'offline') document.getElementById(activeBtn).className = "text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white font-medium transition";
 
-    function updateUI(data, isNight) {
-      // Vetorial Calculation
+      const d = scenarios[mode];
+      updateUI(d);
+    }
+
+    function updateUI(data) {
       const pTot = data.t1.p + data.t2.p;
       const qTot = data.t1.q + data.t2.q;
       const sTot = Math.sqrt(pTot * pTot + qTot * qTot);
       const fpTot = pTot / sTot;
       const isInductive = qTot >= 0;
 
-      // Update Cards
+      // Cards
       document.getElementById('fpValue').innerText = fpTot.toFixed(3);
       document.getElementById('pTotalValue').innerText = pTot.toFixed(1);
       document.getElementById('qTotalValue').innerText = Math.abs(qTot).toFixed(1);
       document.getElementById('sTotalValue').innerText = sTot.toFixed(1);
-
-      document.getElementById('pT1Val').innerText = data.t1.p.toFixed(1) + ' kW';
-      document.getElementById('pT2Val').innerText = data.t2.p.toFixed(1) + ' kW';
-      document.getElementById('qT1Val').innerText = Math.abs(data.t1.q).toFixed(1) + ' kvar';
-      document.getElementById('qT2Val').innerText = Math.abs(data.t2.q).toFixed(1) + ' kvar';
-
+      document.getElementById('pT1Val').innerText = data.t1.p.toFixed(1);
+      document.getElementById('pT2Val').innerText = data.t2.p.toFixed(1);
+      document.getElementById('qT1Val').innerText = Math.abs(data.t1.q).toFixed(1);
+      document.getElementById('qT2Val').innerText = Math.abs(data.t2.q).toFixed(1);
       document.getElementById('loadPct').innerText = ((sTot / 1000) * 100).toFixed(1) + '%';
-      document.getElementById('demandVal').innerText = data.demand + ' kW';
+      document.getElementById('demandVal').innerText = data.demand;
 
-      // Table elements
-      document.getElementById('t1V').innerText = data.t1.v.toFixed(1);
-      document.getElementById('t1I').innerText = data.t1.i.toFixed(1);
+      // Table T1 & T2
+      const t1Vavg = (data.t1.vrs + data.t1.vst + data.t1.vtr) / 3;
+      const t2Vavg = (data.t2.vrs + data.t2.vst + data.t2.vtr) / 3;
+      const t1S = Math.sqrt(data.t1.p**2 + data.t1.q**2);
+      const t2S = Math.sqrt(data.t2.p**2 + data.t2.q**2);
+
+      document.getElementById('t1Vrs').innerText = data.t1.vrs.toFixed(1);
+      document.getElementById('t1Vst').innerText = data.t1.vst.toFixed(1);
+      document.getElementById('t1Vtr').innerText = data.t1.vtr.toFixed(1);
+      document.getElementById('t1Vavg').innerText = t1Vavg.toFixed(1) + ' V';
+      document.getElementById('t1Ir').innerText = data.t1.ir;
+      document.getElementById('t1Is').innerText = data.t1.is;
+      document.getElementById('t1It').innerText = data.t1.it;
       document.getElementById('t1P').innerText = data.t1.p.toFixed(1);
-      document.getElementById('t1Q').innerText = (data.t1.q > 0 ? '' : '-') + Math.abs(data.t1.q).toFixed(1);
-      document.getElementById('t1S').innerText = data.t1.s.toFixed(1);
+      document.getElementById('t1Q').innerText = data.t1.q.toFixed(1);
+      document.getElementById('t1S').innerText = t1S.toFixed(1);
       document.getElementById('t1Fp').innerText = data.t1.fp.toFixed(3);
+      document.getElementById('t1LastSync').innerText = data.t1.sync;
 
-      document.getElementById('t2V').innerText = data.t2.v.toFixed(1);
-      document.getElementById('t2I').innerText = data.t2.i.toFixed(1);
+      document.getElementById('t2Vrs').innerText = data.t2.vrs.toFixed(1);
+      document.getElementById('t2Vst').innerText = data.t2.vst.toFixed(1);
+      document.getElementById('t2Vtr').innerText = data.t2.vtr.toFixed(1);
+      document.getElementById('t2Vavg').innerText = t2Vavg.toFixed(1) + ' V';
+      document.getElementById('t2Ir').innerText = data.t2.ir;
+      document.getElementById('t2Is').innerText = data.t2.is;
+      document.getElementById('t2It').innerText = data.t2.it;
       document.getElementById('t2P').innerText = data.t2.p.toFixed(1);
-      document.getElementById('t2Q').innerText = (data.t2.q > 0 ? '' : '-') + Math.abs(data.t2.q).toFixed(1);
-      document.getElementById('t2S').innerText = data.t2.s.toFixed(1);
+      document.getElementById('t2Q').innerText = data.t2.q.toFixed(1);
+      document.getElementById('t2S').innerText = t2S.toFixed(1);
       document.getElementById('t2Fp').innerText = data.t2.fp.toFixed(3);
+      document.getElementById('t2LastSync').innerText = data.t2.sync;
 
-      document.getElementById('totI').innerText = (data.t1.i + data.t2.i).toFixed(1);
+      const sumI = data.t1.ir + data.t1.is + data.t1.it + data.t2.ir + data.t2.is + data.t2.it;
+      document.getElementById('totI').innerText = sumI.toLocaleString('pt-BR');
       document.getElementById('tableTotP').innerText = pTot.toFixed(1);
-      document.getElementById('tableTotQ').innerText = (qTot > 0 ? '' : '-') + Math.abs(qTot).toFixed(1);
+      document.getElementById('tableTotQ').innerText = qTot.toFixed(1);
       document.getElementById('tableTotS').innerText = sTot.toFixed(1);
       document.getElementById('tableTotFp').innerText = fpTot.toFixed(3);
 
+      // Status Comunicação (Online Verde vs Offline Vermelho)
+      const commDot = document.getElementById('commDot');
+      const commText = document.getElementById('commText');
+      const t1SyncDot = document.getElementById('t1SyncDot');
+      const t1StatusDot = document.getElementById('t1StatusDot');
+
+      if (data.offline) {
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+        commText.className = "font-medium text-red-400 leading-tight";
+        commText.innerText = "Falha Trafo 1 (Offline)";
+        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-red-500 mr-1";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+      } else {
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+        commText.className = "font-medium text-emerald-400 leading-tight";
+        commText.innerText = "Whitebox Online";
+        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+      }
+
+      // Banner e FP Status
       const fpBadge = document.getElementById('fpBadge');
       const fpBar = document.getElementById('fpBar');
       const fpStatus = document.getElementById('fpStatus');
@@ -426,115 +495,94 @@
       const alertDesc = document.getElementById('alertDesc');
       const alertIcon = document.getElementById('alertIcon');
 
-      if (fpTot >= 0.920 && !isNight) {
-        fpBadge.className = "text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+      if (data.offline) {
+        alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4";
+        alertTitle.className = "text-sm font-semibold text-red-300";
+        alertTitle.innerText = "ALERTA DE COMUNICAÇÃO: Analisador Trafo 01 sem resposta há > 60 min";
+        alertDesc.innerText = "O cálculo global está utilizando o último valor válido em cache. Verifique a conexão de internet do D1000A do Trafo 1.";
+        alertIcon.className = "w-9 h-9 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0";
+        alertIcon.innerHTML = '<i class="fa-solid fa-wifi text-lg"></i>';
+      } else if (fpTot >= 0.920 && !data.night) {
+        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
         fpBadge.innerText = isInductive ? "INDUTIVO" : "CAPACITIVO";
         fpBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-500";
         fpBar.style.width = (fpTot * 100) + "%";
         fpStatus.className = "text-emerald-400 font-medium";
-        fpStatus.innerText = "Margem Segura (+" + (fpTot - 0.92).toFixed(3) + ")";
+        fpStatus.innerText = "+" + (fpTot - 0.92).toFixed(3);
 
-        alertBanner.className = "p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4 transition-all";
+        alertBanner.className = "p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4";
         alertTitle.className = "text-sm font-semibold text-emerald-300";
         alertTitle.innerText = "Instalação em Conformidade Regulamentar (ANEEL)";
-        alertDesc.innerText = "Fator de potência global resultante acima de 0,92. Sem cobrança de excedente reativo.";
+        alertDesc.innerText = "Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.";
         alertIcon.className = "w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0";
         alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i>';
       } else {
-        // Alerta de Penalidade (Exemplo da Madrugada sem correção)
-        fpBadge.className = "text-xs font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse";
-        fpBadge.innerText = isInductive ? "INDUTIVO BAIXO" : "EXCEDENTE CAPACITIVO";
+        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse";
+        fpBadge.innerText = "CAPACITIVO (MULTA)";
         fpBar.className = "bg-red-500 h-full rounded-full transition-all duration-500";
         fpBar.style.width = (fpTot * 100) + "%";
         fpStatus.className = "text-red-400 font-medium";
-        fpStatus.innerText = "Abaixo do limite mínimo (-" + (0.92 - fpTot).toFixed(3) + ")";
+        fpStatus.innerText = "-" + (0.92 - fpTot).toFixed(3);
 
-        alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4 transition-all";
+        alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4";
         alertTitle.className = "text-sm font-semibold text-red-300";
-        alertTitle.innerText = "ALERTA: Fator de Potência Global Fora da Meta Regulamentar";
-        alertDesc.innerText = "Identificada sobrecompensação capacitiva na madrugada. Risco iminente de multa por excedente reativo se os bancos não forem desligados.";
+        alertTitle.innerText = "ALERTA: Excedente Reativo Capacitivo na Madrugada";
+        alertDesc.innerText = "Fator de potência global em " + fpTot.toFixed(3) + " capacitivo. Risco de multa pela concessionária se os bancos permanecerem ligados.";
         alertIcon.className = "w-9 h-9 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0";
         alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg"></i>';
       }
-
-      // Update Donut
-      if (loadDonutInstance) {
-        loadDonutInstance.data.datasets[0].data = [data.t1.p, data.t2.p];
-        loadDonutInstance.update();
-      }
-    }
-
-    function toggleScenario() {
-      isNightMode = !isNightMode;
-      const btn = document.getElementById('scenarioBtn');
-      if (isNightMode) {
-        btn.innerHTML = '<i class="fa-solid fa-sun"></i><span>Simular Dia</span>';
-        btn.className = "text-xs px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition flex items-center gap-1.5 shadow";
-        updateUI(nightData, true);
-      } else {
-        btn.innerHTML = '<i class="fa-solid fa-moon"></i><span>Simular Madrugada</span>';
-        btn.className = "text-xs px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition flex items-center gap-1.5 shadow";
-        updateUI(dayData, false);
-      }
-    }
-
-    function refreshData() {
-      const icon = document.getElementById('syncIcon');
-      icon.classList.add('fa-spin');
-      setTimeout(() => {
-        icon.classList.remove('fa-spin');
-        const now = new Date();
-        document.getElementById('lastUpdateText').innerText = 'Atualizado ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      }, 600);
     }
 
     function downloadCSV() {
       const csvContent = "data:text/csv;charset=utf-8," 
-        + "DataHora,Potencia_Ativa_Total_kW,Potencia_Reativa_Total_kvar,Potencia_Aparente_Total_kVA,Fator_Potencia_Global\n"
-        + "2026-11-04 00:00,28.4,-52.1,59.3,0.478\n"
-        + "2026-11-04 03:00,26.1,-58.5,64.0,0.407\n"
-        + "2026-11-04 06:00,185.0,65.2,196.1,0.943\n"
-        + "2026-11-04 10:00,420.5,145.0,444.8,0.945\n"
-        + "2026-11-04 14:00,448.2,152.3,473.4,0.946\n"
-        + "2026-11-04 18:00,290.1,98.4,306.3,0.947\n";
-      const encodedUri = encodeURI(csvContent);
+        + "DataHora,T1_Vmedia_LL,T2_Vmedia_LL,P_Total_kW,Q_Total_kvar,S_Total_kVA,FP_Global\n"
+        + "2026-11-12 03:00,225.7,225.1,26.5,-58.5,64.2,0.413\n"
+        + "2026-11-12 10:00,221.1,219.9,418.5,149.2,444.3,0.942\n"
+        + "2026-11-12 14:12,216.0,208.4,448.2,152.3,473.4,0.946\n";
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "telemetria_global_vj_rauber.csv");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", "historico_vj_rauber_tensao_fp.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    // Chart Initialization
-    window.addEventListener('DOMContentLoaded', () => {
-      // 1. FP History Line Chart
-      const ctxFp = document.getElementById('fpChart').getContext('2d');
-      const hours = ['00h', '01h', '02h', '03h', '04h', '05h', '06h', '07h', '08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'];
-      
-      // Histórico simulado mostrando a madrugada com risco capacitivo e o dia corrigido
-      const fpHistory = [0.84, 0.81, 0.80, 0.79, 0.82, 0.85, 0.93, 0.94, 0.95, 0.94, 0.94, 0.95, 0.93, 0.94, 0.95, 0.94, 0.95, 0.94, 0.93, 0.93, 0.94, 0.93, 0.91, 0.88];
-      const limitLine = Array(24).fill(0.92);
+    function changeChartPeriod() {
+      const val = document.getElementById('periodSelectFp').value;
+      if (val === '24h') {
+        fpChartInstance.data.labels = ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'];
+        fpChartInstance.data.datasets[0].data = [0.84, 0.80, 0.82, 0.93, 0.95, 0.94, 0.93, 0.95, 0.94, 0.93, 0.94, 0.91];
+      } else if (val === '7d') {
+        fpChartInstance.data.labels = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+        fpChartInstance.data.datasets[0].data = [0.93, 0.94, 0.92, 0.95, 0.94, 0.89, 0.85];
+      } else {
+        fpChartInstance.data.labels = ['Sem 1','Sem 2','Sem 3','Sem 4'];
+        fpChartInstance.data.datasets[0].data = [0.92, 0.93, 0.94, 0.94];
+      }
+      fpChartInstance.data.datasets[1].data = Array(fpChartInstance.data.labels.length).fill(0.92);
+      fpChartInstance.update();
+    }
 
+    window.addEventListener('DOMContentLoaded', () => {
+      // Chart 1: FP Global
+      const ctxFp = document.getElementById('fpChart').getContext('2d');
       fpChartInstance = new Chart(ctxFp, {
         type: 'line',
         data: {
-          labels: hours,
+          labels: ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'],
           datasets: [
             {
-              label: 'Fator de Potência Global',
-              data: fpHistory,
+              label: 'FP Global',
+              data: [0.84, 0.80, 0.82, 0.93, 0.95, 0.94, 0.93, 0.95, 0.94, 0.93, 0.94, 0.91],
               borderColor: '#10b981',
               backgroundColor: 'rgba(16, 185, 129, 0.08)',
               borderWidth: 2.5,
               fill: true,
-              tension: 0.35,
-              pointRadius: 3,
-              pointHoverRadius: 6
+              tension: 0.35
             },
             {
-              label: 'Meta Regulamentar (0.92)',
-              data: limitLine,
+              label: 'Limite ANEEL (0.92)',
+              data: Array(12).fill(0.92),
               borderColor: '#ef4444',
               borderWidth: 1.5,
               borderDash: [5, 5],
@@ -546,60 +594,52 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return context.dataset.label + ': ' + context.parsed.y.toFixed(3);
-                }
-              }
-            }
-          },
+          plugins: { legend: { display: false } },
           scales: {
-            y: {
-              min: 0.70,
-              max: 1.00,
-              grid: { color: 'rgba(51, 65, 85, 0.4)' },
-              ticks: { color: '#94a3b8', font: { size: 10 } }
-            },
-            x: {
-              grid: { color: 'rgba(51, 65, 85, 0.2)' },
-              ticks: { color: '#94a3b8', font: { size: 10 } }
-            }
+            y: { min: 0.70, max: 1.00, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
 
-      // 2. Load Donut Chart
-      const ctxDonut = document.getElementById('loadDonutChart').getContext('2d');
-      loadDonutInstance = new Chart(ctxDonut, {
-        type: 'doughnut',
+      // Chart 2: Comparativo de Tensões T1 vs T2
+      const ctxV = document.getElementById('voltageChart').getContext('2d');
+      voltageChartInstance = new Chart(ctxV, {
+        type: 'line',
         data: {
-          labels: ['Trafo 01 (kW)', 'Trafo 02 (kW)'],
-          datasets: [{
-            data: [224.2, 194.3],
-            backgroundColor: ['#3b82f6', '#8b5cf6'],
-            borderWidth: 0
-          }]
+          labels: ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'],
+          datasets: [
+            {
+              label: 'Trafo 1 (Média LL)',
+              data: [225.5, 226.8, 227.8, 223.1, 221.4, 221.1, 220.5, 219.8, 216.0, 220.4, 221.9, 223.0, 224.2],
+              borderColor: '#3b82f6',
+              borderWidth: 2,
+              tension: 0.3,
+              pointRadius: 2.5
+            },
+            {
+              label: 'Trafo 2 (Média LL)',
+              data: [225.0, 226.1, 227.0, 222.5, 220.2, 219.9, 218.7, 217.5, 208.4, 218.9, 220.5, 222.1, 223.8],
+              borderColor: '#f59e0b',
+              borderWidth: 2,
+              tension: 0.3,
+              pointRadius: 2.5
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '72%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: '#cbd5e1', font: { size: 11 }, boxWidth: 12 }
-            }
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 200, max: 235, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
 
-      // Init Default
-      updateUI(dayData, false);
+      setMode('day');
     });
   </script>
-
 </body>
 </html>
