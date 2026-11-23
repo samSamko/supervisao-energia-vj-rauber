@@ -1382,7 +1382,7 @@
       }
     ];
 
-    const DEFAULT_STATE = {
+    const DEFAULT_REAL_STATE = {
       quota: { todayUsed: 3, monthUsed: 3, dailyLimit: 10, monthlyLimit: 100, autoReserveLimit: 80 },
       settings: { schedule_days: 'weekdays', schedule_times: ['17:00'], trafo1_enabled: true, trafo2_enabled: false },
       latest: {
@@ -1393,19 +1393,32 @@
       logs: INITIAL_REAL_LOGS
     };
 
-    let appState = loadSavedState();
+    const DEFAULT_SIM_STATE = {
+      quota: { todayUsed: 0, monthUsed: 0, dailyLimit: 10, monthlyLimit: 100, autoReserveLimit: 80 },
+      settings: { schedule_days: 'weekdays', schedule_times: ['17:00'], trafo1_enabled: true, trafo2_enabled: false },
+      latest: { 1: null, 2: null },
+      readings: [],
+      logs: []
+    };
 
-    function loadSavedState() {
+    let realState = JSON.parse(JSON.stringify(DEFAULT_REAL_STATE));
+    let simState = loadSavedSimState();
+
+    function loadSavedSimState() {
       try {
-        const raw = localStorage.getItem('vjrauber_free_preview_v2');
+        localStorage.removeItem('vjrauber_free_preview_v2');
+        const raw = localStorage.getItem('vjrauber_sim_mock_v3');
         if (raw) return JSON.parse(raw);
       } catch {}
-      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      return JSON.parse(JSON.stringify(DEFAULT_SIM_STATE));
     }
 
-    function persistSavedState() {
-      if (connectedToServer) return;
-      try { localStorage.setItem('vjrauber_free_preview_v2', JSON.stringify(appState)); } catch {}
+    function persistSimState() {
+      try { localStorage.setItem('vjrauber_sim_mock_v3', JSON.stringify(simState)); } catch {}
+    }
+
+    function getActiveState() {
+      return dataSource === 'real' ? realState : simState;
     }
 
     // === GESTÃO DE DIALOGS E GAVETA MOBILE ===
@@ -1583,9 +1596,9 @@
       }
     };
 
-    function buildRealDataView() {
-      const l1 = appState.latest[1];
-      const l2 = appState.latest[2];
+    function buildDataViewFromState(stateObj, isMock = false) {
+      const l1 = stateObj.latest[1];
+      const l2 = stateObj.latest[2];
       const t1 = l1 ? {
         vrs: l1.v_ab || 0, vst: l1.v_bc || 0, vtr: l1.v_ca || 0,
         ir: Math.round(l1.i_a || 0), is: Math.round(l1.i_b || 0), it: Math.round(l1.i_c || 0),
@@ -1603,10 +1616,10 @@
       return {
         offline: false, night: false,
         realBench: (t1.vrs + t2.vrs) < 10,
-        isMockFeed: Boolean(l1?.isMock || l2?.isMock),
+        isMockFeed: isMock,
         t1, t2,
         demand: Math.round(t1.p + t2.p),
-        demandMax: Math.max(Math.round(t1.p + t2.p), (l1?.isMock || l2?.isMock) ? 485 : 0),
+        demandMax: Math.max(Math.round(t1.p + t2.p), isMock ? 485 : 0),
         kwhToday: ((l1?.kwh_total || 0) + (l2?.kwh_total || 0)).toFixed(1)
       };
     }
@@ -1620,22 +1633,22 @@
       const tag = document.getElementById('envModeTag');
       const tagText = document.getElementById('envModeTagText');
       if (src === 'real') {
-        const view = buildRealDataView();
-        if (view.isMockFeed) {
-          tag.className = 'test-mode-badge text-xs sm:text-sm font-extrabold tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1';
-          tagText.innerText = 'SIMULADOR • TESTE';
-        } else {
-          tag.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1';
-          tag.style.cssText = 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);';
-          tagText.innerText = 'DADOS REAIS';
-        }
-        updateUI(view);
+        tag.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1';
+        tag.style.cssText = 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);';
+        tagText.innerText = 'DADOS REAIS';
+        updateUI(buildDataViewFromState(realState, false));
       } else {
         tag.style.cssText = '';
         tag.className = 'test-mode-badge text-xs sm:text-sm font-extrabold tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1';
-        tagText.innerText = 'MODO TESTE • 380V';
-        setSimMode(currentSimMode);
+        if (simState.latest[1] || simState.latest[2]) {
+          tagText.innerText = 'SIMULADOR • TESTE (ALEATÓRIO)';
+          updateUI(buildDataViewFromState(simState, true));
+        } else {
+          tagText.innerText = 'MODO TESTE • 380V';
+          setSimMode(currentSimMode);
+        }
       }
+      renderQuotaAndLogs();
       syncChartsForSource();
     }
 
@@ -1833,24 +1846,24 @@
     }
 
     function resetMockQuota() {
-      if (connectedToServer) return;
-      appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
-      appState.quota.todayUsed = 0;
-      appState.quota.monthUsed = 0;
-      appState.logs = [];
-      appState.readings = [];
-      persistSavedState();
+      if (connectedToServer || dataSource === 'real') return;
+      simState = JSON.parse(JSON.stringify(DEFAULT_SIM_STATE));
+      persistSimState();
       renderQuotaAndLogs();
-      setDataSource('sim');
+      document.getElementById('envModeTagText').innerText = 'MODO TESTE • 380V';
+      setSimMode(currentSimMode);
+      syncChartsForSource();
     }
 
     // === CONTROLE DE COTA, AGENDAMENTO E HISTÓRICO ===
     function renderQuotaAndLogs() {
-      const q = appState.quota;
-      document.getElementById('mockModeBanner').classList.toggle('hidden', connectedToServer);
+      const state = getActiveState();
+      const q = state.quota;
+      // Banner/reset do simulador aparece SOMENTE no modo Simulação (nunca em Dados Reais)
+      document.getElementById('mockModeBanner').classList.toggle('hidden', connectedToServer || dataSource === 'real');
       document.getElementById('headerQuotaPill').innerText = `${q.todayUsed}/${q.dailyLimit}`;
       document.getElementById('drawerQuotaSummary').innerText = `${q.todayUsed}/${q.dailyLimit} hoje • ${q.monthUsed}/${q.monthlyLimit} mês`;
-      document.getElementById('drawerLogCount').innerText = appState.logs.length;
+      document.getElementById('drawerLogCount').innerText = state.logs.length;
 
       document.getElementById('quotaDayText').innerText = `${q.todayUsed} / ${q.dailyLimit}`;
       document.getElementById('quotaMonthText').innerText = `${q.monthUsed} / ${q.monthlyLimit}`;
@@ -1860,13 +1873,13 @@
       document.getElementById('quotaMonthBar').style.width = `${Math.min(100, (q.monthUsed / q.monthlyLimit) * 100)}%`;
       document.getElementById('dailyRecWarning').classList.toggle('hidden', q.todayUsed <= 3);
 
-      document.getElementById('schedDaysSelect').value = appState.settings.schedule_days || 'weekdays';
-      document.getElementById('schedTrafosSelect').value = appState.settings.trafo2_enabled ? '2' : '1';
+      document.getElementById('schedDaysSelect').value = state.settings.schedule_days || 'weekdays';
+      document.getElementById('schedTrafosSelect').value = state.settings.trafo2_enabled ? '2' : '1';
       renderScheduleTimes();
       recalcScheduleProjection();
 
       const list = document.getElementById('auditLogList');
-      if (!appState.logs || appState.logs.length === 0) {
+      if (!state.logs || state.logs.length === 0) {
         list.innerHTML = `
           <div class="surface-card rounded-lg p-4 text-center text-xs text-muted-token space-y-1">
             <div class="font-semibold text-main">Nenhuma consulta simulada registrada ainda (0/10).</div>
@@ -1875,7 +1888,7 @@
         `;
         return;
       }
-      list.innerHTML = appState.logs.map((log, idx) => {
+      list.innerHTML = state.logs.map((log, idx) => {
         const isOk = log.http_status === 200;
         const isEmpty = log.http_status === 204;
         const statusTxt = isOk
@@ -1918,7 +1931,8 @@
     }
 
     function renderScheduleTimes() {
-      const times = appState.settings.schedule_times || ['17:00'];
+      const state = getActiveState();
+      const times = state.settings.schedule_times || ['17:00'];
       const container = document.getElementById('scheduleTimesList');
       if (times.length === 0) {
         container.innerHTML = `<span class="text-[11px] text-muted-token italic">Nenhum horário ativo (somente manual).</span>`;
@@ -1937,27 +1951,29 @@
     function addScheduleTime() {
       const val = document.getElementById('newScheduleTime').value;
       if (!val) return;
-      const times = appState.settings.schedule_times || [];
+      const state = getActiveState();
+      const times = state.settings.schedule_times || [];
       if (!times.includes(val)) { times.push(val); times.sort(); }
-      appState.settings.schedule_times = times;
+      state.settings.schedule_times = times;
       renderScheduleTimes();
       recalcScheduleProjection();
     }
 
     function removeScheduleTime(idx) {
-      appState.settings.schedule_times.splice(idx, 1);
+      getActiveState().settings.schedule_times.splice(idx, 1);
       renderScheduleTimes();
       recalcScheduleProjection();
     }
 
     function recalcScheduleProjection() {
+      const state = getActiveState();
       const daysVal = document.getElementById('schedDaysSelect').value;
       const trafosCount = Number(document.getElementById('schedTrafosSelect').value || 1);
-      const timesCount = (appState.settings.schedule_times || []).length;
+      const timesCount = (state.settings.schedule_times || []).length;
       const daysPerMonth = daysVal === 'weekdays' ? 22 : (daysVal === 'mon_sat' ? 26 : (daysVal === 'everyday' ? 30 : 0));
 
       const projected = daysPerMonth * timesCount * trafosCount;
-      const limit = appState.quota.monthlyLimit || 100;
+      const limit = state.quota.monthlyLimit || 100;
       const pct = Math.min(100, Math.round((projected / limit) * 100));
 
       document.getElementById('schedProjectedText').innerText = `${projected} / mês (${pct}%)`;
@@ -1974,18 +1990,19 @@
     }
 
     async function saveScheduleConfig() {
-      appState.settings.schedule_days = document.getElementById('schedDaysSelect').value;
-      appState.settings.trafo2_enabled = document.getElementById('schedTrafosSelect').value === '2';
+      const state = getActiveState();
+      state.settings.schedule_days = document.getElementById('schedDaysSelect').value;
+      state.settings.trafo2_enabled = document.getElementById('schedTrafosSelect').value === '2';
 
-      if (connectedToServer) {
+      if (connectedToServer && dataSource === 'real') {
         const res = await fetch('/api/schedule', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(appState.settings)
+          body: JSON.stringify(state.settings)
         });
         document.getElementById('schedSaveStatus').innerText = res.ok ? 'Agenda salva!' : 'Erro ao salvar';
       } else {
-        persistSavedState();
+        if (dataSource === 'sim') persistSimState();
         document.getElementById('schedSaveStatus').innerText = 'Agenda salva!';
       }
       setTimeout(() => { document.getElementById('schedSaveStatus').innerText = ''; }, 2500);
@@ -1999,26 +2016,31 @@
     function updateSyncCostPreview() {
       const target = document.querySelector('input[name="syncTarget"]:checked').value;
       const cost = target === 'both' ? 2 : 1;
-      const q = appState.quota;
+      const q = getActiveState().quota;
 
       document.getElementById('syncCostNum').innerText = cost;
       document.getElementById('syncPreviewDay').innerText = `${q.todayUsed} → ${q.todayUsed + cost} / ${q.dailyLimit}`;
       document.getElementById('syncPreviewMonth').innerText = `${q.monthUsed} → ${q.monthUsed + cost} / ${q.monthlyLimit}`;
 
+      const realReadOnly = (dataSource === 'real' && !connectedToServer);
       const overLimit = (q.todayUsed + cost > q.dailyLimit) || (q.monthUsed + cost > q.monthlyLimit);
-      const overRecommended = !overLimit && (q.todayUsed + cost > 3);
+      const overRecommended = !overLimit && !realReadOnly && (q.todayUsed + cost > 3);
       document.getElementById('syncDailyRecWarn').classList.toggle('hidden', !overRecommended);
       document.getElementById('syncOverLimitErr').classList.toggle('hidden', !overLimit);
 
+      const disabled = overLimit || realReadOnly;
       const btn = document.getElementById('btnConfirmSync');
-      btn.disabled = overLimit;
-      btn.style.opacity = overLimit ? '0.45' : '1';
-      btn.style.cursor = overLimit ? 'not-allowed' : 'pointer';
+      btn.disabled = disabled;
+      btn.style.opacity = disabled ? '0.45' : '1';
+      btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
 
       const noteEl = document.getElementById('syncPreviewModeNote');
-      if (!connectedToServer) {
+      if (realReadOnly) {
         noteEl.classList.remove('hidden');
-        noteEl.innerText = 'Simulador de API (Modo de Teste): gera medições realistas levemente aleatórias em 380 V respeitando exatamente os limites reais da conta (10/dia e 100/mês).';
+        noteEl.innerText = 'Dados Reais (Somente Leitura): consultas reais são disparadas apenas quando o painel estiver conectado ao servidor autenticado. Para testar o Simulador de API sem gastar cota real, alterne para Simulação 380V no Menu.';
+      } else if (dataSource === 'sim') {
+        noteEl.classList.remove('hidden');
+        noteEl.innerText = 'Simulador de API (Modo de Teste): gera medições realistas levemente aleatórias em 380 V respeitando exatamente os limites reais da conta (10/dia e 100/mês) sem alterar os Dados Reais.';
       } else {
         noteEl.classList.add('hidden');
       }
@@ -2063,7 +2085,7 @@
       const reason = document.getElementById('syncReasonInput').value.trim() || 'Consulta manual pelo painel';
       const trafos = target === 'both' ? [1, 2] : [Number(target)];
 
-      if (connectedToServer) {
+      if (connectedToServer && dataSource === 'real') {
         const btn = document.getElementById('btnConfirmSync');
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Consultando ISSO...';
@@ -2084,9 +2106,14 @@
         return;
       }
 
-      // Simulador realista de API respeitando exatamente limites reais (10/dia e 100/mes)
+      if (dataSource === 'real') {
+        updateSyncCostPreview();
+        return;
+      }
+
+      // Simulador realista de API no simState (limites reais 10/dia e 100/mes)
       const cost = trafos.length;
-      const q = appState.quota;
+      const q = simState.quota;
       if (q.todayUsed + cost > q.dailyLimit || q.monthUsed + cost > q.monthlyLimit) {
         updateSyncCostPreview();
         return;
@@ -2098,11 +2125,11 @@
 
       for (const tId of trafos) {
         const code = tId === 1 ? '308AD713C046' : '308A3849D67A';
-        const reading = generateMockTrafoReading(tId, appState.latest[tId], brtStr);
-        appState.latest[tId] = reading;
-        if (!Array.isArray(appState.readings)) appState.readings = [];
-        appState.readings.push({ trafo_id: tId, ...reading });
-        if (appState.readings.length > 200) appState.readings = appState.readings.slice(-200);
+        const reading = generateMockTrafoReading(tId, simState.latest[tId], brtStr);
+        simState.latest[tId] = reading;
+        if (!Array.isArray(simState.readings)) simState.readings = [];
+        simState.readings.push({ trafo_id: tId, ...reading });
+        if (simState.readings.length > 200) simState.readings = simState.readings.slice(-200);
         const vAvg = ((reading.v_ab + reading.v_bc + reading.v_ca) / 3).toFixed(1);
 
         const rawPayload = [{
@@ -2117,7 +2144,7 @@
           origem_simulador: 'Leitura realista aleatória de teste (380 V)'
         }];
 
-        appState.logs.unshift({
+        simState.logs.unshift({
           id: Date.now() + tId,
           created_at_brt: brtStr,
           trafo_id: tId,
@@ -2130,19 +2157,19 @@
           translated_summary: `Leitura simulada (${brtStr.slice(11, 16)}): Tensão média ${vAvg} V • Potência ${reading.p_kw.toFixed(1)} kW • FP ${reading.fp.toFixed(3)} Ind • Temp. ${reading.temp_c} °C (valores levemente aleatórios).`,
           raw_json: JSON.stringify(rawPayload)
         });
-        appState.quota.todayUsed += 1;
-        appState.quota.monthUsed += 1;
+        simState.quota.todayUsed += 1;
+        simState.quota.monthUsed += 1;
       }
 
-      persistSavedState();
+      persistSimState();
       renderQuotaAndLogs();
-      setDataSource('real');
+      setDataSource('sim');
       closeDialog('syncDialog');
       openQuotaDialog();
     }
 
     function openDetailsModal(idx) {
-      const log = appState.logs[idx];
+      const log = getActiveState().logs[idx];
       if (!log || !log.raw_json) return;
       document.getElementById('detailsDialogTitle').innerText = `Detalhes da Leitura — Trafo ${log.trafo_id} (${log.created_at_brt})`;
 
@@ -2201,11 +2228,11 @@
         return;
       }
       if (!res.ok) return;
-      appState = await res.json();
+      realState = await res.json();
       connectedToServer = true;
       renderQuotaAndLogs();
       if (dataSource === 'real') {
-        updateUI(buildRealDataView());
+        updateUI(buildDataViewFromState(realState, false));
         syncChartsForSource();
       }
     }
@@ -2236,9 +2263,28 @@
 
       if (dataSource === 'sim') {
         applySimFpPeriod();
+        const t1Series = [385.5, 387.8, 389.4, 383.1, 381.4, 381.1, 380.5, 379.8, 374.2, 380.4, 381.9, 383.0, 384.2];
+        const t2Series = [385.0, 387.1, 388.6, 382.5, 380.2, 379.9, 378.7, 377.5, 362.8, 378.9, 380.5, 382.1, 383.8];
+        if (simState.latest[1]) {
+          const l1 = simState.latest[1];
+          t1Series[t1Series.length - 1] = +((l1.v_ab + l1.v_bc + l1.v_ca) / 3).toFixed(1);
+        }
+        if (simState.latest[2]) {
+          const l2 = simState.latest[2];
+          t2Series[t2Series.length - 1] = +((l2.v_ab + l2.v_bc + l2.v_ca) / 3).toFixed(1);
+        }
+        if (simState.latest[1] || simState.latest[2]) {
+          const pS = (simState.latest[1]?.p_kw || 0) + (simState.latest[2]?.p_kw || 0);
+          const qS = (simState.latest[1]?.q_kvar_signed || 0) + (simState.latest[2]?.q_kvar_signed || 0);
+          const sS = Math.sqrt(pS * pS + qS * qS);
+          if (sS > 0.01 && document.getElementById('periodSelectFp').value === '24h') {
+            fpChartInstance.data.datasets[0].data[fpChartInstance.data.datasets[0].data.length - 1] = +(pS / sS).toFixed(3);
+            fpChartInstance.update();
+          }
+        }
         voltageChartInstance.data.labels = ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'];
-        voltageChartInstance.data.datasets[0].data = [385.5, 387.8, 389.4, 383.1, 381.4, 381.1, 380.5, 379.8, 374.2, 380.4, 381.9, 383.0, 384.2];
-        voltageChartInstance.data.datasets[1].data = [385.0, 387.1, 388.6, 382.5, 380.2, 379.9, 378.7, 377.5, 362.8, 378.9, 380.5, 382.1, 383.8];
+        voltageChartInstance.data.datasets[0].data = t1Series;
+        voltageChartInstance.data.datasets[1].data = t2Series;
         voltageChartInstance.options.scales.y.min = 355;
         voltageChartInstance.options.scales.y.max = 400;
         voltageChartInstance.update();
@@ -2248,11 +2294,11 @@
         return;
       }
 
-      // Modo Dados Reais / Simulador de API: usa apenas leituras coletadas
-      let pts = Array.isArray(appState.readings) && appState.readings.length > 0 ? [...appState.readings] : [];
+      // Modo Dados Reais: usa exclusivamente leituras reais de realState
+      let pts = Array.isArray(realState.readings) && realState.readings.length > 0 ? [...realState.readings] : [];
       if (pts.length === 0) {
-        if (appState.latest[1]) pts.push({ trafo_id: 1, ...appState.latest[1] });
-        if (appState.latest[2]) pts.push({ trafo_id: 2, ...appState.latest[2] });
+        if (realState.latest[1]) pts.push({ trafo_id: 1, ...realState.latest[1] });
+        if (realState.latest[2]) pts.push({ trafo_id: 2, ...realState.latest[2] });
       }
 
       const energized = pts.filter(r => ((Number(r.v_ab || 0) + Number(r.v_bc || 0) + Number(r.v_ca || 0)) / 3) > 10);
@@ -2326,9 +2372,9 @@
     function downloadCSV() {
       let rows = ["DataHora,Trafo,V_RS,V_ST,V_TR,P_kW,Q_kvar,S_kVA,FP"];
       if (dataSource === 'real') {
-        const pts = (Array.isArray(appState.readings) && appState.readings.length > 0)
-          ? appState.readings
-          : [appState.latest[1] ? { trafo_id: 1, ...appState.latest[1] } : null].filter(Boolean);
+        const pts = (Array.isArray(realState.readings) && realState.readings.length > 0)
+          ? realState.readings
+          : [realState.latest[1] ? { trafo_id: 1, ...realState.latest[1] } : null].filter(Boolean);
         for (const r of pts) {
           rows.push(`${r.ts_brt || ''},T${r.trafo_id || 1},${r.v_ab || 0},${r.v_bc || 0},${r.v_ca || 0},${r.p_kw || 0},${r.q_kvar_signed || 0},${r.s_kva || 0},${r.fp || 0}`);
         }
