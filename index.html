@@ -1,16 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-resolved-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23f59e0b' stroke-width='5' stroke-dasharray='8 4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='%231e293b' stroke='%2310b981' stroke-width='2.5'/%3E%3Cpath d='M35 16L22 34h10l-3 14 13-18H32l3-14z' fill='%2310b981'/%3E%3C/svg%3E">
   <script>
     try {
       const savedScheme = localStorage.getItem("color-scheme");
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      let resolved = prefersDark ? "dark" : "light";
       if (savedScheme === "light" || savedScheme === "dark") {
-        document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+        meta.content = savedScheme;
+        resolved = savedScheme;
       }
+      document.documentElement.dataset.resolvedTheme = resolved;
       const savedScale = localStorage.getItem("vjr_font_scale");
       if (savedScale === "100" || savedScale === "112" || savedScale === "125") {
         document.documentElement.style.fontSize = savedScale + "%";
@@ -25,10 +31,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Tema base Claro (Light) */
     :root {
-      color-scheme: light dark;
+      color-scheme: light;
       --bg-page: #f1f5f9;
-      --bg-header: rgba(255, 255, 255, 0.94);
+      --bg-header: rgba(255, 255, 255, 0.96);
       --bg-card: #ffffff;
       --bg-elevated: #f8fafc;
       --bg-hover: #e2e8f0;
@@ -39,90 +46,34 @@
       --border-strong: #94a3b8;
       --accent: #059669;
       --accent-soft: rgba(5, 150, 105, 0.12);
-      --accent-border: rgba(5, 150, 105, 0.35);
+      --accent-border: rgba(5, 150, 105, 0.38);
       --accent-text: #047857;
+      --color-p: #1d4ed8;
+      --color-q: #b45309;
+      --color-s: #6d28d9;
+      --color-min: #dc2626;
       --danger-bg: #fef2f2;
-      --danger-border: #fca5a5;
-      --danger-text: #b91c1c;
+      --danger-border: #ef4444;
+      --danger-text: #991b1b;
       --warn-bg: #fffbeb;
-      --warn-border: #fcd34d;
-      --warn-text: #b45309;
+      --warn-border: #f59e0b;
+      --warn-text: #92400e;
       --info-bg: #f0f9ff;
-      --info-border: #7dd3fc;
-      --info-text: #0369a1;
-      --grid-chart: rgba(100, 116, 139, 0.22);
+      --info-border: #0284c7;
+      --info-text: #075985;
+      --grid-chart: rgba(100, 116, 139, 0.24);
       --tick-chart: #475569;
       --focus-ring: #059669;
       accent-color: #059669;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-page: #020617;
-        --bg-header: rgba(15, 23, 42, 0.95);
-        --bg-card: #0f172a;
-        --bg-elevated: #020617;
-        --bg-hover: #1e293b;
-        --text-primary: #f8fafc;
-        --text-secondary: #cbd5e1;
-        --text-muted: #94a3b8;
-        --border-color: #1e293b;
-        --border-strong: #334155;
-        --accent: #10b981;
-        --accent-soft: rgba(16, 185, 129, 0.14);
-        --accent-border: rgba(16, 185, 129, 0.38);
-        --accent-text: #34d399;
-        --danger-bg: rgba(69, 10, 10, 0.45);
-        --danger-border: rgba(239, 68, 68, 0.45);
-        --danger-text: #fca5a5;
-        --warn-bg: rgba(69, 26, 3, 0.4);
-        --warn-border: rgba(245, 158, 11, 0.45);
-        --warn-text: #fcd34d;
-        --info-bg: rgba(8, 47, 73, 0.45);
-        --info-border: rgba(56, 189, 248, 0.4);
-        --info-text: #7dd3fc;
-        --grid-chart: rgba(148, 163, 184, 0.22);
-        --tick-chart: #94a3b8;
-        --focus-ring: #34d399;
-      }
-    }
-
-    :root:has(> head > meta[name="color-scheme"][content="light"]) {
-      color-scheme: light;
-      --bg-page: #f1f5f9;
-      --bg-header: rgba(255, 255, 255, 0.94);
-      --bg-card: #ffffff;
-      --bg-elevated: #f8fafc;
-      --bg-hover: #e2e8f0;
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #475569;
-      --border-color: #cbd5e1;
-      --border-strong: #94a3b8;
-      --accent: #059669;
-      --accent-soft: rgba(5, 150, 105, 0.12);
-      --accent-border: rgba(5, 150, 105, 0.35);
-      --accent-text: #047857;
-      --danger-bg: #fef2f2;
-      --danger-border: #fca5a5;
-      --danger-text: #b91c1c;
-      --warn-bg: #fffbeb;
-      --warn-border: #fcd34d;
-      --warn-text: #b45309;
-      --info-bg: #f0f9ff;
-      --info-border: #7dd3fc;
-      --info-text: #0369a1;
-      --grid-chart: rgba(100, 116, 139, 0.22);
-      --tick-chart: #475569;
-      --focus-ring: #059669;
-    }
-
-    :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+    /* Tema Escuro (Dark) */
+    :root[data-resolved-theme="dark"] {
       color-scheme: dark;
       --bg-page: #020617;
       --bg-header: rgba(15, 23, 42, 0.95);
       --bg-card: #0f172a;
-      --bg-elevated: #020617;
+      --bg-elevated: #0b1222;
       --bg-hover: #1e293b;
       --text-primary: #f8fafc;
       --text-secondary: #cbd5e1;
@@ -133,63 +84,92 @@
       --accent-soft: rgba(16, 185, 129, 0.14);
       --accent-border: rgba(16, 185, 129, 0.38);
       --accent-text: #34d399;
-      --danger-bg: rgba(69, 10, 10, 0.45);
-      --danger-border: rgba(239, 68, 68, 0.45);
+      --color-p: #60a5fa;
+      --color-q: #fbbf24;
+      --color-s: #c084fc;
+      --color-min: #f87171;
+      --danger-bg: rgba(69, 10, 10, 0.52);
+      --danger-border: rgba(239, 68, 68, 0.52);
       --danger-text: #fca5a5;
-      --warn-bg: rgba(69, 26, 3, 0.4);
-      --warn-border: rgba(245, 158, 11, 0.45);
+      --warn-bg: rgba(69, 26, 3, 0.48);
+      --warn-border: rgba(245, 158, 11, 0.52);
       --warn-text: #fcd34d;
-      --info-bg: rgba(8, 47, 73, 0.45);
-      --info-border: rgba(56, 189, 248, 0.4);
+      --info-bg: rgba(8, 47, 73, 0.52);
+      --info-border: rgba(56, 189, 248, 0.45);
       --info-text: #7dd3fc;
       --grid-chart: rgba(148, 163, 184, 0.22);
       --tick-chart: #94a3b8;
       --focus-ring: #34d399;
     }
 
-    @supports (color: light-dark(white, black)) {
-      :root {
-        --bg-page: light-dark(#f1f5f9, #020617);
-        --bg-header: light-dark(rgba(255, 255, 255, 0.94), rgba(15, 23, 42, 0.95));
-        --bg-card: light-dark(#ffffff, #0f172a);
-        --bg-elevated: light-dark(#f8fafc, #020617);
-        --bg-hover: light-dark(#e2e8f0, #1e293b);
-        --text-primary: light-dark(#0f172a, #f8fafc);
-        --text-secondary: light-dark(#334155, #cbd5e1);
-        --text-muted: light-dark(#475569, #94a3b8);
-        --border-color: light-dark(#cbd5e1, #1e293b);
-        --border-strong: light-dark(#94a3b8, #334155);
-        --accent-text: light-dark(#047857, #34d399);
-        --danger-bg: light-dark(#fef2f2, rgba(69, 10, 10, 0.55));
-        --danger-border: light-dark(#dc2626, rgba(239, 68, 68, 0.5));
-        --danger-text: light-dark(#991b1b, #fca5a5);
-        --warn-bg: light-dark(#fffbeb, rgba(69, 26, 3, 0.48));
-        --warn-border: light-dark(#d97706, rgba(245, 158, 11, 0.5));
-        --warn-text: light-dark(#92400e, #fcd34d);
-        --info-bg: light-dark(#f0f9ff, rgba(8, 47, 73, 0.5));
-        --info-border: light-dark(#0284c7, rgba(56, 189, 248, 0.45));
-        --info-text: light-dark(#075985, #7dd3fc);
-        --grid-chart: light-dark(rgba(100, 116, 139, 0.25), rgba(148, 163, 184, 0.22));
-        --tick-chart: light-dark(#475569, #94a3b8);
-      }
+    /* Alto Contraste — Claro */
+    :root[data-contrast="high"][data-resolved-theme="light"] {
+      color-scheme: light;
+      --bg-page: #ffffff;
+      --bg-header: #ffffff;
+      --bg-card: #ffffff;
+      --bg-elevated: #f1f5f9;
+      --bg-hover: #e2e8f0;
+      --text-primary: #000000;
+      --text-secondary: #000000;
+      --text-muted: #111827;
+      --border-color: #000000;
+      --border-strong: #000000;
+      --accent: #065f46;
+      --accent-soft: #d1fae5;
+      --accent-border: #000000;
+      --accent-text: #064e3b;
+      --color-p: #1e3a8a;
+      --color-q: #78350f;
+      --color-s: #4c1d95;
+      --color-min: #991b1b;
+      --danger-bg: #fee2e2;
+      --danger-border: #000000;
+      --danger-text: #7f1d1d;
+      --warn-bg: #fef3c7;
+      --warn-border: #000000;
+      --warn-text: #78350f;
+      --info-bg: #e0f2fe;
+      --info-border: #000000;
+      --info-text: #0c4a6e;
+      --grid-chart: rgba(0, 0, 0, 0.45);
+      --tick-chart: #000000;
+      --focus-ring: #000000;
     }
 
-    /* Modo Alto Contraste Manual */
-    :root[data-contrast="high"] {
-      --bg-page: light-dark(#ffffff, #000000);
-      --bg-header: light-dark(#ffffff, #000000);
-      --bg-card: light-dark(#ffffff, #000000);
-      --bg-elevated: light-dark(#f8fafc, #0a0a0a);
-      --bg-hover: light-dark(#e2e8f0, #1f2937);
-      --text-primary: light-dark(#000000, #ffffff);
-      --text-secondary: light-dark(#000000, #ffffff);
-      --text-muted: light-dark(#1e293b, #e2e8f0);
-      --border-color: light-dark(#000000, #ffffff);
-      --border-strong: light-dark(#000000, #ffffff);
-      --accent-text: light-dark(#065f46, #6ee7b7);
-      --grid-chart: light-dark(rgba(0, 0, 0, 0.45), rgba(255, 255, 255, 0.45));
-      --tick-chart: light-dark(#000000, #ffffff);
-      --focus-ring: light-dark(#000000, #facc15);
+    /* Alto Contraste — Escuro */
+    :root[data-contrast="high"][data-resolved-theme="dark"] {
+      color-scheme: dark;
+      --bg-page: #000000;
+      --bg-header: #000000;
+      --bg-card: #000000;
+      --bg-elevated: #0a0a0a;
+      --bg-hover: #1f2937;
+      --text-primary: #ffffff;
+      --text-secondary: #ffffff;
+      --text-muted: #f1f5f9;
+      --border-color: #ffffff;
+      --border-strong: #ffffff;
+      --accent: #047857;
+      --accent-soft: #064e3b;
+      --accent-border: #ffffff;
+      --accent-text: #6ee7b7;
+      --color-p: #93c5fd;
+      --color-q: #fde047;
+      --color-s: #e9d5ff;
+      --color-min: #fca5a5;
+      --danger-bg: #450a0a;
+      --danger-border: #ffffff;
+      --danger-text: #fecaca;
+      --warn-bg: #451a03;
+      --warn-border: #ffffff;
+      --warn-text: #fef08a;
+      --info-bg: #082f49;
+      --info-border: #ffffff;
+      --info-text: #bae6fd;
+      --grid-chart: rgba(255, 255, 255, 0.5);
+      --tick-chart: #ffffff;
+      --focus-ring: #facc15;
     }
 
     :root[data-contrast="high"] .surface-card,
@@ -219,6 +199,12 @@
       border-bottom: 1px solid var(--border-color);
     }
 
+    /* Barra decorativa discreta Serraria (madeira/energia) */
+    .sawmill-strip {
+      height: 3px;
+      background: linear-gradient(90deg, #d97706 0%, #f59e0b 35%, #10b981 75%, #059669 100%);
+    }
+
     .surface-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -233,10 +219,57 @@
     .text-sec { color: var(--text-secondary); }
     .text-muted-token { color: var(--text-muted); }
     .text-accent-token { color: var(--accent-text); }
-    .text-p-token { color: light-dark(#2563eb, #60a5fa); }
-    .text-q-token { color: light-dark(#d97706, #fbbf24); }
-    .text-s-token { color: light-dark(#7c3aed, #c084fc); }
+    .text-p-token { color: var(--color-p); }
+    .text-q-token { color: var(--color-q); }
+    .text-s-token { color: var(--color-s); }
+    .text-min-token { color: var(--color-min); }
     .border-token { border-color: var(--border-color); }
+
+    /* Destaque animado para aviso de Modo Teste / Simulação no Header */
+    .test-mode-badge {
+      background: linear-gradient(135deg, #d97706, #ea580c);
+      color: #ffffff;
+      border: 1px solid #fbbf24;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.55);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .test-mode-badge {
+        animation: test-glow 2.2s ease-in-out infinite;
+      }
+    }
+    @keyframes test-glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.45), 0 0 0 0 rgba(245, 158, 11, 0.35); }
+      50% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.85), 0 0 0 3px rgba(245, 158, 11, 0.15); }
+    }
+
+    /* Interruptor (Toggle Switch) acessível para Alto Contraste */
+    .switch-track {
+      width: 3rem;
+      height: 1.65rem;
+      border-radius: 9999px;
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      background-color: var(--border-strong);
+      border: 1px solid var(--border-strong);
+      transition: background-color 150ms ease;
+      flex-shrink: 0;
+    }
+    .switch-track[aria-checked="true"] {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+    .switch-thumb {
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 9999px;
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      transition: transform 150ms ease;
+    }
+    .switch-track[aria-checked="true"] .switch-thumb {
+      transform: translateX(1.3rem);
+    }
 
     :where(a:any-link, button, input, select, summary):focus-visible {
       outline: 3px solid var(--focus-ring);
@@ -343,24 +376,29 @@
   <a href="#main-content" class="skip-link visually-hidden">Pular para o conteúdo principal</a>
 
   <!-- HEADER COMPACTO MOBILE-FIRST (1 LINHA ÚNICA) -->
-  <header class="top-bar backdrop-blur sticky top-0 z-40 px-3 sm:px-6 lg:px-8 h-14 flex items-center">
+  <div class="sawmill-strip w-full sticky top-0 z-50" aria-hidden="true"></div>
+  <header class="top-bar backdrop-blur sticky top-[3px] z-40 px-3 sm:px-6 lg:px-8 min-h-[3.5rem] py-1.5 flex items-center">
     <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-2">
-      <!-- Identificação -->
+      <!-- Identificação com Logo Serra Circular + Raio -->
       <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-             style="background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-text);">
-          <i class="fa-solid fa-bolt text-base" aria-hidden="true"></i>
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+             style="background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid #f59e0b;">
+          <svg viewBox="0 0 40 40" class="w-7 h-7" role="img" aria-label="Logo Serraria VJ Rauber">
+            <circle cx="20" cy="20" r="15" fill="none" stroke="#f59e0b" stroke-width="3.2" stroke-dasharray="5 2.5"/>
+            <circle cx="20" cy="20" r="10" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+            <path d="M22 9L14 21h6l-2 10 8-12h-6l2-10z" fill="#34d399"/>
+          </svg>
         </div>
         <div class="min-w-0">
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-sm sm:text-base font-bold text-main truncate">Serraria VJ Rauber</h1>
-            <span id="envModeTag" class="hidden md:inline-block text-[10px] font-semibold px-2 py-0.5 rounded"
-                  style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
-              Simulação 380V
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <h1 class="text-sm sm:text-base font-extrabold text-main truncate">Serraria VJ Rauber</h1>
+            <span id="envModeTag" class="test-mode-badge text-xs sm:text-sm font-extrabold tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <i class="fa-solid fa-flask text-[11px]" aria-hidden="true"></i>
+              <span id="envModeTagText">MODO TESTE • 380V</span>
             </span>
           </div>
           <p class="hidden sm:block text-[11px] text-muted-token truncate">
-            Tela Global • T1 + T2 (380/220 V) • ISSO D1000A
+            Supervisão Global • Transformadores 01 & 02 (380/220 V) • Piratini/RS
           </p>
         </div>
       </div>
@@ -497,7 +535,7 @@
           <span class="text-xs font-semibold text-muted-token">kW (15m)</span>
         </div>
         <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
-          <span>Máx: <strong id="demandMaxVal" class="text-amber-500">485 kW</strong></span>
+          <span>Máx: <strong id="demandMaxVal" class="text-q-token">485 kW</strong></span>
           <span>Hoje: <strong id="kwhTodayVal" class="text-accent-token">4.820 kWh</strong></span>
         </div>
       </div>
@@ -668,7 +706,7 @@
         <div class="mt-3 pt-2.5 border-t border-token grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
           <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
             <span class="text-muted-token">Mínima Registrada:</span>
-            <span class="font-bold text-red-500">362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span></span>
+            <span class="font-bold text-min-token">362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span></span>
           </div>
           <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
             <span class="text-muted-token">Máxima Registrada:</span>
@@ -687,7 +725,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-token">
         <div>
           <h2 id="drawerTitle" class="text-base font-bold text-main">Opções e Controles</h2>
-          <p class="text-[11px] text-muted-token">Serraria VJ Rauber • Tela Global</p>
+          <p class="text-[11px] text-muted-token">Serraria VJ Rauber • Piratini/RS</p>
         </div>
         <button type="button" id="drawerCloseBtn" autofocus onclick="closeMenuDrawer()"
                 aria-label="Fechar menu"
@@ -780,15 +818,19 @@
           </div>
         </div>
 
-        <!-- Alto Contraste -->
-        <div class="flex items-center justify-between text-xs surface-elevated p-2.5 rounded-lg">
+        <!-- Alto Contraste (Interruptor / Toggle Switch real) -->
+        <div class="flex items-center justify-between gap-3 text-xs surface-elevated p-3 rounded-lg">
           <div>
             <div class="font-semibold text-main">Modo Alto Contraste</div>
-            <div class="text-[11px] text-muted-token">Bordas reforçadas e máxima leitura</div>
+            <div class="text-[11px] text-muted-token">
+              Estado: <strong id="highContrastLabel" class="text-main">Desligado</strong> • Bordas fortes
+            </div>
           </div>
-          <button type="button" id="btnHighContrast" role="switch" aria-checked="false" onclick="toggleHighContrast()"
-                  class="touch-target px-3 py-1.5 rounded-lg font-bold border text-xs transition">
-            Desligado
+          <button type="button" id="btnHighContrast" role="switch" aria-checked="false"
+                  aria-label="Alternar modo alto contraste"
+                  onclick="toggleHighContrast()"
+                  class="switch-track cursor-pointer">
+            <span class="switch-thumb" aria-hidden="true"></span>
           </button>
         </div>
       </div>
@@ -1102,17 +1144,30 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div class="surface-elevated p-3.5 rounded-xl space-y-1.5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-accent-token">Engenharia Elétrica & Campo</div>
-          <div class="text-sm font-bold text-main">Eng. Roberto Moutinho ("Beto")</div>
-          <p class="text-muted-token">Responsável pelo projeto elétrico, instalação física dos analisadores ISSO D1000A, quadros e acompanhamento técnico.</p>
+        <div class="surface-elevated p-3.5 rounded-xl space-y-2 flex flex-col justify-between">
+          <div class="space-y-1">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-accent-token">Engenharia Elétrica & Campo</div>
+            <div class="text-sm font-bold text-main">Eng. Roberto Moutinho ("Beto")</div>
+            <p class="text-muted-token">Responsável pelo projeto elétrico, instalação dos analisadores ISSO D1000A e acompanhamento técnico.</p>
+            <div class="font-mono text-xs font-semibold text-main pt-0.5">+55 53 99185-3349</div>
+          </div>
+          <a href="https://wa.me/5553991853349" target="_blank" rel="noopener noreferrer"
+             class="touch-target inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-white text-xs hover:opacity-90"
+             style="background-color: #16a34a;">
+            <i class="fa-brands fa-whatsapp text-sm" aria-hidden="true"></i> Chamar Beto no WhatsApp
+          </a>
         </div>
-        <div class="surface-elevated p-3.5 rounded-xl space-y-1.5">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-blue-500">Sistema & Supervisão Digital</div>
-          <div class="text-sm font-bold text-main">Samael</div>
-          <p class="text-muted-token">Desenvolvimento da Tela Global, consolidação automática dos transformadores e suporte do sistema.</p>
-          <a href="https://samael.com.br" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-semibold text-accent-token hover:underline pt-1">
-            samael.com.br <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
+        <div class="surface-elevated p-3.5 rounded-xl space-y-2 flex flex-col justify-between">
+          <div class="space-y-1">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-p-token">Sistema & Supervisão Digital</div>
+            <div class="text-sm font-bold text-main">Samael Samoilenko</div>
+            <p class="text-muted-token">Desenvolvimento da Tela Global, consolidação dos transformadores e suporte do sistema.</p>
+            <div class="font-mono text-xs font-semibold text-main pt-0.5">+55 53 99969-1359</div>
+          </div>
+          <a href="https://wa.me/5553999691359" target="_blank" rel="noopener noreferrer"
+             class="touch-target inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-white text-xs hover:opacity-90"
+             style="background-color: #16a34a;">
+            <i class="fa-brands fa-whatsapp text-sm" aria-hidden="true"></i> Chamar Samael no WhatsApp
           </a>
         </div>
       </div>
@@ -1290,6 +1345,13 @@
       return 'system';
     }
 
+    function applyResolvedTheme(mode) {
+      const resolved = mode === 'system'
+        ? (darkMediaQuery.matches ? 'dark' : 'light')
+        : mode;
+      document.documentElement.dataset.resolvedTheme = resolved;
+    }
+
     function setColorScheme(mode) {
       const meta = document.querySelector('meta[name="color-scheme"]');
       try {
@@ -1303,6 +1365,7 @@
       } catch {
         meta.content = mode === 'system' ? 'light dark' : mode;
       }
+      applyResolvedTheme(mode);
       renderAppearanceControls();
       refreshChartTheme();
     }
@@ -1358,8 +1421,7 @@
       const high = document.documentElement.dataset.contrast === 'high';
       const hcBtn = document.getElementById('btnHighContrast');
       hcBtn.setAttribute('aria-checked', String(high));
-      hcBtn.innerText = high ? 'Ativado' : 'Desligado';
-      styleOptionButton(hcBtn, high);
+      document.getElementById('highContrastLabel').innerText = high ? 'Ativado' : 'Desligado';
     }
 
     function refreshChartTheme() {
@@ -1377,6 +1439,7 @@
     }
 
     darkMediaQuery.addEventListener('change', () => {
+      applyResolvedTheme(getActiveThemeSetting());
       renderAppearanceControls();
       refreshChartTheme();
     });
@@ -1437,12 +1500,23 @@
       styleOptionButton(document.getElementById('menuSourceSim'), src === 'sim');
       document.getElementById('menuSimSubgroup').classList.toggle('hidden', src !== 'sim');
 
+      const tag = document.getElementById('envModeTag');
+      const tagText = document.getElementById('envModeTagText');
       if (src === 'real') {
         const view = buildRealDataView();
-        document.getElementById('envModeTag').innerText = view.isMockFeed ? 'Simulador API (Aleatório)' : 'Dados Reais';
+        if (view.isMockFeed) {
+          tag.className = 'test-mode-badge text-xs sm:text-sm font-extrabold tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1';
+          tagText.innerText = 'SIMULADOR • TESTE';
+        } else {
+          tag.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1';
+          tag.style.cssText = 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);';
+          tagText.innerText = 'DADOS REAIS';
+        }
         updateUI(view);
       } else {
-        document.getElementById('envModeTag').innerText = 'Simulação 380V';
+        tag.style.cssText = '';
+        tag.className = 'test-mode-badge text-xs sm:text-sm font-extrabold tracking-wide px-2.5 py-0.5 rounded-full flex items-center gap-1';
+        tagText.innerText = 'MODO TESTE • 380V';
         setSimMode(currentSimMode);
       }
     }
