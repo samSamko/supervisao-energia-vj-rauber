@@ -706,11 +706,11 @@
         <div class="mt-3 pt-2.5 border-t border-token grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
           <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
             <span class="text-muted-token">Mínima Registrada:</span>
-            <span class="font-bold text-min-token">362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span></span>
+            <span id="vMinBox" class="font-bold text-min-token">362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span></span>
           </div>
           <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
             <span class="text-muted-token">Máxima Registrada:</span>
-            <span class="font-bold text-accent-token">389.4 V <span class="text-muted-token font-normal">(T1 • 03:45)</span></span>
+            <span id="vMaxBox" class="font-bold text-accent-token">389.4 V <span class="text-muted-token font-normal">(T1 • 03:45)</span></span>
           </div>
         </div>
       </div>
@@ -1519,6 +1519,7 @@
         tagText.innerText = 'MODO TESTE • 380V';
         setSimMode(currentSimMode);
       }
+      syncChartsForSource();
     }
 
     function setSimMode(mode) {
@@ -1930,6 +1931,9 @@
         const code = tId === 1 ? '308AD713C046' : '308A3849D67A';
         const reading = generateMockTrafoReading(tId, appState.latest[tId], brtStr);
         appState.latest[tId] = reading;
+        if (!Array.isArray(appState.readings)) appState.readings = [];
+        appState.readings.push({ trafo_id: tId, ...reading });
+        if (appState.readings.length > 200) appState.readings = appState.readings.slice(-200);
         const vAvg = ((reading.v_ab + reading.v_bc + reading.v_ca) / 3).toFixed(1);
 
         const rawPayload = [{
@@ -1960,28 +1964,6 @@
         appState.quota.todayUsed += 1;
         appState.quota.monthUsed += 1;
       }
-
-      // Atualiza último ponto dos gráficos para refletir a nova leitura do simulador
-      const l1 = appState.latest[1];
-      const l2 = appState.latest[2];
-      if (l1 && voltageChartInstance) {
-        const v1 = +((l1.v_ab + l1.v_bc + l1.v_ca) / 3).toFixed(1);
-        voltageChartInstance.data.datasets[0].data[voltageChartInstance.data.datasets[0].data.length - 1] = v1;
-      }
-      if (l2 && voltageChartInstance) {
-        const v2 = +((l2.v_ab + l2.v_bc + l2.v_ca) / 3).toFixed(1);
-        voltageChartInstance.data.datasets[1].data[voltageChartInstance.data.datasets[1].data.length - 1] = v2;
-      }
-      if (fpChartInstance && (l1 || l2)) {
-        const pSum = (l1?.p_kw || 0) + (l2?.p_kw || 0);
-        const qSum = (l1?.q_kvar_signed || 0) + (l2?.q_kvar_signed || 0);
-        const sSum = Math.sqrt(pSum * pSum + qSum * qSum);
-        if (sSum > 0) {
-          fpChartInstance.data.datasets[0].data[fpChartInstance.data.datasets[0].data.length - 1] = +(pSum / sSum).toFixed(3);
-        }
-      }
-      fpChartInstance?.update();
-      voltageChartInstance?.update();
 
       persistSavedState();
       renderQuotaAndLogs();
@@ -2053,23 +2035,14 @@
       appState = await res.json();
       connectedToServer = true;
       renderQuotaAndLogs();
+      if (dataSource === 'real') {
+        updateUI(buildRealDataView());
+        syncChartsForSource();
+      }
     }
 
-    function downloadCSV() {
-      const csvContent = "data:text/csv;charset=utf-8,"
-        + "DataHora,T1_Vmedia_LL,T2_Vmedia_LL,P_Total_kW,Q_Total_kvar,S_Total_kVA,FP_Global\n"
-        + "2026-11-23 03:00,388.8,388.1,26.5,-58.5,64.2,0.413\n"
-        + "2026-11-23 10:00,381.1,379.9,418.5,149.2,444.3,0.942\n"
-        + "2026-11-23 14:12,374.2,362.8,448.2,152.3,473.4,0.946\n";
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", "historico_vj_rauber_380v_fp.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function changeChartPeriod() {
+    function applySimFpPeriod() {
+      if (!fpChartInstance) return;
       const val = document.getElementById('periodSelectFp').value;
       if (val === '24h') {
         fpChartInstance.data.labels = ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'];
@@ -2082,7 +2055,133 @@
         fpChartInstance.data.datasets[0].data = [0.92, 0.93, 0.94, 0.94];
       }
       fpChartInstance.data.datasets[1].data = Array(fpChartInstance.data.labels.length).fill(0.92);
+      fpChartInstance.options.scales.y.min = 0.70;
+      fpChartInstance.options.scales.y.max = 1.00;
       fpChartInstance.update();
+    }
+
+    function syncChartsForSource() {
+      if (!fpChartInstance || !voltageChartInstance) return;
+      const vMinBox = document.getElementById('vMinBox');
+      const vMaxBox = document.getElementById('vMaxBox');
+
+      if (dataSource === 'sim') {
+        applySimFpPeriod();
+        voltageChartInstance.data.labels = ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'];
+        voltageChartInstance.data.datasets[0].data = [385.5, 387.8, 389.4, 383.1, 381.4, 381.1, 380.5, 379.8, 374.2, 380.4, 381.9, 383.0, 384.2];
+        voltageChartInstance.data.datasets[1].data = [385.0, 387.1, 388.6, 382.5, 380.2, 379.9, 378.7, 377.5, 362.8, 378.9, 380.5, 382.1, 383.8];
+        voltageChartInstance.options.scales.y.min = 355;
+        voltageChartInstance.options.scales.y.max = 400;
+        voltageChartInstance.update();
+
+        vMinBox.innerHTML = '362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span>';
+        vMaxBox.innerHTML = '389.4 V <span class="text-muted-token font-normal">(T1 • 03:45)</span>';
+        return;
+      }
+
+      // Modo Dados Reais / Simulador de API: usa apenas leituras coletadas
+      let pts = Array.isArray(appState.readings) && appState.readings.length > 0 ? [...appState.readings] : [];
+      if (pts.length === 0) {
+        if (appState.latest[1]) pts.push({ trafo_id: 1, ...appState.latest[1] });
+        if (appState.latest[2]) pts.push({ trafo_id: 2, ...appState.latest[2] });
+      }
+
+      const energized = pts.filter(r => ((Number(r.v_ab || 0) + Number(r.v_bc || 0) + Number(r.v_ca || 0)) / 3) > 10);
+      if (energized.length === 0) {
+        // Apenas leitura de bancada (0 V / 0 A) ou sem leituras energizadas
+        const benchTime = pts[0]?.ts_brt ? `${pts[0].ts_brt.slice(8, 10)}/${pts[0].ts_brt.slice(5, 7)} ${pts[0].ts_brt.slice(11, 16)}` : 'Aguardando';
+        fpChartInstance.data.labels = [`${benchTime} (Sem carga)`];
+        fpChartInstance.data.datasets[0].data = [null];
+        fpChartInstance.data.datasets[1].data = [0.92];
+        fpChartInstance.options.scales.y.min = 0.70;
+        fpChartInstance.options.scales.y.max = 1.00;
+        fpChartInstance.update();
+
+        voltageChartInstance.data.labels = [`${benchTime} (Bancada)`];
+        voltageChartInstance.data.datasets[0].data = [pts.some(r => r.trafo_id === 1) ? 0 : null];
+        voltageChartInstance.data.datasets[1].data = [pts.some(r => r.trafo_id === 2) ? 0 : null];
+        voltageChartInstance.options.scales.y.min = 0;
+        voltageChartInstance.options.scales.y.max = 400;
+        voltageChartInstance.update();
+
+        vMinBox.innerHTML = '— <span class="text-muted-token font-normal">(aguardando energização)</span>';
+        vMaxBox.innerHTML = '— <span class="text-muted-token font-normal">(aguardando energização)</span>';
+        return;
+      }
+
+      // Agrupa leituras energizadas por carimbo de data/hora (minuto)
+      const byTs = new Map();
+      let minV = Infinity, minMeta = '', maxV = -Infinity, maxMeta = '';
+      for (const r of energized) {
+        const tsKey = (r.ts_brt || '').slice(0, 16);
+        if (!tsKey) continue;
+        if (!byTs.has(tsKey)) byTs.set(tsKey, { t1: null, t2: null });
+        const vAvg = (Number(r.v_ab || 0) + Number(r.v_bc || 0) + Number(r.v_ca || 0)) / 3;
+        byTs.get(tsKey)[r.trafo_id === 2 ? 't2' : 't1'] = { ...r, vAvg };
+        const shortTime = `${tsKey.slice(8, 10)}/${tsKey.slice(5, 7)} ${tsKey.slice(11, 16)}`;
+        if (vAvg < minV) { minV = vAvg; minMeta = `T${r.trafo_id} • ${shortTime}`; }
+        if (vAvg > maxV) { maxV = vAvg; maxMeta = `T${r.trafo_id} • ${shortTime}`; }
+      }
+
+      const sortedKeys = [...byTs.keys()].sort();
+      const labels = [], fpArr = [], t1Arr = [], t2Arr = [];
+      for (const k of sortedKeys) {
+        const pair = byTs.get(k);
+        labels.push(k.slice(11, 16));
+        t1Arr.push(pair.t1 ? +pair.t1.vAvg.toFixed(1) : null);
+        t2Arr.push(pair.t2 ? +pair.t2.vAvg.toFixed(1) : null);
+        const pSum = (pair.t1?.p_kw || 0) + (pair.t2?.p_kw || 0);
+        const qSum = (pair.t1?.q_kvar_signed || 0) + (pair.t2?.q_kvar_signed || 0);
+        const sSum = Math.sqrt(pSum * pSum + qSum * qSum);
+        fpArr.push(sSum > 0.01 ? +(pSum / sSum).toFixed(3) : null);
+      }
+
+      fpChartInstance.data.labels = labels;
+      fpChartInstance.data.datasets[0].data = fpArr;
+      fpChartInstance.data.datasets[1].data = Array(labels.length).fill(0.92);
+      fpChartInstance.options.scales.y.min = 0.70;
+      fpChartInstance.options.scales.y.max = 1.00;
+      fpChartInstance.update();
+
+      voltageChartInstance.data.labels = labels;
+      voltageChartInstance.data.datasets[0].data = t1Arr;
+      voltageChartInstance.data.datasets[1].data = t2Arr;
+      voltageChartInstance.options.scales.y.min = 355;
+      voltageChartInstance.options.scales.y.max = 400;
+      voltageChartInstance.update();
+
+      vMinBox.innerHTML = `${minV.toFixed(1)} V <span class="text-muted-token font-normal">(${minMeta})</span>`;
+      vMaxBox.innerHTML = `${maxV.toFixed(1)} V <span class="text-muted-token font-normal">(${maxMeta})</span>`;
+    }
+
+    function downloadCSV() {
+      let rows = ["DataHora,Trafo,V_RS,V_ST,V_TR,P_kW,Q_kvar,S_kVA,FP"];
+      if (dataSource === 'real') {
+        const pts = (Array.isArray(appState.readings) && appState.readings.length > 0)
+          ? appState.readings
+          : [appState.latest[1] ? { trafo_id: 1, ...appState.latest[1] } : null].filter(Boolean);
+        for (const r of pts) {
+          rows.push(`${r.ts_brt || ''},T${r.trafo_id || 1},${r.v_ab || 0},${r.v_bc || 0},${r.v_ca || 0},${r.p_kw || 0},${r.q_kvar_signed || 0},${r.s_kva || 0},${r.fp || 0}`);
+        }
+      } else {
+        rows = [
+          "DataHora,T1_Vmedia_LL,T2_Vmedia_LL,P_Total_kW,Q_Total_kvar,S_Total_kVA,FP_Global",
+          "2026-11-23 03:00,388.8,388.1,26.5,-58.5,64.2,0.413",
+          "2026-11-23 10:00,381.1,379.9,418.5,149.2,444.3,0.942",
+          "2026-11-23 14:12,374.2,362.8,448.2,152.3,473.4,0.946"
+        ];
+      }
+      const csvContent = "data:text/csv;charset=utf-8," + rows.join("\n") + "\n";
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", dataSource === 'real' ? "historico_real_vj_rauber.csv" : "historico_simulacao_vj_rauber.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function changeChartPeriod() {
+      syncChartsForSource();
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
