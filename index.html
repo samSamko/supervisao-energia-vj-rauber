@@ -564,7 +564,124 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <!-- TABELA VERTICAL TRANSPOSTA PARA MOBILE (Trafos como colunas, sem corte lateral) -->
+      <div class="block md:hidden">
+        <table class="w-full text-left text-xs table-fixed">
+          <caption class="visually-hidden">Comparativo elétrico em formato vertical para celular</caption>
+          <thead class="surface-elevated text-muted-token border-b border-token">
+            <tr>
+              <th scope="col" class="w-[34%] px-3 py-2.5 font-semibold">GRANDEZA</th>
+              <th scope="col" class="w-[33%] px-2.5 py-2.5 font-bold text-main">
+                <span class="inline-flex items-center gap-1.5">
+                  <span id="mT1Dot" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true"></span>
+                  Trafo 01
+                </span>
+                <div class="text-[10px] font-normal text-muted-token">500 kVA</div>
+              </th>
+              <th scope="col" class="w-[33%] px-2.5 py-2.5 font-bold text-main">
+                <span class="inline-flex items-center gap-1.5">
+                  <span id="mT2Dot" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true"></span>
+                  Trafo 02
+                </span>
+                <div class="text-[10px] font-normal text-muted-token">500 kVA</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border-color)] text-main">
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec align-top">
+                Tensão (V)
+                <div class="text-[10px] font-normal text-muted-token">R-S / S-T / T-R</div>
+              </th>
+              <td class="px-2.5 py-2.5 font-mono text-[11px] leading-snug">
+                <div><span class="text-muted-token">RS</span> <span id="mT1Vrs">381.4</span></div>
+                <div><span class="text-muted-token">ST</span> <span id="mT1Vst">379.8</span></div>
+                <div><span class="text-muted-token">TR</span> <span id="mT1Vtr">382.1</span></div>
+                <div class="text-[10px] text-muted-token pt-0.5">Méd: <strong id="mT1Vavg" class="text-main">381.1 V</strong></div>
+              </td>
+              <td class="px-2.5 py-2.5 font-mono text-[11px] leading-snug">
+                <div><span class="text-muted-token">RS</span> <span id="mT2Vrs">378.2</span></div>
+                <div><span class="text-muted-token">ST</span> <span id="mT2Vst">380.5</span></div>
+                <div><span class="text-muted-token">TR</span> <span id="mT2Vtr">381.0</span></div>
+                <div class="text-[10px] text-muted-token pt-0.5">Méd: <strong id="mT2Vavg" class="text-main">379.9 V</strong></div>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec align-top">
+                Correntes (A)
+                <div class="text-[10px] font-normal text-muted-token">Fases R / S / T</div>
+              </th>
+              <td class="px-2.5 py-2.5 font-mono text-[11px] leading-snug">
+                <div><span class="text-muted-token">R</span> <span id="mT1Ir">358</span> A</div>
+                <div><span class="text-muted-token">S</span> <span id="mT1Is">364</span> A</div>
+                <div><span class="text-muted-token">T</span> <span id="mT1It">361</span> A</div>
+              </td>
+              <td class="px-2.5 py-2.5 font-mono text-[11px] leading-snug">
+                <div><span class="text-muted-token">R</span> <span id="mT2Ir">310</span> A</div>
+                <div><span class="text-muted-token">S</span> <span id="mT2Is">316</span> A</div>
+                <div><span class="text-muted-token">T</span> <span id="mT2It">313</span> A</div>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec">Pot. Ativa</th>
+              <td class="px-2.5 py-2.5 font-bold text-p-token"><span id="mT1P">224.2</span> kW</td>
+              <td class="px-2.5 py-2.5 font-bold text-p-token"><span id="mT2P">194.3</span> kW</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec">Pot. Reativa</th>
+              <td class="px-2.5 py-2.5 font-bold text-q-token"><span id="mT1Q">81.0</span> kvar</td>
+              <td class="px-2.5 py-2.5 font-bold text-q-token"><span id="mT2Q">68.2</span> kvar</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec">Pot. Aparente</th>
+              <td class="px-2.5 py-2.5 font-bold text-s-token"><span id="mT1S">238.4</span> kVA</td>
+              <td class="px-2.5 py-2.5 font-bold text-s-token"><span id="mT2S">205.9</span> kVA</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-3 py-2.5 font-semibold text-sec">FP Indiv.</th>
+              <td class="px-2.5 py-2.5">
+                <span class="px-2 py-0.5 rounded text-[11px] font-semibold" style="background: var(--accent-soft); color: var(--accent-text);">
+                  <span id="mT1Fp">0.940</span>
+                </span>
+              </td>
+              <td class="px-2.5 py-2.5">
+                <span class="px-2 py-0.5 rounded text-[11px] font-semibold" style="background: var(--accent-soft); color: var(--accent-text);">
+                  <span id="mT2Fp">0.944</span>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Total Global Mobile -->
+        <div class="surface-elevated border-t-2 border-[var(--border-strong)] p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-accent-token flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator" aria-hidden="true"></i> TOTAL GLOBAL
+            </span>
+            <span class="px-2.5 py-0.5 rounded text-xs font-bold text-white" style="background: var(--accent);">
+              <span id="mTotFp">0.942 IND</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <div class="surface-card px-2 py-1.5 rounded">
+              <span class="block text-[10px] text-muted-token">P. Ativa</span>
+              <strong class="text-main"><span id="mTotP">418.5</span> kW</strong>
+            </div>
+            <div class="surface-card px-2 py-1.5 rounded">
+              <span class="block text-[10px] text-muted-token">P. Reativa</span>
+              <strong class="text-main"><span id="mTotQ">149.2</span> kvar</strong>
+            </div>
+            <div class="surface-card px-2 py-1.5 rounded">
+              <span class="block text-[10px] text-muted-token">P. Aparente</span>
+              <strong class="text-main"><span id="mTotS">444.3</span> kVA</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABELA HORIZONTAL PARA DESKTOP -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left text-xs">
           <caption class="visually-hidden">Comparativo elétrico individual dos Transformadores 01 e 02 e total global</caption>
           <thead class="surface-elevated text-muted-token border-b border-token">
@@ -876,7 +993,7 @@
         </div>
         <button type="button" onclick="resetMockQuota()"
                 class="px-2.5 py-1.5 rounded-lg font-semibold surface-card text-main flex-shrink-0 hover:opacity-90">
-          Reiniciar Teste (3/10)
+          Reiniciar Teste (0/10)
         </button>
       </div>
 
@@ -1591,29 +1708,68 @@
       document.getElementById('tableTotP').innerText = pTot.toFixed(1);
       document.getElementById('tableTotQ').innerText = qTot.toFixed(1);
       document.getElementById('tableTotS').innerText = sTot.toFixed(1);
-      document.getElementById('tableTotFp').innerText = sTot > 0.01 ? `${fpTot.toFixed(3)} ${isInductive ? 'IND' : 'CAP'}` : 'SEM CARGA';
+      const totFpLabel = sTot > 0.01 ? `${fpTot.toFixed(3)} ${isInductive ? 'IND' : 'CAP'}` : 'SEM CARGA';
+      document.getElementById('tableTotFp').innerText = totFpLabel;
+
+      // Espelha os valores na tabela transposta mobile
+      document.getElementById('mT1Vrs').innerText = data.t1.vrs.toFixed(1);
+      document.getElementById('mT1Vst').innerText = data.t1.vst.toFixed(1);
+      document.getElementById('mT1Vtr').innerText = data.t1.vtr.toFixed(1);
+      document.getElementById('mT1Vavg').innerText = t1Vavg.toFixed(1) + ' V';
+      document.getElementById('mT1Ir').innerText = data.t1.ir;
+      document.getElementById('mT1Is').innerText = data.t1.is;
+      document.getElementById('mT1It').innerText = data.t1.it;
+      document.getElementById('mT1P').innerText = data.t1.p.toFixed(1);
+      document.getElementById('mT1Q').innerText = data.t1.q.toFixed(1);
+      document.getElementById('mT1S').innerText = t1S.toFixed(1);
+      document.getElementById('mT1Fp').innerText = t1S > 0.01 ? data.t1.fp.toFixed(3) : '—';
+
+      document.getElementById('mT2Vrs').innerText = data.t2.vrs.toFixed(1);
+      document.getElementById('mT2Vst').innerText = data.t2.vst.toFixed(1);
+      document.getElementById('mT2Vtr').innerText = data.t2.vtr.toFixed(1);
+      document.getElementById('mT2Vavg').innerText = t2Vavg.toFixed(1) + ' V';
+      document.getElementById('mT2Ir').innerText = data.t2.ir;
+      document.getElementById('mT2Is').innerText = data.t2.is;
+      document.getElementById('mT2It').innerText = data.t2.it;
+      document.getElementById('mT2P').innerText = data.t2.p.toFixed(1);
+      document.getElementById('mT2Q').innerText = data.t2.q.toFixed(1);
+      document.getElementById('mT2S').innerText = t2S.toFixed(1);
+      document.getElementById('mT2Fp').innerText = t2S > 0.01 ? data.t2.fp.toFixed(3) : '—';
+
+      document.getElementById('mTotP').innerText = pTot.toFixed(1);
+      document.getElementById('mTotQ').innerText = qTot.toFixed(1);
+      document.getElementById('mTotS').innerText = sTot.toFixed(1);
+      document.getElementById('mTotFp').innerText = totFpLabel;
 
       // Status Comunicação
       const commDot = document.getElementById('commDot');
       const commText = document.getElementById('commText');
       const t1SyncDot = document.getElementById('t1SyncDot');
       const t1StatusDot = document.getElementById('t1StatusDot');
+      const mT1Dot = document.getElementById('mT1Dot');
+      const mT2Dot = document.getElementById('mT2Dot');
 
       if (data.offline) {
         commDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping flex-shrink-0";
         commText.innerText = "Falha T1";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-red-500 mr-1";
         t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0";
+        mT1Dot.className = "w-2 h-2 rounded-full bg-red-500 flex-shrink-0";
+        mT2Dot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
       } else if (data.realBench) {
         commDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse flex-shrink-0";
         commText.innerText = "Bancada";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-amber-500 mr-1";
         t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0";
+        mT1Dot.className = "w-2 h-2 rounded-full bg-amber-500 flex-shrink-0";
+        mT2Dot.className = "w-2 h-2 rounded-full bg-slate-400 flex-shrink-0";
       } else {
         commDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0";
         commText.innerText = "Online";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-500 mr-1";
         t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0";
+        mT1Dot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
+        mT2Dot.className = "w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0";
       }
 
       const fpBadge = document.getElementById('fpBadge');
@@ -1678,8 +1834,12 @@
 
     function resetMockQuota() {
       if (connectedToServer) return;
-      try { localStorage.removeItem('vjrauber_free_preview_v2'); } catch {}
       appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      appState.quota.todayUsed = 0;
+      appState.quota.monthUsed = 0;
+      appState.logs = [];
+      appState.readings = [];
+      persistSavedState();
       renderQuotaAndLogs();
       setDataSource('sim');
     }
@@ -1706,6 +1866,15 @@
       recalcScheduleProjection();
 
       const list = document.getElementById('auditLogList');
+      if (!appState.logs || appState.logs.length === 0) {
+        list.innerHTML = `
+          <div class="surface-card rounded-lg p-4 text-center text-xs text-muted-token space-y-1">
+            <div class="font-semibold text-main">Nenhuma consulta simulada registrada ainda (0/10).</div>
+            <p>Clique em <strong>+ Nova Consulta Manual</strong> acima para testar o consumo da franquia com leituras aleatórias em 380 V.</p>
+          </div>
+        `;
+        return;
+      }
       list.innerHTML = appState.logs.map((log, idx) => {
         const isOk = log.http_status === 200;
         const isEmpty = log.http_status === 204;
