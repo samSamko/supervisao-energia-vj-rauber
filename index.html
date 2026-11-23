@@ -4,492 +4,608 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Supervisão Elétrica Global - Serraria VJ Rauber</title>
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      const savedScheme = localStorage.getItem("color-scheme");
+      if (savedScheme === "light" || savedScheme === "dark") {
+        document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+      }
+      const savedScale = localStorage.getItem("vjr_font_scale");
+      if (savedScale === "100" || savedScale === "112" || savedScale === "125") {
+        document.documentElement.style.fontSize = savedScale + "%";
+      }
+      if (localStorage.getItem("vjr_high_contrast") === "true") {
+        document.documentElement.dataset.contrast = "high";
+      }
+    } catch {}
+  </script>
+  <title>Supervisão Elétrica Global | Serraria VJ Rauber</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            darkcard: '#1e293b',
-            darkbg: '#0f172a',
-          }
-        }
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg-page: #f1f5f9;
+      --bg-header: rgba(255, 255, 255, 0.94);
+      --bg-card: #ffffff;
+      --bg-elevated: #f8fafc;
+      --bg-hover: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --border-strong: #94a3b8;
+      --accent: #059669;
+      --accent-soft: rgba(5, 150, 105, 0.12);
+      --accent-border: rgba(5, 150, 105, 0.35);
+      --accent-text: #047857;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --danger-text: #b91c1c;
+      --warn-bg: #fffbeb;
+      --warn-border: #fcd34d;
+      --warn-text: #b45309;
+      --info-bg: #f0f9ff;
+      --info-border: #7dd3fc;
+      --info-text: #0369a1;
+      --grid-chart: rgba(100, 116, 139, 0.22);
+      --tick-chart: #475569;
+      --focus-ring: #059669;
+      accent-color: #059669;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #020617;
+        --bg-header: rgba(15, 23, 42, 0.95);
+        --bg-card: #0f172a;
+        --bg-elevated: #020617;
+        --bg-hover: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #1e293b;
+        --border-strong: #334155;
+        --accent: #10b981;
+        --accent-soft: rgba(16, 185, 129, 0.14);
+        --accent-border: rgba(16, 185, 129, 0.38);
+        --accent-text: #34d399;
+        --danger-bg: rgba(69, 10, 10, 0.45);
+        --danger-border: rgba(239, 68, 68, 0.45);
+        --danger-text: #fca5a5;
+        --warn-bg: rgba(69, 26, 3, 0.4);
+        --warn-border: rgba(245, 158, 11, 0.45);
+        --warn-text: #fcd34d;
+        --info-bg: rgba(8, 47, 73, 0.45);
+        --info-border: rgba(56, 189, 248, 0.4);
+        --info-text: #7dd3fc;
+        --grid-chart: rgba(148, 163, 184, 0.22);
+        --tick-chart: #94a3b8;
+        --focus-ring: #34d399;
       }
     }
-  </script>
+
+    :root:has(> head > meta[name="color-scheme"][content="light"]) {
+      color-scheme: light;
+      --bg-page: #f1f5f9;
+      --bg-header: rgba(255, 255, 255, 0.94);
+      --bg-card: #ffffff;
+      --bg-elevated: #f8fafc;
+      --bg-hover: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --border-strong: #94a3b8;
+      --accent: #059669;
+      --accent-soft: rgba(5, 150, 105, 0.12);
+      --accent-border: rgba(5, 150, 105, 0.35);
+      --accent-text: #047857;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --danger-text: #b91c1c;
+      --warn-bg: #fffbeb;
+      --warn-border: #fcd34d;
+      --warn-text: #b45309;
+      --info-bg: #f0f9ff;
+      --info-border: #7dd3fc;
+      --info-text: #0369a1;
+      --grid-chart: rgba(100, 116, 139, 0.22);
+      --tick-chart: #475569;
+      --focus-ring: #059669;
+    }
+
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+      color-scheme: dark;
+      --bg-page: #020617;
+      --bg-header: rgba(15, 23, 42, 0.95);
+      --bg-card: #0f172a;
+      --bg-elevated: #020617;
+      --bg-hover: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+      --border-strong: #334155;
+      --accent: #10b981;
+      --accent-soft: rgba(16, 185, 129, 0.14);
+      --accent-border: rgba(16, 185, 129, 0.38);
+      --accent-text: #34d399;
+      --danger-bg: rgba(69, 10, 10, 0.45);
+      --danger-border: rgba(239, 68, 68, 0.45);
+      --danger-text: #fca5a5;
+      --warn-bg: rgba(69, 26, 3, 0.4);
+      --warn-border: rgba(245, 158, 11, 0.45);
+      --warn-text: #fcd34d;
+      --info-bg: rgba(8, 47, 73, 0.45);
+      --info-border: rgba(56, 189, 248, 0.4);
+      --info-text: #7dd3fc;
+      --grid-chart: rgba(148, 163, 184, 0.22);
+      --tick-chart: #94a3b8;
+      --focus-ring: #34d399;
+    }
+
+    @supports (color: light-dark(white, black)) {
+      :root {
+        --bg-page: light-dark(#f1f5f9, #020617);
+        --bg-header: light-dark(rgba(255, 255, 255, 0.94), rgba(15, 23, 42, 0.95));
+        --bg-card: light-dark(#ffffff, #0f172a);
+        --bg-elevated: light-dark(#f8fafc, #020617);
+        --bg-hover: light-dark(#e2e8f0, #1e293b);
+        --text-primary: light-dark(#0f172a, #f8fafc);
+        --text-secondary: light-dark(#334155, #cbd5e1);
+        --text-muted: light-dark(#475569, #94a3b8);
+        --border-color: light-dark(#cbd5e1, #1e293b);
+        --border-strong: light-dark(#94a3b8, #334155);
+        --accent-text: light-dark(#047857, #34d399);
+        --danger-bg: light-dark(#fef2f2, rgba(69, 10, 10, 0.55));
+        --danger-border: light-dark(#dc2626, rgba(239, 68, 68, 0.5));
+        --danger-text: light-dark(#991b1b, #fca5a5);
+        --warn-bg: light-dark(#fffbeb, rgba(69, 26, 3, 0.48));
+        --warn-border: light-dark(#d97706, rgba(245, 158, 11, 0.5));
+        --warn-text: light-dark(#92400e, #fcd34d);
+        --info-bg: light-dark(#f0f9ff, rgba(8, 47, 73, 0.5));
+        --info-border: light-dark(#0284c7, rgba(56, 189, 248, 0.45));
+        --info-text: light-dark(#075985, #7dd3fc);
+        --grid-chart: light-dark(rgba(100, 116, 139, 0.25), rgba(148, 163, 184, 0.22));
+        --tick-chart: light-dark(#475569, #94a3b8);
+      }
+    }
+
+    /* Modo Alto Contraste Manual */
+    :root[data-contrast="high"] {
+      --bg-page: light-dark(#ffffff, #000000);
+      --bg-header: light-dark(#ffffff, #000000);
+      --bg-card: light-dark(#ffffff, #000000);
+      --bg-elevated: light-dark(#f8fafc, #0a0a0a);
+      --bg-hover: light-dark(#e2e8f0, #1f2937);
+      --text-primary: light-dark(#000000, #ffffff);
+      --text-secondary: light-dark(#000000, #ffffff);
+      --text-muted: light-dark(#1e293b, #e2e8f0);
+      --border-color: light-dark(#000000, #ffffff);
+      --border-strong: light-dark(#000000, #ffffff);
+      --accent-text: light-dark(#065f46, #6ee7b7);
+      --grid-chart: light-dark(rgba(0, 0, 0, 0.45), rgba(255, 255, 255, 0.45));
+      --tick-chart: light-dark(#000000, #ffffff);
+      --focus-ring: light-dark(#000000, #facc15);
+    }
+
+    :root[data-contrast="high"] .surface-card,
+    :root[data-contrast="high"] .surface-elevated,
+    :root[data-contrast="high"] header.top-bar {
+      border-width: 2px !important;
+    }
+
+    @media (forced-colors: active) {
+      .surface-card, .surface-elevated, dialog {
+        background: Canvas !important;
+        color: CanvasText !important;
+        border: 2px solid ButtonBorder !important;
+      }
+      button, a {
+        border: 1px solid ButtonBorder;
+      }
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+    }
+
+    .top-bar {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .surface-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    .surface-elevated {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+    }
+
+    .text-main { color: var(--text-primary); }
+    .text-sec { color: var(--text-secondary); }
+    .text-muted-token { color: var(--text-muted); }
+    .text-accent-token { color: var(--accent-text); }
+    .text-p-token { color: light-dark(#2563eb, #60a5fa); }
+    .text-q-token { color: light-dark(#d97706, #fbbf24); }
+    .text-s-token { color: light-dark(#7c3aed, #c084fc); }
+    .border-token { border-color: var(--border-color); }
+
+    :where(a:any-link, button, input, select, summary):focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Skip link e visually hidden */
+    .visually-hidden:where(:not(:focus-within, :active)) {
+      position: absolute !important;
+      clip-path: inset(50%) !important;
+      overflow: hidden !important;
+      width: 1px !important;
+      height: 1px !important;
+      margin: -1px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      white-space: nowrap !important;
+    }
+
+    .skip-link:focus {
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 200;
+      padding: 0.65rem 1rem;
+      border-radius: 0.5rem;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    @media (pointer: coarse) {
+      button, .touch-target {
+        min-height: 44px;
+      }
+    }
+
+    /* Native Modal Dialogs */
+    dialog.app-dialog {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 1rem;
+      padding: 0;
+      width: min(94vw, 42rem);
+      max-height: 90dvh;
+      margin: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    }
+
+    dialog.app-dialog::backdrop {
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Navigation Drawer (Gaveta lateral no padrão native dialog) */
+    dialog.Drawer {
+      inset: 0;
+      width: auto;
+      height: auto;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    dialog.Drawer::backdrop {
+      background: rgba(2, 6, 23, 0.68);
+      backdrop-filter: blur(3px);
+    }
+
+    .Drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100svh;
+      width: min(23rem, 88dvw);
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border-left: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      box-shadow: -12px 0 35px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      dialog.Drawer[open] .Drawer-panel {
+        animation: drawer-slide-in 180ms ease-out;
+      }
+    }
+
+    @keyframes drawer-slide-in {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+<body class="min-h-screen font-sans antialiased">
 
-  <!-- LOGIN MODAL (Exibido apenas quando conectado ao backend protegido por senha) -->
-  <div id="loginModal" class="hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-        <div>
-          <h2 class="text-base font-bold text-white">Acesso Restrito — VJ Rauber</h2>
-          <p class="text-xs text-slate-400">Supervisão Elétrica Global • Sessão de 30 dias</p>
-        </div>
-      </div>
-      <form onsubmit="submitLogin(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">Senha do Painel</label>
-          <input id="loginPassword" type="password" required placeholder="Digite a senha..."
-                 class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <p id="loginError" class="hidden text-xs text-red-400"></p>
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition">
-          Entrar no Painel
-        </button>
-      </form>
-    </div>
-  </div>
+  <a href="#main-content" class="skip-link visually-hidden">Pular para o conteúdo principal</a>
 
-  <!-- TOP NAVIGATION / HEADER -->
-  <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-          <i class="fa-solid fa-bolt text-xl"></i>
+  <!-- HEADER COMPACTO MOBILE-FIRST (1 LINHA ÚNICA) -->
+  <header class="top-bar backdrop-blur sticky top-0 z-40 px-3 sm:px-6 lg:px-8 h-14 flex items-center">
+    <div class="max-w-7xl mx-auto w-full flex items-center justify-between gap-2">
+      <!-- Identificação -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+             style="background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-text);">
+          <i class="fa-solid fa-bolt text-base" aria-hidden="true"></i>
         </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h1 class="text-lg font-bold text-white tracking-wide">Serraria VJ Rauber</h1>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Tela Global • T1 + T2 (380/220 V)
-            </span>
-            <span id="runtimeEnvBadge" class="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-              Preview + Dados Reais (23/11)
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm sm:text-base font-bold text-main truncate">Serraria VJ Rauber</h1>
+            <span id="envModeTag" class="hidden md:inline-block text-[10px] font-semibold px-2 py-0.5 rounded"
+                  style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
+              Simulação 380V
             </span>
           </div>
-          <p class="text-xs text-slate-400">
-            Consolidação: Transformadores 01 & 02 (1.000 kVA) • Analisadores ISSO D1000A
+          <p class="hidden sm:block text-[11px] text-muted-token truncate">
+            Tela Global • T1 + T2 (380/220 V) • ISSO D1000A
           </p>
         </div>
       </div>
 
-      <!-- MENU DE NAVEGAÇÃO UNIFICADO + FONTE + STATUS -->
-      <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
-        <!-- Atalhos para as 3 telas -->
-        <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
-          <span class="px-2.5 py-1.5 rounded bg-emerald-600 text-white font-semibold flex items-center gap-1.5">
-            <i class="fa-solid fa-layer-group"></i> Global
-          </span>
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer" title="Abrir painel individual na Whitebox"
-             class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
-            Trafo 1 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
-          </a>
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer" title="Abrir painel individual na Whitebox"
-             class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
-            Trafo 2 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
-          </a>
-        </div>
-
-        <!-- Status Comunicação -->
-        <div id="commStatusBox" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 flex items-center gap-2 text-xs">
-          <span id="commDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <div>
-            <div id="commText" class="font-medium text-emerald-400 leading-tight">Whitebox Online</div>
-            <div id="commSub" class="text-[10px] text-slate-400 leading-tight">Modo Grátis Híbrido</div>
-          </div>
-        </div>
-
-        <!-- Alternância Dados Reais vs Simulação 380V -->
-        <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs gap-1">
-          <button onclick="setDataSource('real')" id="btnSourceReal"
-                  class="px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300">
-            <i class="fa-solid fa-database text-[10px]"></i> Dados Reais
-          </button>
-          <button onclick="setDataSource('sim')" id="btnSourceSim"
-                  class="px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-blue-600 text-white">
-            <i class="fa-solid fa-flask text-[10px]"></i> Simulação 380V
-          </button>
-        </div>
-
-        <!-- Cenários da Simulação -->
-        <div id="simButtonsGroup" class="flex items-center gap-1">
-          <button onclick="setSimMode('day')" id="btnDay" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition">Dia</button>
-          <button onclick="setSimMode('night')" id="btnNight" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">Madrugada</button>
-          <button onclick="setSimMode('offline')" id="btnOffline" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition" title="Simular falha de comunicação">Falha</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- BARRA DE TRANSPARÊNCIA DE COTA (SEMPRE VISÍVEL NO TOPO) -->
-    <div class="max-w-7xl mx-auto mt-3 pt-2.5 border-t border-slate-800/80 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-3 text-xs w-full lg:w-auto">
-        <span class="px-2 py-1 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold flex items-center gap-1.5">
-          <i class="fa-solid fa-shield-halved"></i> Plano Grátis ISSO (10/dia • 100/mês)
-        </span>
-
-        <!-- Barra Hoje -->
-        <div class="flex items-center gap-2 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800">
-          <span class="text-slate-400">Hoje:</span>
-          <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-            <div id="quotaDayBar" class="h-full bg-emerald-400 transition-all" style="width: 30%"></div>
-          </div>
-          <strong id="quotaDayText" class="text-white font-mono">3/10</strong>
-        </div>
-
-        <!-- Barra Mês com indicador de reserva 80% -->
-        <div class="flex items-center gap-2 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800" title="Ao atingir 80/100 no mês, o automático pausa para reservar 20 req manuais">
-          <span class="text-slate-400">Mês:</span>
-          <div class="relative w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-            <div id="quotaMonthBar" class="h-full bg-sky-400 transition-all" style="width: 3%"></div>
-            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-400/90" style="left: 80%" title="Trava de reserva automática: 80/100"></div>
-          </div>
-          <strong id="quotaMonthText" class="text-white font-mono">3/100</strong>
-          <span class="text-[10px] text-amber-300 hidden sm:inline">(reserva auto: 80)</span>
-        </div>
-
-        <!-- Resumo da Agenda -->
-        <div class="flex items-center gap-1.5 text-slate-300 bg-slate-950/60 px-2.5 py-1 rounded-lg border border-slate-800">
-          <i class="fa-regular fa-clock text-emerald-400"></i>
-          <span id="topScheduleSummary">Agenda: 1x/dia útil (17:00) • Proj: ~22 req/mês</span>
-        </div>
-      </div>
-
-      <!-- Ações Manuais e Drawer -->
-      <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
-        <button onclick="openSyncModal()"
-                class="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition flex items-center gap-1.5 shadow">
-          <i class="fa-solid fa-rotate"></i> Sincronizar Agora (Manual)
+      <!-- Ações Compactas no Topo (Status/Cota + Menu) -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <!-- Botão compacto de Status + Cota -->
+        <button type="button" onclick="openQuotaDialog()"
+                aria-label="Abrir controle de consultas e histórico da cota"
+                class="surface-elevated touch-target px-2.5 py-1.5 rounded-lg flex items-center gap-2 text-xs hover:opacity-90 transition">
+          <span id="commDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" aria-hidden="true"></span>
+          <span id="commText" class="font-semibold text-main hidden sm:inline">Online</span>
+          <span class="text-muted-token hidden sm:inline">•</span>
+          <span class="font-mono font-bold text-accent-token" id="headerQuotaPill">3/10</span>
         </button>
-        <button onclick="toggleQuotaDrawer()" id="btnToggleDrawer"
-                class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition flex items-center gap-1.5">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Histórico & Agenda (<span id="logCountBadge">3</span>)</span>
-          <i id="drawerChevron" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+
+        <!-- Botão Menu Mobile-First -->
+        <button type="button" id="menuOpenBtn" onclick="openMenuDrawer()"
+                aria-controls="menuDrawer" aria-expanded="false"
+                class="touch-target px-3 py-1.5 rounded-lg font-semibold text-xs text-white flex items-center gap-1.5 shadow-sm transition"
+                style="background-color: var(--accent);">
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
+          <span>Menu</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
-
-    <!-- PAINEL EXPANSÍVEL: CONTROLE DE COTA, AGENDAMENTO & MINI-HISTÓRICO -->
-    <section id="quotaDrawer" class="hidden bg-slate-900 border border-sky-500/30 rounded-xl p-5 shadow-2xl space-y-5">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
-        <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-gauge text-sky-400"></i>
-            Controle de Cota da API ISSO, Agendamento Automático & Mini-Histórico
-          </h2>
-          <p class="text-xs text-slate-400">
-            Transparência total no plano gratuito (10 req/dia • 100 req/mês). Cada consulta busca até 24h de dados minuto a minuto em 1 única requisição por trafo.
-          </p>
-        </div>
-        <button onclick="toggleQuotaDrawer()" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800">
-          Fechar <i class="fa-solid fa-xmark ml-1"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <!-- EDITOR DE AGENDAMENTO AUTOMÁTICO (5 COLS) -->
-        <div class="lg:col-span-5 bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-calendar-check"></i> Agendamento Automático (Nuvem)
-            </h3>
-            <span id="schedSaveStatus" class="text-[11px] text-emerald-400"></span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div>
-              <label class="block text-slate-400 mb-1">Frequência de Dias</label>
-              <select id="schedDaysSelect" onchange="recalcScheduleProjection()"
-                      class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-2">
-                <option value="weekdays">Dias Úteis (Seg–Sex • ~22 dias)</option>
-                <option value="mon_sat">Seg a Sáb (~26 dias)</option>
-                <option value="everyday">Todos os dias (~30 dias)</option>
-                <option value="disabled">Desativado (100% Manual)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-400 mb-1">Trafos na Coleta Automática</label>
-              <select id="schedTrafosSelect" onchange="recalcScheduleProjection()"
-                      class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-2">
-                <option value="1">Só Trafo 1 (1 req/coleta)</option>
-                <option value="2">Trafo 1 + Trafo 2 (2 req/coleta)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Horarios Configuraveis -->
-          <div class="space-y-2 text-xs">
-            <div class="flex items-center justify-between">
-              <label class="text-slate-400">Horários configurados (Brasília):</label>
-              <div class="flex items-center gap-1.5">
-                <input id="newScheduleTime" type="time" value="11:30"
-                       class="bg-slate-900 border border-slate-700 text-slate-100 rounded px-2 py-1 text-xs">
-                <button onclick="addScheduleTime()" type="button"
-                        class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-medium">
-                  + Horário
-                </button>
-              </div>
-            </div>
-            <div id="scheduleTimesList" class="flex flex-wrap gap-2"></div>
-          </div>
-
-          <!-- Projeção Mensal em Tempo Real -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-2 text-xs">
-            <div class="flex justify-between items-center">
-              <span class="text-slate-400">Projeção Mensal Automática:</span>
-              <strong id="schedProjectedText" class="text-emerald-400">22 req/mês (22%)</strong>
-            </div>
-            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden flex relative">
-              <div id="schedProjectedBar" class="h-full bg-emerald-500 transition-all" style="width: 22%"></div>
-              <div class="absolute top-0 bottom-0 w-0.5 bg-amber-400" style="left: 80%" title="Trava de reserva em 80/100"></div>
-            </div>
-            <p id="schedProjectedNote" class="text-[11px] text-slate-400">
-              Restam ~78 requisições no mês livres para cliques manuais. Coletas automáticas pausam automaticamente se o mês atingir 80/100.
-            </p>
-          </div>
-
-          <button onclick="saveScheduleConfig()" type="button"
-                  class="w-full py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-floppy-disk"></i> Salvar Configuração da Agenda
-          </button>
-        </div>
-
-        <!-- MINI-HISTÓRICO DE REQUISIÇÕES COM RETORNO TRADUZIDO (7 COLS) -->
-        <div class="lg:col-span-7 bg-slate-950/70 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-list-check"></i> Mini-Histórico de Requisições (Retorno Traduzido)
-              </h3>
-              <p class="text-[11px] text-slate-400">Cada linha registra uma chamada real à API da ISSO, o motivo e o diagnóstico em português.</p>
-            </div>
-            <button onclick="resetDemoLogs()" id="btnResetDemoLogs" class="text-[11px] text-slate-400 hover:text-slate-200 underline">
-              Restaurar log inicial (3 req)
-            </button>
-          </div>
-
-          <div id="auditLogList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
-        </div>
-      </div>
-    </section>
+  <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5">
 
     <!-- ALERT BANNER -->
-    <div id="alertBanner" class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4 transition-all">
+    <div id="alertBanner" class="p-3.5 sm:p-4 rounded-xl flex items-start sm:items-center justify-between gap-3 transition-all"
+         style="background: var(--accent-soft); border: 1px solid var(--accent-border);">
       <div class="flex items-center gap-3">
-        <div id="alertIcon" class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-          <i class="fa-solid fa-circle-check text-lg"></i>
+        <div id="alertIcon" class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+             style="background: var(--accent-soft); color: var(--accent-text);">
+          <i class="fa-solid fa-circle-check text-lg" aria-hidden="true"></i>
         </div>
         <div>
-          <h2 id="alertTitle" class="text-sm font-semibold text-emerald-300">Instalação em Conformidade Regulamentar (ANEEL)</h2>
-          <p id="alertDesc" class="text-xs text-slate-300">
+          <h2 id="alertTitle" class="text-sm font-bold text-main">Instalação em Conformidade Regulamentar (ANEEL)</h2>
+          <p id="alertDesc" class="text-xs text-sec">
             Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.
           </p>
         </div>
       </div>
       <div class="hidden sm:block text-right flex-shrink-0">
-        <span class="text-xs text-slate-400">Meta Regulamentar</span>
-        <div class="text-sm font-bold text-white">≥ 0,920</div>
+        <span class="text-[11px] text-muted-token">Meta Regulamentar</span>
+        <div class="text-sm font-bold text-main">≥ 0,920</div>
       </div>
     </div>
 
     <!-- CARDS DE DESTAQUE CONSOLIDADO GLOBAL (5 CARDS) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <section aria-label="Indicadores globais da instalação" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
 
       <!-- CARD 1: FP GLOBAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
-        <div class="flex justify-between items-start">
-          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">FP Global</span>
-          <span id="fpBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+      <div class="surface-card rounded-xl p-4 shadow-sm">
+        <div class="flex justify-between items-start gap-2">
+          <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">FP Global</span>
+          <span id="fpBadge" class="text-[10px] font-bold px-2 py-0.5 rounded"
+                style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
             INDUTIVO
           </span>
         </div>
         <div class="mt-2 flex items-baseline gap-1.5">
-          <span id="fpValue" class="text-2xl font-extrabold text-white">0.942</span>
-          <span class="text-xs text-slate-400">/ 1.000</span>
+          <span id="fpValue" class="text-2xl font-extrabold text-main">0.942</span>
+          <span class="text-xs text-muted-token">/ 1.000</span>
         </div>
-        <div class="mt-2.5 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+        <div class="mt-2.5 w-full h-2 rounded-full overflow-hidden surface-elevated">
           <div id="fpBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 94.2%"></div>
         </div>
-        <div class="mt-2 text-[11px] text-slate-400 flex justify-between">
+        <div class="mt-2 text-[11px] text-muted-token flex justify-between">
           <span>Meta: 0.920</span>
-          <span id="fpStatus" class="text-emerald-400 font-medium">+0.022</span>
+          <span id="fpStatus" class="font-semibold text-accent-token">+0.022</span>
         </div>
       </div>
 
       <!-- CARD 2: POTÊNCIA ATIVA TOTAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+      <div class="surface-card rounded-xl p-4 shadow-sm">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Ativa</span>
-          <i class="fa-solid fa-bolt text-blue-400 text-xs"></i>
+          <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Ativa</span>
+          <i class="fa-solid fa-bolt text-blue-500 text-xs" aria-hidden="true"></i>
         </div>
         <div class="mt-2 flex items-baseline gap-1.5">
-          <span id="pTotalValue" class="text-2xl font-extrabold text-white">418.5</span>
-          <span class="text-xs font-semibold text-slate-400">kW</span>
+          <span id="pTotalValue" class="text-2xl font-extrabold text-main">418.5</span>
+          <span class="text-xs font-semibold text-muted-token">kW</span>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-          <span>T1: <strong id="pT1Val" class="text-slate-200">224.2</strong></span>
-          <span>T2: <strong id="pT2Val" class="text-slate-200">194.3</strong></span>
+        <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
+          <span>T1: <strong id="pT1Val" class="text-main">224.2</strong></span>
+          <span>T2: <strong id="pT2Val" class="text-main">194.3</strong></span>
         </div>
       </div>
 
       <!-- CARD 3: POTÊNCIA REATIVA TOTAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+      <div class="surface-card rounded-xl p-4 shadow-sm">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Reativa</span>
-          <i class="fa-solid fa-wave-square text-amber-400 text-xs"></i>
+          <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Reativa</span>
+          <i class="fa-solid fa-wave-square text-amber-500 text-xs" aria-hidden="true"></i>
         </div>
         <div class="mt-2 flex items-baseline gap-1.5">
-          <span id="qTotalValue" class="text-2xl font-extrabold text-white">149.2</span>
-          <span class="text-xs font-semibold text-slate-400">kvar</span>
+          <span id="qTotalValue" class="text-2xl font-extrabold text-main">149.2</span>
+          <span class="text-xs font-semibold text-muted-token">kvar</span>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-          <span>T1: <strong id="qT1Val" class="text-slate-200">81.0</strong></span>
-          <span>T2: <strong id="qT2Val" class="text-slate-200">68.2</strong></span>
+        <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
+          <span>T1: <strong id="qT1Val" class="text-main">81.0</strong></span>
+          <span>T2: <strong id="qT2Val" class="text-main">68.2</strong></span>
         </div>
       </div>
 
       <!-- CARD 4: POTÊNCIA APARENTE TOTAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+      <div class="surface-card rounded-xl p-4 shadow-sm">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Potência Aparente</span>
-          <i class="fa-solid fa-gauge-high text-purple-400 text-xs"></i>
+          <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Aparente</span>
+          <i class="fa-solid fa-gauge-high text-purple-500 text-xs" aria-hidden="true"></i>
         </div>
         <div class="mt-2 flex items-baseline gap-1.5">
-          <span id="sTotalValue" class="text-2xl font-extrabold text-white">444.3</span>
-          <span class="text-xs font-semibold text-slate-400">kVA</span>
+          <span id="sTotalValue" class="text-2xl font-extrabold text-main">444.3</span>
+          <span class="text-xs font-semibold text-muted-token">kVA</span>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-          <span>Carga: <strong id="loadPct" class="text-slate-200">44.4%</strong></span>
-          <span>Cap: <strong class="text-slate-300">1.000 kVA</strong></span>
+        <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
+          <span>Carga: <strong id="loadPct" class="text-main">44.4%</strong></span>
+          <span>Cap: <strong class="text-sec">1.000 kVA</strong></span>
         </div>
       </div>
 
       <!-- CARD 5: DEMANDA & CONSUMO GLOBAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+      <div class="surface-card rounded-xl p-4 shadow-sm sm:col-span-2 lg:col-span-1">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Demanda & Consumo</span>
-          <i class="fa-solid fa-clock text-emerald-400 text-xs"></i>
+          <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Demanda & Consumo</span>
+          <i class="fa-solid fa-clock text-emerald-500 text-xs" aria-hidden="true"></i>
         </div>
         <div class="mt-2 flex items-baseline gap-1.5">
-          <span id="demandVal" class="text-2xl font-extrabold text-white">432</span>
-          <span class="text-xs font-semibold text-slate-400">kW (15m)</span>
+          <span id="demandVal" class="text-2xl font-extrabold text-main">432</span>
+          <span class="text-xs font-semibold text-muted-token">kW (15m)</span>
         </div>
-        <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-          <span>Máx: <strong id="demandMaxVal" class="text-amber-300">485 kW</strong></span>
-          <span>Hoje: <strong id="kwhTodayVal" class="text-emerald-400">4.820 kWh</strong></span>
+        <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
+          <span>Máx: <strong id="demandMaxVal" class="text-amber-500">485 kW</strong></span>
+          <span>Hoje: <strong id="kwhTodayVal" class="text-accent-token">4.820 kWh</strong></span>
         </div>
       </div>
 
-    </div>
+    </section>
 
-    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 (TENSÕES ENTRE FASES R-S, S-T, T-R ~380 V) -->
-    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-      <div class="px-5 py-4 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 -->
+    <section aria-labelledby="table-heading" class="surface-card rounded-xl overflow-hidden shadow-sm">
+      <div class="px-4 sm:px-5 py-3.5 border-b border-token flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-server text-blue-400"></i>
-            Medições Individuais por Transformador (Tensões Entre Fases R-S, S-T, T-R • 380 V)
-          </h3>
-          <p class="text-xs text-slate-400">Última leitura efetiva e status de cada analisador ISSO Blue Box D1000A</p>
+          <h2 id="table-heading" class="text-sm font-bold text-main flex items-center gap-2">
+            <i class="fa-solid fa-server text-blue-500" aria-hidden="true"></i>
+            Medições Individuais (Tensões Entre Fases R-S, S-T, T-R • 380 V)
+          </h2>
+          <p class="text-xs text-muted-token">Última leitura efetiva e status de cada analisador ISSO D1000A</p>
         </div>
         <div class="flex flex-wrap items-center gap-2 text-xs">
-          <span class="text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
-            <i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1" id="t1SyncDot"></i> T1: <span id="t1LastSync">17:15:02</span>
+          <span class="surface-elevated text-sec px-2.5 py-1 rounded">
+            <i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1" id="t1SyncDot" aria-hidden="true"></i>
+            T1: <span id="t1LastSync">17:15:02</span>
           </span>
-          <span class="text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
-            <i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1" id="t2SyncDot"></i> T2: <span id="t2LastSync">17:15:04</span>
+          <span class="surface-elevated text-sec px-2.5 py-1 rounded">
+            <i class="fa-solid fa-circle text-[8px] text-emerald-500 mr-1" id="t2SyncDot" aria-hidden="true"></i>
+            T2: <span id="t2LastSync">17:15:04</span>
           </span>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950/60 text-slate-400 border-b border-slate-800">
+          <caption class="visually-hidden">Comparativo elétrico individual dos Transformadores 01 e 02 e total global</caption>
+          <thead class="surface-elevated text-muted-token border-b border-token">
             <tr>
-              <th class="px-4 py-3 font-semibold">EQUIPAMENTO</th>
-              <th class="px-4 py-3 font-semibold">TENSÕES ENTRE FASES (R-S / S-T / T-R)</th>
-              <th class="px-4 py-3 font-semibold">CORRENTES (R / S / T)</th>
-              <th class="px-4 py-3 font-semibold text-blue-400">P. ATIVA</th>
-              <th class="px-4 py-3 font-semibold text-amber-400">P. REATIVA</th>
-              <th class="px-4 py-3 font-semibold text-purple-400">P. APARENTE</th>
-              <th class="px-4 py-3 font-semibold">FP INDIV.</th>
+              <th scope="col" class="px-4 py-3 font-semibold">EQUIPAMENTO</th>
+              <th scope="col" class="px-4 py-3 font-semibold">TENSÕES (R-S / S-T / T-R)</th>
+              <th scope="col" class="px-4 py-3 font-semibold">CORRENTES (R / S / T)</th>
+              <th scope="col" class="px-4 py-3 font-semibold">P. ATIVA</th>
+              <th scope="col" class="px-4 py-3 font-semibold">P. REATIVA</th>
+              <th scope="col" class="px-4 py-3 font-semibold">P. APARENTE</th>
+              <th scope="col" class="px-4 py-3 font-semibold">FP INDIV.</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800 text-slate-200">
-            <!-- LINHA TRAFO 1 -->
-            <tr class="hover:bg-slate-800/40 transition">
-              <td class="px-4 py-3.5">
+          <tbody class="divide-y divide-[var(--border-color)] text-main">
+            <tr>
+              <th scope="row" class="px-4 py-3.5 text-left font-normal">
                 <div class="flex items-center gap-2">
-                  <span id="t1StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span id="t1StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true"></span>
                   <div>
-                    <div class="font-bold text-white">Trafo 01 (500 kVA)</div>
-                    <div class="text-[10px] text-slate-500">Serraria 1 • 308AD713C046</div>
+                    <div class="font-bold text-main">Trafo 01 (500 kVA)</div>
+                    <div class="text-[11px] text-muted-token">Serraria 1 • 308AD713C046</div>
                   </div>
                 </div>
-              </td>
+              </th>
               <td class="px-4 py-3.5 font-mono text-[11px]">
                 <span id="t1Vrs">381.4</span> / <span id="t1Vst">379.8</span> / <span id="t1Vtr">382.1</span> V
-                <div class="text-[10px] text-slate-400">Média: <strong id="t1Vavg" class="text-slate-200">381.1 V</strong></div>
+                <div class="text-[11px] text-muted-token">Média: <strong id="t1Vavg" class="text-main">381.1 V</strong></div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
                 <span id="t1Ir">358</span> / <span id="t1Is">364</span> / <span id="t1It">361</span> A
               </td>
-              <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t1P">224.2</span> kW</td>
-              <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t1Q">81.0</span> kvar</td>
-              <td class="px-4 py-3.5 font-bold text-purple-400"><span id="t1S">238.4</span> kVA</td>
+              <td class="px-4 py-3.5 font-bold text-p-token"><span id="t1P">224.2</span> kW</td>
+              <td class="px-4 py-3.5 font-bold text-q-token"><span id="t1Q">81.0</span> kvar</td>
+              <td class="px-4 py-3.5 font-bold text-s-token"><span id="t1S">238.4</span> kVA</td>
               <td class="px-4 py-3.5">
-                <span id="t1FpBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-400">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold" style="background: var(--accent-soft); color: var(--accent-text);">
                   <span id="t1Fp">0.940</span> (Ind)
                 </span>
               </td>
             </tr>
 
-            <!-- LINHA TRAFO 2 -->
-            <tr class="hover:bg-slate-800/40 transition">
-              <td class="px-4 py-3.5">
+            <tr>
+              <th scope="row" class="px-4 py-3.5 text-left font-normal">
                 <div class="flex items-center gap-2">
-                  <span id="t2StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span id="t2StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true"></span>
                   <div>
-                    <div class="font-bold text-white">Trafo 02 (500 kVA)</div>
-                    <div class="text-[10px] text-slate-500">Serraria 2 • 308A3849D67A</div>
+                    <div class="font-bold text-main">Trafo 02 (500 kVA)</div>
+                    <div class="text-[11px] text-muted-token">Serraria 2 • 308A3849D67A</div>
                   </div>
                 </div>
-              </td>
+              </th>
               <td class="px-4 py-3.5 font-mono text-[11px]">
                 <span id="t2Vrs">378.2</span> / <span id="t2Vst">380.5</span> / <span id="t2Vtr">381.0</span> V
-                <div class="text-[10px] text-slate-400">Média: <strong id="t2Vavg" class="text-slate-200">379.9 V</strong></div>
+                <div class="text-[11px] text-muted-token">Média: <strong id="t2Vavg" class="text-main">379.9 V</strong></div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
                 <span id="t2Ir">310</span> / <span id="t2Is">316</span> / <span id="t2It">313</span> A
               </td>
-              <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t2P">194.3</span> kW</td>
-              <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t2Q">68.2</span> kvar</td>
-              <td class="px-4 py-3.5 font-bold text-purple-400"><span id="t2S">205.9</span> kVA</td>
+              <td class="px-4 py-3.5 font-bold text-p-token"><span id="t2P">194.3</span> kW</td>
+              <td class="px-4 py-3.5 font-bold text-q-token"><span id="t2Q">68.2</span> kvar</td>
+              <td class="px-4 py-3.5 font-bold text-s-token"><span id="t2S">205.9</span> kVA</td>
               <td class="px-4 py-3.5">
-                <span id="t2FpBadge" class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-400">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold" style="background: var(--accent-soft); color: var(--accent-text);">
                   <span id="t2Fp">0.944</span> (Ind)
                 </span>
               </td>
             </tr>
 
-            <!-- LINHA TOTAL CONSOLIDADO (SEM SOMA DE CORRENTES CONFORME SOLICITADO PELO BETO) -->
-            <tr class="bg-slate-950/80 font-bold border-t-2 border-slate-700">
-              <td class="px-4 py-3.5 text-emerald-400 flex items-center gap-2">
-                <i class="fa-solid fa-calculator"></i> TOTAL GLOBAL
-              </td>
-              <td class="px-4 py-3.5 text-slate-400 text-[11px] font-normal">Comparativo de 380 V abaixo ↓</td>
-              <td class="px-4 py-3.5 text-slate-500 font-mono text-[11px] font-normal" title="Correntes exibidas apenas individualmente por transformador">
-                — <span class="text-[10px]">(por trafo)</span>
-              </td>
-              <td class="px-4 py-3.5 text-blue-300 text-sm"><span id="tableTotP">418.5</span> kW</td>
-              <td class="px-4 py-3.5 text-amber-300 text-sm"><span id="tableTotQ">149.2</span> kvar</td>
-              <td class="px-4 py-3.5 text-purple-300 text-sm"><span id="tableTotS">444.3</span> kVA</td>
+            <tr class="surface-elevated font-bold border-t-2 border-[var(--border-strong)]">
+              <th scope="row" class="px-4 py-3.5 text-left text-accent-token">
+                <i class="fa-solid fa-calculator mr-1.5" aria-hidden="true"></i> TOTAL GLOBAL
+              </th>
+              <td class="px-4 py-3.5 text-muted-token text-[11px] font-normal">Comparativo 380 V abaixo</td>
+              <td class="px-4 py-3.5 text-muted-token font-mono text-[11px] font-normal">— (por trafo)</td>
+              <td class="px-4 py-3.5 text-sm text-main"><span id="tableTotP">418.5</span> kW</td>
+              <td class="px-4 py-3.5 text-sm text-main"><span id="tableTotQ">149.2</span> kvar</td>
+              <td class="px-4 py-3.5 text-sm text-main"><span id="tableTotS">444.3</span> kVA</td>
               <td class="px-4 py-3.5">
-                <span id="tableFpBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500 text-slate-950 shadow">
+                <span id="tableFpBadge" class="px-2.5 py-1 rounded text-xs font-bold text-white shadow-sm" style="background: var(--accent);">
                   <span id="tableTotFp">0.942 IND</span>
                 </span>
               </td>
@@ -497,191 +613,500 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <!-- GRÁFICOS HISTÓRICOS: FATOR DE POTÊNCIA + COMPARATIVO DE TENSÕES ENTRE FASES (380 V) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- GRÁFICOS HISTÓRICOS -->
+    <section aria-label="Gráficos históricos" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
       <!-- GRÁFICO 1: FATOR DE POTÊNCIA GLOBAL -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <div class="surface-card rounded-xl p-4 sm:p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-chart-area text-emerald-400"></i>
+            <h2 class="text-sm font-bold text-main flex items-center gap-2">
+              <i class="fa-solid fa-chart-area text-emerald-500" aria-hidden="true"></i>
               Histórico de Fator de Potência Global
-            </h3>
-            <p class="text-xs text-slate-400">Identificação de desvios na madrugada e horário de ponta</p>
+            </h2>
+            <p class="text-xs text-muted-token">Desvios na madrugada e horário de ponta</p>
           </div>
-          <select id="periodSelectFp" onchange="changeChartPeriod()" class="text-xs bg-slate-800 border border-slate-700 text-slate-200 rounded px-2 py-1">
+          <label for="periodSelectFp" class="visually-hidden">Selecionar período do gráfico</label>
+          <select id="periodSelectFp" onchange="changeChartPeriod()"
+                  class="text-xs surface-elevated text-main rounded-lg px-2.5 py-1.5">
             <option value="24h">Últimas 24 horas</option>
             <option value="7d">Últimos 7 dias</option>
             <option value="30d">Últimos 30 dias</option>
           </select>
         </div>
         <div class="h-60 w-full">
-          <canvas id="fpChart"></canvas>
+          <canvas id="fpChart" role="img" aria-label="Gráfico de linha mostrando evolução do fator de potência global comparado ao limite 0,92"></canvas>
         </div>
-        <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <div class="mt-3 pt-2.5 border-t border-token flex items-center justify-between text-xs text-muted-token">
           <span>Linha tracejada: Limite ANEEL (0,920)</span>
-          <button onclick="downloadCSV()" class="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1">
-            <i class="fa-solid fa-file-excel"></i> Exportar CSV/Excel
+          <button type="button" onclick="downloadCSV()" class="text-accent-token hover:underline font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel" aria-hidden="true"></i> Exportar CSV/Excel
           </button>
         </div>
       </div>
 
-      <!-- GRÁFICO 2: COMPARATIVO DE TENSÕES ENTRE FASES (TRAFO 1 VS TRAFO 2 - 380 V) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <!-- GRÁFICO 2: COMPARATIVO DE TENSÕES ENTRE FASES (380 V) -->
+      <div class="surface-card rounded-xl p-4 sm:p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
           <div>
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-wave-square text-blue-400"></i>
-              Comparativo de Tensão Média Entre Fases (380 V • T1 vs T2)
-            </h3>
-            <p class="text-xs text-slate-400">Amostragem de 1 min para detectar quedas simultâneas ou isoladas</p>
+            <h2 class="text-sm font-bold text-main flex items-center gap-2">
+              <i class="fa-solid fa-wave-square text-blue-500" aria-hidden="true"></i>
+              Comparativo de Tensão Média (380 V • T1 vs T2)
+            </h2>
+            <p class="text-xs text-muted-token">Amostragem de 1 min para detectar quedas simultâneas ou isoladas</p>
           </div>
-          <div class="flex items-center gap-3 text-[11px]">
-            <span class="flex items-center gap-1 text-blue-400"><span class="w-2.5 h-0.5 bg-blue-400"></span> Trafo 1</span>
-            <span class="flex items-center gap-1 text-amber-400"><span class="w-2.5 h-0.5 bg-amber-400"></span> Trafo 2</span>
+          <div class="flex items-center gap-3 text-[11px] font-medium">
+            <span class="flex items-center gap-1 text-blue-500"><span class="w-2.5 h-0.5 bg-blue-500"></span> Trafo 1</span>
+            <span class="flex items-center gap-1 text-amber-500"><span class="w-2.5 h-0.5 bg-amber-500"></span> Trafo 2</span>
           </div>
         </div>
         <div class="h-60 w-full">
-          <canvas id="voltageChart"></canvas>
+          <canvas id="voltageChart" role="img" aria-label="Gráfico comparativo das tensões médias entre fases dos transformadores 1 e 2"></canvas>
         </div>
-        <!-- REGISTRO DE MÍNIMA E MÁXIMA DE TENSÃO COM DATA E HORA -->
-        <div class="mt-3 pt-2.5 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
-          <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
-            <span class="text-slate-400">Mínima Registrada:</span>
-            <span id="vMinText" class="text-red-400 font-semibold">362.8 V <span class="text-slate-500 font-normal">(T2 • 14:12)</span></span>
+        <div class="mt-3 pt-2.5 border-t border-token grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
+            <span class="text-muted-token">Mínima Registrada:</span>
+            <span class="font-bold text-red-500">362.8 V <span class="text-muted-token font-normal">(T2 • 14:12)</span></span>
           </div>
-          <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
-            <span class="text-slate-400">Máxima Registrada:</span>
-            <span id="vMaxText" class="text-emerald-400 font-semibold">389.4 V <span class="text-slate-500 font-normal">(T1 • 03:45)</span></span>
+          <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
+            <span class="text-muted-token">Máxima Registrada:</span>
+            <span class="font-bold text-accent-token">389.4 V <span class="text-muted-token font-normal">(T1 • 03:45)</span></span>
           </div>
         </div>
       </div>
 
-    </div>
+    </section>
 
   </main>
 
-  <!-- MODAL DE CONFIRMAÇÃO: SINCRONIZAR AGORA (MANUAL) -->
-  <div id="syncModal" class="hidden fixed inset-0 z-[90] bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
-      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+  <!-- GAVETA MOBILE-FIRST DE MENU / OPÇÕES -->
+  <dialog id="menuDrawer" class="Drawer" aria-labelledby="drawerTitle">
+    <nav class="Drawer-panel p-4 space-y-5" aria-label="Menu principal de opções e ferramentas">
+      <div class="flex items-center justify-between pb-3 border-b border-token">
         <div>
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-rotate text-emerald-400"></i>
-            Confirmar Envio Manual de Requisição
-          </h3>
-          <p class="text-xs text-slate-400">Consulta direta à API ISSO Whitebox (energiamedicaov2)</p>
+          <h2 id="drawerTitle" class="text-base font-bold text-main">Opções e Controles</h2>
+          <p class="text-[11px] text-muted-token">Serraria VJ Rauber • Tela Global</p>
         </div>
-        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" id="drawerCloseBtn" autofocus onclick="closeMenuDrawer()"
+                aria-label="Fechar menu"
+                class="surface-elevated touch-target px-3 py-1.5 rounded-lg text-xs font-semibold text-main">
+          <i class="fa-solid fa-xmark mr-1" aria-hidden="true"></i> Fechar
+        </button>
       </div>
 
-      <!-- Escolha de Equipamentos -->
-      <div class="space-y-1.5 text-xs">
-        <label class="block text-slate-300 font-semibold">1. Qual analisador consultar?</label>
+      <!-- 1. FONTE DOS DADOS E TESTES -->
+      <div class="space-y-2.5">
+        <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Visualização dos Dados</h3>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button type="button" id="menuSourceReal" onclick="setDataSource('real')"
+                  class="touch-target px-3 py-2 rounded-lg font-semibold border transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-database" aria-hidden="true"></i> Dados Reais
+          </button>
+          <button type="button" id="menuSourceSim" onclick="setDataSource('sim')"
+                  class="touch-target px-3 py-2 rounded-lg font-semibold border transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-flask" aria-hidden="true"></i> Simulação 380V
+          </button>
+        </div>
+
+        <div id="menuSimSubgroup" class="grid grid-cols-3 gap-1.5 text-xs pt-1">
+          <button type="button" id="btnDay" onclick="setSimMode('day')" class="touch-target py-2 rounded-lg font-medium border">Dia</button>
+          <button type="button" id="btnNight" onclick="setSimMode('night')" class="touch-target py-2 rounded-lg font-medium border">Madrugada</button>
+          <button type="button" id="btnOffline" onclick="setSimMode('offline')" class="touch-target py-2 rounded-lg font-medium border">Falha</button>
+        </div>
+      </div>
+
+      <!-- 2. CONSULTAS & COTA DA API -->
+      <div class="space-y-2.5 pt-3 border-t border-token">
+        <div class="flex items-center justify-between">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Consultas & Franquia ISSO</h3>
+          <span class="text-[11px] font-mono font-bold text-accent-token" id="drawerQuotaSummary">3/10 hoje • 3/100 mês</span>
+        </div>
+
+        <button type="button" onclick="closeMenuDrawer(); openSyncModal();"
+                class="w-full touch-target py-2.5 px-3 rounded-lg text-xs font-bold text-white flex items-center justify-between shadow-sm"
+                style="background-color: var(--accent);">
+          <span><i class="fa-solid fa-rotate mr-2" aria-hidden="true"></i> Sincronizar Agora (Manual)</span>
+          <i class="fa-solid fa-chevron-right text-[10px]" aria-hidden="true"></i>
+        </button>
+
+        <button type="button" onclick="closeMenuDrawer(); openQuotaDialog();"
+                class="w-full touch-target surface-elevated py-2.5 px-3 rounded-lg text-xs font-semibold text-main flex items-center justify-between hover:opacity-90">
+          <span><i class="fa-solid fa-sliders mr-2 text-blue-500" aria-hidden="true"></i> Cota, Agenda & Histórico (<span id="drawerLogCount">3</span>)</span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-muted-token" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- 3. TELAS INDIVIDUAIS WHITEBOX -->
+      <div class="space-y-2 pt-3 border-t border-token">
+        <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Telas Individuais (Whitebox ISSO)</h3>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
+             class="touch-target surface-elevated px-3 py-2 rounded-lg font-semibold text-main flex items-center justify-between hover:opacity-90">
+            <span>Trafo 1</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
+          </a>
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
+             class="touch-target surface-elevated px-3 py-2 rounded-lg font-semibold text-main flex items-center justify-between hover:opacity-90">
+            <span>Trafo 2</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. APARÊNCIA & ACESSIBILIDADE -->
+      <div class="space-y-3 pt-3 border-t border-token">
+        <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Aparência & Acessibilidade</h3>
+
+        <!-- Tema Claro / Escuro / Sistema -->
+        <div class="space-y-1 text-xs">
+          <span class="text-sec font-medium">Tema da Tela</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" id="themeBtnSystem" onclick="setColorScheme('system')" class="touch-target py-2 px-2 rounded-lg border font-medium">Sistema</button>
+            <button type="button" id="themeBtnLight" onclick="setColorScheme('light')" class="touch-target py-2 px-2 rounded-lg border font-medium"><i class="fa-solid fa-sun mr-1" aria-hidden="true"></i>Claro</button>
+            <button type="button" id="themeBtnDark" onclick="setColorScheme('dark')" class="touch-target py-2 px-2 rounded-lg border font-medium"><i class="fa-solid fa-moon mr-1" aria-hidden="true"></i>Escuro</button>
+          </div>
+          <p id="systemThemeHint" class="text-[11px] text-muted-token"></p>
+        </div>
+
+        <!-- Tamanho da Fonte -->
+        <div class="space-y-1 text-xs">
+          <span class="text-sec font-medium">Tamanho da Letra</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" id="fontBtn100" onclick="setFontScale('100')" class="touch-target py-2 rounded-lg border font-medium">Normal</button>
+            <button type="button" id="fontBtn112" onclick="setFontScale('112')" class="touch-target py-2 rounded-lg border font-medium">Grande</button>
+            <button type="button" id="fontBtn125" onclick="setFontScale('125')" class="touch-target py-2 rounded-lg border font-medium">Extra</button>
+          </div>
+        </div>
+
+        <!-- Alto Contraste -->
+        <div class="flex items-center justify-between text-xs surface-elevated p-2.5 rounded-lg">
+          <div>
+            <div class="font-semibold text-main">Modo Alto Contraste</div>
+            <div class="text-[11px] text-muted-token">Bordas reforçadas e máxima leitura</div>
+          </div>
+          <button type="button" id="btnHighContrast" role="switch" aria-checked="false" onclick="toggleHighContrast()"
+                  class="touch-target px-3 py-1.5 rounded-lg font-bold border text-xs transition">
+            Desligado
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. AJUDA & CONTATOS -->
+      <div class="pt-3 border-t border-token">
+        <button type="button" onclick="closeMenuDrawer(); openHelpDialog();"
+                class="w-full touch-target surface-elevated py-2.5 px-3 rounded-lg text-xs font-semibold text-main flex items-center justify-between hover:opacity-90">
+          <span><i class="fa-solid fa-circle-question mr-2 text-amber-500" aria-hidden="true"></i> Ajuda & Contatos Técnicos</span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-muted-token" aria-hidden="true"></i>
+        </button>
+      </div>
+    </nav>
+  </dialog>
+
+  <!-- PAINEL SEPARADO: COTA, AGENDAMENTO AUTOMÁTICO & HISTÓRICO TRADUZIDO -->
+  <dialog id="quotaDialog" class="app-dialog" style="width: min(96vw, 62rem);" aria-labelledby="quotaDialogTitle">
+    <div class="p-4 sm:p-5 space-y-5">
+      <div class="flex items-start justify-between border-b border-token pb-3 gap-3">
+        <div>
+          <h2 id="quotaDialogTitle" class="text-base font-bold text-main flex items-center gap-2">
+            <i class="fa-solid fa-gauge text-blue-500" aria-hidden="true"></i>
+            Controle de Consultas, Agenda & Histórico
+          </h2>
+          <p class="text-xs text-muted-token">
+            Franquia gratuita ISSO (10 consultas/dia • 100 consultas/mês). Cada consulta busca até 24h de dados minuto a minuto por transformador.
+          </p>
+        </div>
+        <button type="button" onclick="closeDialog('quotaDialog')" aria-label="Fechar painel de cota"
+                class="surface-elevated touch-target px-3 py-1.5 rounded-lg text-xs font-semibold text-main">
+          Fechar
+        </button>
+      </div>
+
+      <!-- Barras de Progresso de Cota -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="surface-elevated p-3 rounded-xl space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-sec font-semibold">Consultas Hoje</span>
+            <strong id="quotaDayText" class="font-mono text-main">3 / 10</strong>
+          </div>
+          <div class="w-full h-2 rounded-full overflow-hidden surface-card">
+            <div id="quotaDayBar" class="h-full bg-emerald-500 transition-all" style="width: 30%"></div>
+          </div>
+        </div>
+        <div class="surface-elevated p-3 rounded-xl space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-sec font-semibold">Consultas no Mês (reserva automática: 80)</span>
+            <strong id="quotaMonthText" class="font-mono text-main">3 / 100</strong>
+          </div>
+          <div class="relative w-full h-2 rounded-full overflow-hidden surface-card">
+            <div id="quotaMonthBar" class="h-full bg-blue-500 transition-all" style="width: 3%"></div>
+            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-500" style="left: 80%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- EDITOR DE AGENDAMENTO AUTOMÁTICO -->
+        <div class="lg:col-span-5 surface-elevated rounded-xl p-4 space-y-3 text-xs">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold uppercase tracking-wider text-main">Agendamento Automático</h3>
+            <span id="schedSaveStatus" class="text-[11px] font-semibold text-accent-token"></span>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <label for="schedDaysSelect" class="block text-sec mb-1 font-medium">Dias da semana</label>
+              <select id="schedDaysSelect" onchange="recalcScheduleProjection()"
+                      class="w-full surface-card text-main rounded-lg px-2.5 py-2">
+                <option value="weekdays">Dias Úteis (Seg–Sex • ~22 dias)</option>
+                <option value="mon_sat">Seg a Sáb (~26 dias)</option>
+                <option value="everyday">Todos os dias (~30 dias)</option>
+                <option value="disabled">Desativado (100% Manual)</option>
+              </select>
+            </div>
+            <div>
+              <label for="schedTrafosSelect" class="block text-sec mb-1 font-medium">Equipamentos na coleta automática</label>
+              <select id="schedTrafosSelect" onchange="recalcScheduleProjection()"
+                      class="w-full surface-card text-main rounded-lg px-2.5 py-2">
+                <option value="1">Só Trafo 1 (1 consulta/coleta)</option>
+                <option value="2">Trafo 1 + Trafo 2 (2 consultas/coleta)</option>
+              </select>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <label for="newScheduleTime" class="text-sec font-medium">Horários (Brasília):</label>
+                <div class="flex items-center gap-1.5">
+                  <input id="newScheduleTime" type="time" value="11:30" class="surface-card text-main rounded px-2 py-1 text-xs">
+                  <button type="button" onclick="addScheduleTime()" class="px-2.5 py-1 rounded surface-card text-accent-token font-semibold">+ Horário</button>
+                </div>
+              </div>
+              <div id="scheduleTimesList" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <div class="surface-card rounded-lg p-3 space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-muted-token">Projeção Mensal:</span>
+                <strong id="schedProjectedText" class="text-accent-token">22 / mês (22%)</strong>
+              </div>
+              <div class="w-full h-2 surface-elevated rounded-full overflow-hidden relative">
+                <div id="schedProjectedBar" class="h-full bg-emerald-500 transition-all" style="width: 22%"></div>
+                <div class="absolute top-0 bottom-0 w-0.5 bg-amber-500" style="left: 80%"></div>
+              </div>
+              <p id="schedProjectedNote" class="text-[11px] text-muted-token"></p>
+            </div>
+
+            <button type="button" onclick="saveScheduleConfig()"
+                    class="w-full touch-target py-2 rounded-lg text-white font-semibold" style="background: var(--accent);">
+              Salvar Agendamento
+            </button>
+          </div>
+        </div>
+
+        <!-- MINI-HISTÓRICO DE CONSULTAS (RETORNO TRADUZIDO) -->
+        <div class="lg:col-span-7 surface-elevated rounded-xl p-4 flex flex-col justify-between space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-main">Histórico de Consultas (Traduzido)</h3>
+              <p class="text-[11px] text-muted-token">Motivo do envio e diagnóstico traduzido de cada chamada.</p>
+            </div>
+            <button type="button" onclick="closeDialog('quotaDialog'); openSyncModal();"
+                    class="px-3 py-1.5 rounded-lg text-white text-xs font-semibold" style="background: var(--accent);">
+              + Nova Consulta Manual
+            </button>
+          </div>
+          <div id="auditLogList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL DE CONFIRMAÇÃO: SINCRONIZAR AGORA (MANUAL) -->
+  <dialog id="syncDialog" class="app-dialog" style="width: min(94vw, 34rem);" aria-labelledby="syncDialogTitle">
+    <div class="p-4 sm:p-5 space-y-4">
+      <div class="flex items-start justify-between border-b border-token pb-3">
+        <div>
+          <h2 id="syncDialogTitle" class="text-base font-bold text-main flex items-center gap-2">
+            <i class="fa-solid fa-rotate text-emerald-500" aria-hidden="true"></i>
+            Confirmar Consulta Manual
+          </h2>
+          <p class="text-xs text-muted-token">Busca imediata de leituras nos analisadores ISSO D1000A</p>
+        </div>
+        <button type="button" onclick="closeDialog('syncDialog')" aria-label="Fechar janela de consulta"
+                class="surface-elevated px-2.5 py-1 rounded-lg text-xs font-semibold text-main">Fechar</button>
+      </div>
+
+      <fieldset class="space-y-1.5 text-xs">
+        <legend class="text-sec font-semibold mb-1">1. Qual equipamento consultar?</legend>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-            <input type="radio" name="syncTarget" value="1" checked onchange="updateSyncCostPreview()" class="accent-emerald-500">
+          <label class="flex items-center gap-2 surface-elevated p-2.5 rounded-lg cursor-pointer">
+            <input type="radio" name="syncTarget" value="1" checked onchange="updateSyncCostPreview()">
             <div>
-              <div class="font-semibold text-white">Trafo 1</div>
-              <div class="text-[10px] text-slate-400">308AD713C046 • 1 req</div>
+              <div class="font-bold text-main">Trafo 1</div>
+              <div class="text-[10px] text-muted-token">308AD713C046 • 1 req</div>
             </div>
           </label>
-          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-            <input type="radio" name="syncTarget" value="2" onchange="updateSyncCostPreview()" class="accent-emerald-500">
+          <label class="flex items-center gap-2 surface-elevated p-2.5 rounded-lg cursor-pointer">
+            <input type="radio" name="syncTarget" value="2" onchange="updateSyncCostPreview()">
             <div>
-              <div class="font-semibold text-white">Trafo 2</div>
-              <div class="text-[10px] text-slate-400">308A3849D67A • 1 req</div>
+              <div class="font-bold text-main">Trafo 2</div>
+              <div class="text-[10px] text-muted-token">308A3849D67A • 1 req</div>
             </div>
           </label>
-          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
-            <input type="radio" name="syncTarget" value="both" onchange="updateSyncCostPreview()" class="accent-emerald-500">
+          <label class="flex items-center gap-2 surface-elevated p-2.5 rounded-lg cursor-pointer">
+            <input type="radio" name="syncTarget" value="both" onchange="updateSyncCostPreview()">
             <div>
-              <div class="font-semibold text-white">Ambos</div>
-              <div class="text-[10px] text-slate-400">T1 + T2 • 2 req</div>
+              <div class="font-bold text-main">Ambos</div>
+              <div class="text-[10px] text-muted-token">T1 + T2 • 2 req</div>
             </div>
           </label>
         </div>
-      </div>
+      </fieldset>
 
-      <!-- Tipo de Busca -->
-      <div class="space-y-1.5 text-xs">
-        <label class="block text-slate-300 font-semibold">2. Tipo de consulta:</label>
+      <fieldset class="space-y-1.5 text-xs">
+        <legend class="text-sec font-semibold mb-1">2. Tipo de consulta:</legend>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <label class="flex items-start gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-sky-500">
-            <input type="radio" name="syncQueryType" value="janela_24h_minuto" checked class="mt-0.5 accent-sky-500">
+          <label class="flex items-start gap-2 surface-elevated p-2.5 rounded-lg cursor-pointer">
+            <input type="radio" name="syncQueryType" value="janela_24h_minuto" checked class="mt-0.5">
             <div>
-              <div class="font-semibold text-white">Histórico 24h (minuto a minuto)</div>
-              <div class="text-[10px] text-slate-400">Preenche gráficos e última leitura de uma só vez.</div>
+              <div class="font-bold text-main">Histórico 24h (minuto a minuto)</div>
+              <div class="text-[10px] text-muted-token">Preenche gráficos e leitura atual.</div>
             </div>
           </label>
-          <label class="flex items-start gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-sky-500">
-            <input type="radio" name="syncQueryType" value="ultimo_registro" class="mt-0.5 accent-sky-500">
+          <label class="flex items-start gap-2 surface-elevated p-2.5 rounded-lg cursor-pointer">
+            <input type="radio" name="syncQueryType" value="ultimo_registro" class="mt-0.5">
             <div>
-              <div class="font-semibold text-white">Apenas Último Registro</div>
-              <div class="text-[10px] text-slate-400">Mais leve; ideal para testar comunicação rápida.</div>
+              <div class="font-bold text-main">Apenas Último Registro</div>
+              <div class="text-[10px] text-muted-token">Checagem rápida instantânea.</div>
             </div>
           </label>
         </div>
-      </div>
+      </fieldset>
 
-      <!-- Motivo -->
       <div class="space-y-2 text-xs">
-        <label class="block text-slate-300 font-semibold">3. Motivo da requisição (registrado no histórico):</label>
+        <label for="syncReasonInput" class="block text-sec font-semibold">3. Motivo da consulta:</label>
         <div class="flex flex-wrap gap-1.5">
-          <button type="button" onclick="pickReason('Atualização de rotina')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Atualização de rotina</button>
-          <button type="button" onclick="pickReason('Conferência de instalação em campo')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Conferência em campo</button>
-          <button type="button" onclick="pickReason('Verificação de queda de tensão')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Queda de tensão</button>
-          <button type="button" onclick="pickReason('Teste de comunicação Wi-Fi')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Teste comunicação</button>
+          <button type="button" onclick="pickReason('Atualização de rotina')" class="px-2 py-1 rounded surface-elevated text-main">Rotina</button>
+          <button type="button" onclick="pickReason('Conferência em campo')" class="px-2 py-1 rounded surface-elevated text-main">Conferência em campo</button>
+          <button type="button" onclick="pickReason('Verificação de queda de tensão')" class="px-2 py-1 rounded surface-elevated text-main">Queda de tensão</button>
+          <button type="button" onclick="pickReason('Teste de comunicação Wi-Fi')" class="px-2 py-1 rounded surface-elevated text-main">Teste Wi-Fi</button>
         </div>
-        <input id="syncReasonInput" type="text" value="Atualização de rotina" placeholder="Descreva o motivo..."
-               class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
+        <input id="syncReasonInput" type="text" value="Atualização de rotina"
+               class="w-full px-3 py-2 rounded-lg surface-elevated text-main text-xs">
       </div>
 
-      <!-- Aviso de Consumo / Limite -->
-      <div id="syncQuotaWarningBox" class="p-3 rounded-lg bg-amber-950/40 border border-amber-500/40 text-xs space-y-1">
-        <div class="font-bold text-amber-300 flex items-center gap-1.5">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          Esta ação vai consumir <span id="syncCostNum">1</span> requisição da cota ISSO
+      <div class="p-3 rounded-lg text-xs space-y-1" style="background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text);">
+        <div class="font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          Esta ação consome <span id="syncCostNum">1</span> requisição da franquia ISSO
         </div>
-        <div class="text-slate-300 flex justify-between pt-1">
-          <span>Saldo Hoje: <strong id="syncPreviewDay" class="text-white">3 → 4 / 10</strong></span>
-          <span>Saldo Mês: <strong id="syncPreviewMonth" class="text-white">3 → 4 / 100</strong></span>
+        <div class="flex justify-between pt-1 text-main">
+          <span>Hoje: <strong id="syncPreviewDay">3 → 4 / 10</strong></span>
+          <span>Mês: <strong id="syncPreviewMonth">3 → 4 / 100</strong></span>
         </div>
-        <p id="syncPreviewModeNote" class="text-[11px] text-sky-300 pt-1 hidden"></p>
+        <p id="syncPreviewModeNote" class="text-[11px] text-sec pt-1 hidden"></p>
       </div>
 
-      <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-        <button onclick="closeSyncModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Cancelar</button>
-        <button id="btnConfirmSync" onclick="executeManualSync()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5">
-          <i class="fa-solid fa-paper-plane"></i> Confirmar e Enviar
+      <div class="flex justify-end gap-2 pt-2 border-t border-token">
+        <button type="button" onclick="closeDialog('syncDialog')" class="touch-target px-4 py-2 rounded-lg surface-elevated text-main text-xs font-medium">Cancelar</button>
+        <button type="button" id="btnConfirmSync" onclick="executeManualSync()"
+                class="touch-target px-4 py-2 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5" style="background: var(--accent);">
+          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Confirmar e Consultar
         </button>
       </div>
     </div>
-  </div>
+  </dialog>
 
-  <!-- MODAL: VER JSON TÉCNICO -->
-  <div id="jsonModal" class="hidden fixed inset-0 z-[95] bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-3">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
-        <h3 id="jsonModalTitle" class="text-sm font-bold text-white">Retorno JSON Técnico</h3>
-        <button onclick="document.getElementById('jsonModal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+  <!-- MODAL DE DETALHES DA LEITURA (TRADUZIDA PARA O USUÁRIO) -->
+  <dialog id="detailsDialog" class="app-dialog" style="width: min(94vw, 36rem);" aria-labelledby="detailsDialogTitle">
+    <div class="p-4 sm:p-5 space-y-3">
+      <div class="flex justify-between items-center border-b border-token pb-2.5">
+        <h2 id="detailsDialogTitle" class="text-sm font-bold text-main">Detalhes da Leitura</h2>
+        <button type="button" onclick="closeDialog('detailsDialog')" class="surface-elevated px-2.5 py-1 rounded-lg text-xs font-semibold text-main">Fechar</button>
       </div>
-      <pre id="jsonModalPre" class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] text-emerald-300 font-mono max-h-96 overflow-auto whitespace-pre-wrap"></pre>
+      <div id="detailsSummaryBody" class="space-y-2 text-xs text-main"></div>
     </div>
-  </div>
+  </dialog>
+
+  <!-- PAINEL DE AJUDA & CONTATOS -->
+  <dialog id="helpDialog" class="app-dialog" style="width: min(94vw, 38rem);" aria-labelledby="helpDialogTitle">
+    <div class="p-4 sm:p-5 space-y-4">
+      <div class="flex justify-between items-center border-b border-token pb-3">
+        <div>
+          <h2 id="helpDialogTitle" class="text-base font-bold text-main flex items-center gap-2">
+            <i class="fa-solid fa-circle-question text-amber-500" aria-hidden="true"></i>
+            Ajuda & Contatos Técnicos
+          </h2>
+          <p class="text-xs text-muted-token">Suporte da instalação elétrica e do painel de supervisão</p>
+        </div>
+        <button type="button" onclick="closeDialog('helpDialog')" class="surface-elevated px-2.5 py-1 rounded-lg text-xs font-semibold text-main">Fechar</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="surface-elevated p-3.5 rounded-xl space-y-1.5">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-accent-token">Engenharia Elétrica & Campo</div>
+          <div class="text-sm font-bold text-main">Eng. Roberto Moutinho ("Beto")</div>
+          <p class="text-muted-token">Responsável pelo projeto elétrico, instalação física dos analisadores ISSO D1000A, quadros e acompanhamento técnico.</p>
+        </div>
+        <div class="surface-elevated p-3.5 rounded-xl space-y-1.5">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-blue-500">Sistema & Supervisão Digital</div>
+          <div class="text-sm font-bold text-main">Samael</div>
+          <p class="text-muted-token">Desenvolvimento da Tela Global, consolidação automática dos transformadores e suporte do sistema.</p>
+          <a href="https://samael.com.br" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-semibold text-accent-token hover:underline pt-1">
+            samael.com.br <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="surface-elevated p-3.5 rounded-xl space-y-2 text-xs">
+        <h3 class="font-bold text-main">Como interpretar os principais indicadores</h3>
+        <ul class="space-y-1.5 text-sec list-disc pl-4">
+          <li><strong>Fator de Potência Global (meta ≥ 0,920):</strong> Calculado a partir da soma das potências ativas e reativas dos dois transformadores no mesmo instante (nunca por média simples).</li>
+          <li><strong>Indutivo vs. Capacitivo:</strong> Durante a produção predomina carga indutiva (motores); na madrugada com máquinas paradas pode surgir excedente capacitivo dos bancos de capacitores.</li>
+          <li><strong>Tensões Entre Fases (~380 V):</strong> O gráfico comparativo mostra T1 e T2 juntos para identificar rapidamente se uma queda de tensão veio da rede externa ou de apenas um transformador.</li>
+          <li><strong>Controle de Consultas:</strong> Na franquia gratuita ISSO (10/dia e 100/mês), a agenda busca os dados automaticamente nos horários definidos e mantém uma reserva de segurança de 20 consultas para sincronizações manuais.</li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- LOGIN MODAL (Exibido apenas quando o painel exigir autenticação) -->
+  <dialog id="loginDialog" class="app-dialog" style="width: min(92vw, 24rem);" aria-labelledby="loginDialogTitle">
+    <div class="p-5 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+             style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h2 id="loginDialogTitle" class="text-base font-bold text-main">Acesso Restrito — VJ Rauber</h2>
+          <p class="text-xs text-muted-token">Supervisão Elétrica Global</p>
+        </div>
+      </div>
+      <form onsubmit="submitLogin(event)" class="space-y-3">
+        <div>
+          <label for="loginPassword" class="block text-xs text-sec mb-1">Senha do Painel</label>
+          <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Digite a senha..."
+                 class="w-full px-3 py-2 rounded-lg surface-elevated text-sm text-main">
+        </div>
+        <p id="loginError" role="alert" class="hidden text-xs text-red-500 font-medium"></p>
+        <button type="submit" class="w-full touch-target py-2.5 rounded-lg text-white text-sm font-semibold" style="background: var(--accent);">
+          Entrar no Painel
+        </button>
+      </form>
+    </div>
+  </dialog>
 
   <!-- JAVASCRIPT -->
   <script>
     let fpChartInstance = null;
     let voltageChartInstance = null;
-    let backendMode = false; // true quando rodando sobre Cloudflare Worker (/api/state), false no preview estático
-    let dataSource = 'sim';  // inicia na Simulação 380V para visualização imediata; alternável para 'real' em 1 clique
+    let connectedToServer = false;
+    let dataSource = 'sim';
     let currentSimMode = 'day';
 
-    // Os 3 registros reais executados em 23/11/2026 19:09 (sem tokens expostos)
+    // 3 testes reais de 23/11/2026 com retorno 100% traduzido para o usuário
     const INITIAL_REAL_LOGS = [
       {
         id: 3,
@@ -689,12 +1114,10 @@
         trafo_id: 1,
         device_code: '308AD713C046',
         query_type: 'consumo_1h',
-        params_used: '?Periodo=1h&Consumo=1&JSON=1',
         trigger_source: 'seed',
-        reason: 'Teste inicial v2 — validar retorno de consumo e demanda (1h)',
+        reason: 'Teste inicial — verificar consumo e demanda (1h)',
         http_status: 204,
-        records_count: 0,
-        translated_summary: 'Nenhum registro de consumo na última hora (HTTP 204 — aparelho sem comunicação recente após as 15:14).',
+        translated_summary: 'Nenhum registro de consumo na última hora (aparelho sem envio recente após os testes de bancada às 15:14).',
         raw_json: null
       },
       {
@@ -703,12 +1126,10 @@
         trafo_id: 1,
         device_code: '308AD713C046',
         query_type: 'janela_15m_minuto',
-        params_used: '?Periodo=15m&Grupo=m&JSON=1',
         trigger_source: 'seed',
-        reason: 'Teste inicial v2 — validar agrupamento minuto a minuto (15 min)',
+        reason: 'Teste inicial — verificar amostragem minuto a minuto',
         http_status: 204,
-        records_count: 0,
-        translated_summary: 'Nenhum dado novo enviado nos últimos 15 minutos (HTTP 204 — equipamento desligado após os testes de bancada às 15:14).',
+        translated_summary: 'Nenhum dado novo enviado nos últimos 15 minutos (equipamento desligado após as 15:14).',
         raw_json: null
       },
       {
@@ -717,29 +1138,23 @@
         trafo_id: 1,
         device_code: '308AD713C046',
         query_type: 'ultimo_registro',
-        params_used: '?UltimoRegistro=1&JSON=1',
         trigger_source: 'seed',
-        reason: 'Teste inicial v2 — validar campos reais da Serraria 1',
+        reason: 'Teste inicial — conferir leitura da Serraria 1',
         http_status: 200,
-        records_count: 1,
-        translated_summary: 'Registro recebido de 23/11/2026 às 15:14 (Temp. 33 °C), porém com 0 V, 0 A e 0 kW — equipamento em bancada/desenergizado fora do quadro.',
+        translated_summary: 'Registro recebido de 23/11/2026 às 15:14 (Temp. 33 °C), porém com 0 V, 0 A e 0 kW — equipamento em bancada fora do quadro.',
         raw_json: JSON.stringify([{
-          envio: "2026-11-23 15:14:00", fuso: -180, duracaoperiodo: 5, frequencia: 0,
-          tensao_fase_a: 0, tensao_fase_b: 0, tensao_fase_c: 0,
+          envio: "2026-11-23 15:14:00",
           tensao_fase_ab: 0, tensao_fase_bc: 0, tensao_fase_ca: 0,
           corrente_fase_a: 0, corrente_fase_b: 0, corrente_fase_c: 0,
-          potencia_ativa_total: 0, potencia_aparente_total_vetorial: 0, potencia_reativa_total_vetor: 0,
-          fator_medio_vetor: 0, cosphi_medio: 0, circuito_indutivo: 0,
-          kwh_direto_a: 0, kwh_direto_b: 0, kwh_direto_c: 0,
-          temperatura: 33, kvarh_direto_a: 0, kvarh_direto_b: 0, kvarh_direto_c: 0
-        }], null, 2)
+          potencia_ativa_total: 0, potencia_reativa_total_vetor: 0, potencia_aparente_total_vetorial: 0,
+          fator_medio_vetor: 0, temperatura: 33
+        }])
       }
     ];
 
     const DEFAULT_STATE = {
       quota: { todayUsed: 3, monthUsed: 3, dailyLimit: 10, monthlyLimit: 100, autoReserveLimit: 80 },
       settings: { schedule_days: 'weekdays', schedule_times: ['17:00'], trafo1_enabled: true, trafo2_enabled: false },
-      tokensConfigured: { 1: true, 2: false },
       latest: {
         1: { ts_brt: '2026-11-23 15:14:00', v_ab: 0, v_bc: 0, v_ca: 0, i_a: 0, i_b: 0, i_c: 0, p_kw: 0, q_kvar_signed: 0, s_kva: 0, fp: 0, inductive: 0, kwh_total: 0, temp_c: 33 },
         2: null
@@ -748,45 +1163,182 @@
       logs: INITIAL_REAL_LOGS
     };
 
-    let appState = loadLocalPreviewState();
+    let appState = loadSavedState();
 
-    function loadLocalPreviewState() {
+    function loadSavedState() {
       try {
-        const saved = localStorage.getItem('vjrauber_free_preview_v1');
-        if (saved) return JSON.parse(saved);
+        const raw = localStorage.getItem('vjrauber_free_preview_v2');
+        if (raw) return JSON.parse(raw);
       } catch {}
       return JSON.parse(JSON.stringify(DEFAULT_STATE));
     }
 
-    function persistLocalPreviewState() {
-      if (backendMode) return;
-      try {
-        localStorage.setItem('vjrauber_free_preview_v1', JSON.stringify(appState));
-      } catch {}
+    function persistSavedState() {
+      if (connectedToServer) return;
+      try { localStorage.setItem('vjrauber_free_preview_v2', JSON.stringify(appState)); } catch {}
     }
 
-    // Cenários simulados em 380/220 V com coerência S = sqrt(3)*V*I
+    // === GESTÃO DE DIALOGS E GAVETA MOBILE ===
+    function openMenuDrawer() {
+      const drawer = document.getElementById('menuDrawer');
+      drawer.showModal();
+      document.getElementById('menuOpenBtn').setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenuDrawer() {
+      const drawer = document.getElementById('menuDrawer');
+      if (drawer.open) drawer.close();
+      document.getElementById('menuOpenBtn').setAttribute('aria-expanded', 'false');
+    }
+
+    function openQuotaDialog() {
+      renderQuotaAndLogs();
+      document.getElementById('quotaDialog').showModal();
+    }
+
+    function openSyncModal() {
+      updateSyncCostPreview();
+      document.getElementById('syncDialog').showModal();
+    }
+
+    function openHelpDialog() {
+      document.getElementById('helpDialog').showModal();
+    }
+
+    function closeDialog(id) {
+      const d = document.getElementById(id);
+      if (d && d.open) d.close();
+    }
+
+    // Fechar dialogs ao clicar no backdrop (light dismiss)
+    ['menuDrawer', 'quotaDialog', 'syncDialog', 'detailsDialog', 'helpDialog'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('click', (e) => {
+        if (e.target === el) {
+          if (id === 'menuDrawer') closeMenuDrawer();
+          else el.close();
+        }
+      });
+    });
+
+    // === TEMA CLARO / ESCURO / SISTEMA & ACESSIBILIDADE ===
+    const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function getActiveThemeSetting() {
+      try {
+        const s = localStorage.getItem('color-scheme');
+        if (s === 'light' || s === 'dark') return s;
+      } catch {}
+      return 'system';
+    }
+
+    function setColorScheme(mode) {
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      try {
+        if (mode === 'system') {
+          localStorage.removeItem('color-scheme');
+          meta.content = 'light dark';
+        } else {
+          localStorage.setItem('color-scheme', mode);
+          meta.content = mode;
+        }
+      } catch {
+        meta.content = mode === 'system' ? 'light dark' : mode;
+      }
+      renderAppearanceControls();
+      refreshChartTheme();
+    }
+
+    function setFontScale(scale) {
+      document.documentElement.style.fontSize = scale + '%';
+      try { localStorage.setItem('vjr_font_scale', scale); } catch {}
+      renderAppearanceControls();
+    }
+
+    function toggleHighContrast() {
+      const active = document.documentElement.dataset.contrast === 'high';
+      if (active) {
+        delete document.documentElement.dataset.contrast;
+        try { localStorage.removeItem('vjr_high_contrast'); } catch {}
+      } else {
+        document.documentElement.dataset.contrast = 'high';
+        try { localStorage.setItem('vjr_high_contrast', 'true'); } catch {}
+      }
+      renderAppearanceControls();
+      refreshChartTheme();
+    }
+
+    function styleOptionButton(btn, isActive) {
+      if (isActive) {
+        btn.style.backgroundColor = 'var(--accent)';
+        btn.style.color = '#ffffff';
+        btn.style.borderColor = 'var(--accent)';
+      } else {
+        btn.style.backgroundColor = 'var(--bg-elevated)';
+        btn.style.color = 'var(--text-primary)';
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    }
+
+    function renderAppearanceControls() {
+      const theme = getActiveThemeSetting();
+      styleOptionButton(document.getElementById('themeBtnSystem'), theme === 'system');
+      styleOptionButton(document.getElementById('themeBtnLight'), theme === 'light');
+      styleOptionButton(document.getElementById('themeBtnDark'), theme === 'dark');
+
+      const sysTxt = darkMediaQuery.matches ? 'Escuro' : 'Claro';
+      document.getElementById('systemThemeHint').innerText = theme === 'system'
+        ? `Seguindo o aparelho (atual: ${sysTxt})`
+        : `Tema fixado manualmente (${theme === 'light' ? 'Claro' : 'Escuro'})`;
+
+      let scale = '100';
+      try { scale = localStorage.getItem('vjr_font_scale') || '100'; } catch {}
+      styleOptionButton(document.getElementById('fontBtn100'), scale === '100');
+      styleOptionButton(document.getElementById('fontBtn112'), scale === '112');
+      styleOptionButton(document.getElementById('fontBtn125'), scale === '125');
+
+      const high = document.documentElement.dataset.contrast === 'high';
+      const hcBtn = document.getElementById('btnHighContrast');
+      hcBtn.setAttribute('aria-checked', String(high));
+      hcBtn.innerText = high ? 'Ativado' : 'Desligado';
+      styleOptionButton(hcBtn, high);
+    }
+
+    function refreshChartTheme() {
+      const cs = getComputedStyle(document.documentElement);
+      const gridColor = cs.getPropertyValue('--grid-chart').trim() || 'rgba(148, 163, 184, 0.25)';
+      const tickColor = cs.getPropertyValue('--tick-chart').trim() || '#94a3b8';
+      [fpChartInstance, voltageChartInstance].forEach(chart => {
+        if (!chart) return;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.y.ticks.color = tickColor;
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.x.ticks.color = tickColor;
+        chart.update();
+      });
+    }
+
+    darkMediaQuery.addEventListener('change', () => {
+      renderAppearanceControls();
+      refreshChartTheme();
+    });
+
+    // === DADOS REAIS & CENÁRIOS DE SIMULAÇÃO 380V ===
     const scenarios = {
       day: {
-        offline: false,
-        night: false,
-        realBench: false,
+        offline: false, night: false, realBench: false,
         t1: { vrs: 381.4, vst: 379.8, vtr: 382.1, ir: 358, is: 364, it: 361, p: 224.2, q: 81.0, fp: 0.940, sync: '17:15:02' },
         t2: { vrs: 378.2, vst: 380.5, vtr: 381.0, ir: 310, is: 316, it: 313, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
         demand: 432, demandMax: 485, kwhToday: '4.820'
       },
       night: {
-        offline: false,
-        night: true,
-        realBench: false,
+        offline: false, night: true, realBench: false,
         t1: { vrs: 388.4, vst: 389.1, vtr: 388.8, ir: 51, is: 53, it: 52, p: 14.5, q: -32.0, fp: 0.413, sync: '03:15:02' },
         t2: { vrs: 387.9, vst: 388.3, vtr: 388.0, ir: 42, is: 44, it: 43, p: 12.0, q: -26.5, fp: 0.412, sync: '03:15:04' },
         demand: 28, demandMax: 485, kwhToday: '4.820'
       },
       offline: {
-        offline: true,
-        night: false,
-        realBench: false,
+        offline: true, night: false, realBench: false,
         t1: { vrs: 381.4, vst: 379.8, vtr: 382.1, ir: 358, is: 364, it: 361, p: 224.2, q: 81.0, fp: 0.940, sync: '16:15:02 (Atrasado)' },
         t2: { vrs: 378.2, vst: 380.5, vtr: 381.0, ir: 310, is: 316, it: 313, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
         demand: 432, demandMax: 485, kwhToday: '4.820'
@@ -810,45 +1362,38 @@
         sync: l2.ts_brt ? l2.ts_brt.slice(5, 16) : 'Sem registro'
       } : { vrs: 0, vst: 0, vtr: 0, ir: 0, is: 0, it: 0, p: 0, q: 0, fp: 0, sync: 'Aguardando 4ª-feira' };
 
-      const zeroCircuit = (t1.vrs + t2.vrs) < 10;
       return {
-        offline: false,
-        night: false,
-        realBench: zeroCircuit,
+        offline: false, night: false, realBench: (t1.vrs + t2.vrs) < 10,
         t1, t2,
         demand: Math.round(t1.p + t2.p),
         demandMax: Math.round(t1.p + t2.p),
-        kwhToday: (((l1?.kwh_total || 0) + (l2?.kwh_total || 0))).toFixed(1)
+        kwhToday: ((l1?.kwh_total || 0) + (l2?.kwh_total || 0)).toFixed(1)
       };
     }
 
     function setDataSource(src) {
       dataSource = src;
-      document.getElementById('btnSourceReal').className = src === 'real'
-        ? "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-emerald-600 text-white"
-        : "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white";
-      document.getElementById('btnSourceSim').className = src === 'sim'
-        ? "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-blue-600 text-white"
-        : "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white";
-      document.getElementById('simButtonsGroup').classList.toggle('hidden', src !== 'sim');
+      styleOptionButton(document.getElementById('menuSourceReal'), src === 'real');
+      styleOptionButton(document.getElementById('menuSourceSim'), src === 'sim');
+      document.getElementById('menuSimSubgroup').classList.toggle('hidden', src !== 'sim');
+      document.getElementById('envModeTag').innerText = src === 'real' ? 'Dados Reais' : 'Simulação 380V';
 
-      if (src === 'real') {
-        updateUI(buildRealDataView());
-      } else {
-        setSimMode(currentSimMode);
-      }
+      if (src === 'real') updateUI(buildRealDataView());
+      else setSimMode(currentSimMode);
     }
 
     function setSimMode(mode) {
       currentSimMode = mode;
-      ['btnDay', 'btnNight', 'btnOffline'].forEach(id => {
-        document.getElementById(id).className = "text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition";
-      });
-      const activeBtn = mode === 'day' ? 'btnDay' : (mode === 'night' ? 'btnNight' : 'btnOffline');
-      document.getElementById(activeBtn).className = mode === 'offline'
-        ? "text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white font-medium transition"
-        : "text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-
+      styleOptionButton(document.getElementById('btnDay'), mode === 'day');
+      styleOptionButton(document.getElementById('btnNight'), mode === 'night');
+      const offBtn = document.getElementById('btnOffline');
+      if (mode === 'offline') {
+        offBtn.style.backgroundColor = '#dc2626';
+        offBtn.style.color = '#ffffff';
+        offBtn.style.borderColor = '#dc2626';
+      } else {
+        styleOptionButton(offBtn, false);
+      }
       updateUI(scenarios[mode]);
     }
 
@@ -859,7 +1404,6 @@
       const fpTot = sTot > 0.01 ? (pTot / sTot) : 0;
       const isInductive = qTot >= 0;
 
-      // Cards
       document.getElementById('fpValue').innerText = sTot > 0.01 ? fpTot.toFixed(3) : '—';
       document.getElementById('pTotalValue').innerText = pTot.toFixed(1);
       document.getElementById('qTotalValue').innerText = Math.abs(qTot).toFixed(1);
@@ -873,7 +1417,6 @@
       document.getElementById('demandMaxVal').innerText = data.demandMax + ' kW';
       document.getElementById('kwhTodayVal').innerText = data.kwhToday + ' kWh';
 
-      // Table T1 & T2
       const t1Vavg = (data.t1.vrs + data.t1.vst + data.t1.vtr) / 3;
       const t2Vavg = (data.t2.vrs + data.t2.vst + data.t2.vtr) / 3;
       const t1S = Math.sqrt(data.t1.p**2 + data.t1.q**2);
@@ -915,36 +1458,24 @@
       const commText = document.getElementById('commText');
       const t1SyncDot = document.getElementById('t1SyncDot');
       const t1StatusDot = document.getElementById('t1StatusDot');
-      const t2SyncDot = document.getElementById('t2SyncDot');
-      const t2StatusDot = document.getElementById('t2StatusDot');
 
       if (data.offline) {
-        commDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
-        commText.className = "font-medium text-red-400 leading-tight";
-        commText.innerText = "Falha Trafo 1 (Offline)";
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping flex-shrink-0";
+        commText.innerText = "Falha T1";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-red-500 mr-1";
-        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
-        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0";
       } else if (data.realBench) {
-        commDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
-        commText.className = "font-medium text-amber-300 leading-tight";
-        commText.innerText = "Em Bancada / Aguardando";
-        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-amber-400 mr-1";
-        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
-        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-slate-500 mr-1";
-        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse flex-shrink-0";
+        commText.innerText = "Bancada";
+        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-amber-500 mr-1";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0";
       } else {
-        commDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-        commText.className = "font-medium text-emerald-400 leading-tight";
-        commText.innerText = "Whitebox Online";
-        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
-        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
-        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0";
+        commText.innerText = "Online";
+        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-500 mr-1";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0";
       }
 
-      // Banner e FP Status
       const fpBadge = document.getElementById('fpBadge');
       const fpBar = document.getElementById('fpBar');
       const fpStatus = document.getElementById('fpStatus');
@@ -954,127 +1485,92 @@
       const alertIcon = document.getElementById('alertIcon');
 
       if (data.realBench) {
-        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
         fpBadge.innerText = "SEM CARGA";
-        fpBar.className = "bg-slate-600 h-full rounded-full transition-all duration-500";
         fpBar.style.width = "0%";
-        fpStatus.className = "text-amber-300 font-medium";
         fpStatus.innerText = "Aguardando";
-
-        alertBanner.className = "p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 flex items-start sm:items-center justify-between gap-4";
-        alertTitle.className = "text-sm font-semibold text-amber-300";
-        alertTitle.innerText = "Dados Reais de Bancada — Aguardando Instalação na Fábrica (4ª-feira)";
-        alertDesc.innerText = "Serraria 1 (308AD713C046) registrou último ponto em 23/11 às 15:14 (Temp. 33 °C, 0 V / 0 A fora do quadro). Serraria 2 aguarda roteador. Use o botão 'Simulação 380V' acima para visualizar o painel em carga.";
-        alertIcon.className = "w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center flex-shrink-0";
-        alertIcon.innerHTML = '<i class="fa-solid fa-plug-circle-exclamation text-lg"></i>';
+        alertBanner.style.background = "var(--warn-bg)";
+        alertBanner.style.borderColor = "var(--warn-border)";
+        alertTitle.innerText = "Dados Reais de Bancada — Aguardando Instalação em Campo";
+        alertDesc.innerText = "Serraria 1 (308AD713C046) enviou leitura em 23/11 às 15:14 (Temp. 33 °C, 0 V / 0 A fora do quadro). Serraria 2 aguarda instalação. Alterne para Simulação 380V no Menu para visualizar em carga.";
+        alertIcon.innerHTML = '<i class="fa-solid fa-plug-circle-exclamation text-lg" aria-hidden="true"></i>';
       } else if (data.offline) {
-        alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4";
-        alertTitle.className = "text-sm font-semibold text-red-300";
-        alertTitle.innerText = "ALERTA DE COMUNICAÇÃO: Analisador Trafo 01 sem resposta há > 60 min";
-        alertDesc.innerText = "O cálculo global está utilizando o último valor válido em cache. Verifique a conexão Wi-Fi do D1000A do Trafo 1.";
-        alertIcon.className = "w-9 h-9 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0";
-        alertIcon.innerHTML = '<i class="fa-solid fa-wifi text-lg"></i>';
+        alertBanner.style.background = "var(--danger-bg)";
+        alertBanner.style.borderColor = "var(--danger-border)";
+        alertTitle.innerText = "ALERTA DE COMUNICAÇÃO: Analisador Trafo 01 sem resposta";
+        alertDesc.innerText = "Sem novas leituras há mais de 60 minutos. Verifique o roteador/Wi-Fi do D1000A do Trafo 1.";
+        alertIcon.innerHTML = '<i class="fa-solid fa-wifi text-lg" aria-hidden="true"></i>';
       } else if (fpTot >= 0.920 && !data.night) {
-        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
         fpBadge.innerText = isInductive ? "INDUTIVO" : "CAPACITIVO";
         fpBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-500";
         fpBar.style.width = (fpTot * 100) + "%";
-        fpStatus.className = "text-emerald-400 font-medium";
         fpStatus.innerText = "+" + (fpTot - 0.92).toFixed(3);
-
-        alertBanner.className = "p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4";
-        alertTitle.className = "text-sm font-semibold text-emerald-300";
+        alertBanner.style.background = "var(--accent-soft)";
+        alertBanner.style.borderColor = "var(--accent-border)";
         alertTitle.innerText = "Instalação em Conformidade Regulamentar (ANEEL)";
         alertDesc.innerText = "Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.";
-        alertIcon.className = "w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0";
-        alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i>';
+        alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-lg" aria-hidden="true"></i>';
       } else {
-        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse";
-        fpBadge.innerText = "CAPACITIVO (MULTA)";
+        fpBadge.innerText = "CAPACITIVO (ATENÇÃO)";
         fpBar.className = "bg-red-500 h-full rounded-full transition-all duration-500";
         fpBar.style.width = (fpTot * 100) + "%";
-        fpStatus.className = "text-red-400 font-medium";
         fpStatus.innerText = "-" + (0.92 - fpTot).toFixed(3);
-
-        alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4";
-        alertTitle.className = "text-sm font-semibold text-red-300";
+        alertBanner.style.background = "var(--danger-bg)";
+        alertBanner.style.borderColor = "var(--danger-border)";
         alertTitle.innerText = "ALERTA: Excedente Reativo Capacitivo na Madrugada";
-        alertDesc.innerText = "Fator de potência global em " + fpTot.toFixed(3) + " capacitivo. Risco de multa pela concessionária se os bancos permanecerem ligados.";
-        alertIcon.className = "w-9 h-9 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0";
-        alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg"></i>';
+        alertDesc.innerText = "Fator de potência global em " + fpTot.toFixed(3) + " capacitivo. Risco de cobrança de reativo excedente pela concessionária.";
+        alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg" aria-hidden="true"></i>';
       }
     }
 
     // === CONTROLE DE COTA, AGENDAMENTO E HISTÓRICO ===
-    function toggleQuotaDrawer() {
-      const drawer = document.getElementById('quotaDrawer');
-      const chev = document.getElementById('drawerChevron');
-      const isHidden = drawer.classList.contains('hidden');
-      drawer.classList.toggle('hidden');
-      chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-
     function renderQuotaAndLogs() {
       const q = appState.quota;
-      const dayPct = Math.min(100, (q.todayUsed / q.dailyLimit) * 100);
-      const monthPct = Math.min(100, (q.monthUsed / q.monthlyLimit) * 100);
+      document.getElementById('headerQuotaPill').innerText = `${q.todayUsed}/${q.dailyLimit}`;
+      document.getElementById('drawerQuotaSummary').innerText = `${q.todayUsed}/${q.dailyLimit} hoje • ${q.monthUsed}/${q.monthlyLimit} mês`;
+      document.getElementById('drawerLogCount').innerText = appState.logs.length;
 
-      document.getElementById('quotaDayText').innerText = `${q.todayUsed}/${q.dailyLimit}`;
-      document.getElementById('quotaMonthText').innerText = `${q.monthUsed}/${q.monthlyLimit}`;
-      document.getElementById('quotaDayBar').style.width = `${dayPct}%`;
-      document.getElementById('quotaMonthBar').style.width = `${monthPct}%`;
-      document.getElementById('quotaDayBar').className = `h-full transition-all ${q.todayUsed >= q.dailyLimit ? 'bg-red-500' : (q.todayUsed >= 7 ? 'bg-amber-400' : 'bg-emerald-400')}`;
-      document.getElementById('quotaMonthBar').className = `h-full transition-all ${q.monthUsed >= q.autoReserveLimit ? 'bg-amber-400' : 'bg-sky-400'}`;
+      document.getElementById('quotaDayText').innerText = `${q.todayUsed} / ${q.dailyLimit}`;
+      document.getElementById('quotaMonthText').innerText = `${q.monthUsed} / ${q.monthlyLimit}`;
+      document.getElementById('quotaDayBar').style.width = `${Math.min(100, (q.todayUsed / q.dailyLimit) * 100)}%`;
+      document.getElementById('quotaMonthBar').style.width = `${Math.min(100, (q.monthUsed / q.monthlyLimit) * 100)}%`;
 
-      document.getElementById('logCountBadge').innerText = appState.logs.length;
-
-      // Renderizar editor de agenda
       document.getElementById('schedDaysSelect').value = appState.settings.schedule_days || 'weekdays';
       document.getElementById('schedTrafosSelect').value = appState.settings.trafo2_enabled ? '2' : '1';
       renderScheduleTimes();
       recalcScheduleProjection();
 
-      // Renderizar Audit Log
       const list = document.getElementById('auditLogList');
       list.innerHTML = appState.logs.map((log, idx) => {
-        const statusBadge = log.http_status === 200
-          ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[10px]">HTTP 200 OK</span>`
-          : (log.http_status === 204
-            ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px]">HTTP 204 Vazio</span>`
-            : `<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 font-mono text-[10px]">HTTP ${log.http_status}</span>`);
+        const isOk = log.http_status === 200;
+        const isEmpty = log.http_status === 204;
+        const statusTxt = isOk ? 'Leitura Recebida' : (isEmpty ? 'Sem Novos Dados' : 'Falha na Consulta');
+        const statusStyle = isOk
+          ? 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);'
+          : (isEmpty ? 'background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);' : 'background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border);');
 
-        const srcLabel = log.trigger_source === 'seed'
-          ? 'Teste Real'
-          : (log.trigger_source === 'auto' ? 'Automático' : 'Manual');
-        const srcBadge = log.trigger_source === 'auto'
-          ? 'bg-sky-500/20 text-sky-300'
-          : (log.trigger_source === 'seed' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-200');
-
-        const jsonBtn = log.raw_json
-          ? `<button onclick="openJsonModal(${idx})" class="text-[11px] text-sky-400 hover:text-sky-300 underline flex items-center gap-1"><i class="fa-solid fa-code"></i> Ver JSON técnico</button>`
-          : `<span class="text-[10px] text-slate-500 italic">Sem corpo JSON (204)</span>`;
+        const srcTxt = log.trigger_source === 'seed' ? 'Teste Inicial' : (log.trigger_source === 'auto' ? 'Agendada' : 'Manual');
+        const detailsBtn = log.raw_json
+          ? `<button type="button" onclick="openDetailsModal(${idx})" class="text-[11px] font-semibold text-accent-token hover:underline flex items-center gap-1"><i class="fa-solid fa-eye" aria-hidden="true"></i> Ver Detalhes da Leitura</button>`
+          : `<span class="text-[11px] text-muted-token italic">Sem medições novas na janela</span>`;
 
         return `
-          <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-1.5 text-xs">
+          <div class="surface-card rounded-lg p-3 space-y-1.5 text-xs">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="flex flex-wrap items-center gap-1.5">
-                <span class="font-mono text-[11px] text-slate-400">${log.created_at_brt}</span>
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${srcBadge}">${srcLabel}</span>
-                <span class="font-semibold text-white">Trafo ${log.trafo_id} (${log.device_code})</span>
+                <span class="font-mono text-[11px] text-muted-token">${log.created_at_brt}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold surface-elevated text-sec">${srcTxt}</span>
+                <span class="font-bold text-main">Trafo ${log.trafo_id} (${log.device_code})</span>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="font-mono text-[10px] text-slate-400">${log.params_used}</span>
-                ${statusBadge}
-              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="${statusStyle}">${statusTxt}</span>
             </div>
-            <div class="text-[11px] text-slate-400">
-              <strong class="text-slate-300">Motivo:</strong> ${escapeHtml(log.reason)}
+            <div class="text-[11px] text-muted-token">
+              <strong class="text-sec">Motivo:</strong> ${escapeHtml(log.reason)}
             </div>
-            <div class="bg-slate-950/90 border border-slate-800 rounded px-2.5 py-2 text-slate-200 flex items-start gap-2">
-              <i class="fa-solid fa-comment-dots text-emerald-400 mt-0.5 text-xs"></i>
+            <div class="surface-elevated rounded px-2.5 py-2 text-main flex items-start gap-2">
+              <i class="fa-solid fa-comment-dots text-accent-token mt-0.5" aria-hidden="true"></i>
               <span>${escapeHtml(log.translated_summary)}</span>
             </div>
-            <div class="flex justify-end">${jsonBtn}</div>
+            <div class="flex justify-end">${detailsBtn}</div>
           </div>
         `;
       }).join('');
@@ -1088,14 +1584,14 @@
       const times = appState.settings.schedule_times || ['17:00'];
       const container = document.getElementById('scheduleTimesList');
       if (times.length === 0) {
-        container.innerHTML = `<span class="text-[11px] text-slate-500 italic">Nenhum horário configurado (apenas manual).</span>`;
+        container.innerHTML = `<span class="text-[11px] text-muted-token italic">Nenhum horário ativo (somente manual).</span>`;
         return;
       }
       container.innerHTML = times.map((t, i) => `
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-slate-200 font-mono text-xs">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md surface-card text-main font-mono text-xs">
           ${t}
-          <button onclick="removeScheduleTime(${i})" type="button" class="text-slate-500 hover:text-red-400" title="Remover horário">
-            <i class="fa-solid fa-xmark"></i>
+          <button type="button" onclick="removeScheduleTime(${i})" aria-label="Remover horário ${t}" class="text-muted-token hover:text-red-500">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
           </button>
         </span>
       `).join('');
@@ -1105,10 +1601,7 @@
       const val = document.getElementById('newScheduleTime').value;
       if (!val) return;
       const times = appState.settings.schedule_times || [];
-      if (!times.includes(val)) {
-        times.push(val);
-        times.sort();
-      }
+      if (!times.includes(val)) { times.push(val); times.sort(); }
       appState.settings.schedule_times = times;
       renderScheduleTimes();
       recalcScheduleProjection();
@@ -1130,30 +1623,16 @@
       const limit = appState.quota.monthlyLimit || 100;
       const pct = Math.min(100, Math.round((projected / limit) * 100));
 
-      const textEl = document.getElementById('schedProjectedText');
-      const barEl = document.getElementById('schedProjectedBar');
+      document.getElementById('schedProjectedText').innerText = `${projected} / mês (${pct}%)`;
+      document.getElementById('schedProjectedBar').style.width = `${pct}%`;
+
       const noteEl = document.getElementById('schedProjectedNote');
-      const topSummary = document.getElementById('topScheduleSummary');
-
-      textEl.innerText = `${projected} req/mês (${pct}%)`;
-      barEl.style.width = `${pct}%`;
-
       if (projected === 0) {
-        textEl.className = 'text-sky-300 font-bold';
-        barEl.className = 'h-full bg-sky-500 transition-all';
-        noteEl.innerText = 'Modo 100% Manual: nenhuma requisição será disparada automaticamente.';
-        topSummary.innerText = 'Agenda: Desativada (100% Manual)';
+        noteEl.innerText = 'Modo 100% Manual: nenhuma consulta será disparada sem acionamento manual.';
       } else if (projected <= 80) {
-        textEl.className = 'text-emerald-400 font-bold';
-        barEl.className = 'h-full bg-emerald-500 transition-all';
-        noteEl.innerText = `Saudável: sobram ~${limit - projected} req/mês para consultas manuais. Trava automática em 80/100.`;
-        const daysTxt = daysVal === 'weekdays' ? 'dia útil' : (daysVal === 'mon_sat' ? 'Seg–Sáb' : 'dia');
-        topSummary.innerText = `Agenda: ${timesCount}x/${daysTxt} (${appState.settings.schedule_times.join(', ')}) • Proj: ~${projected}/mês`;
+        noteEl.innerText = `Saudável: sobram ~${limit - projected} consultas manuais no mês. Coleta automática pausa em 80/100.`;
       } else {
-        textEl.className = 'text-red-400 font-bold';
-        barEl.className = 'h-full bg-red-500 transition-all';
-        noteEl.innerText = `Atenção: projeção (${projected}) ultrapassa a reserva de 80/100! O sistema pausará o automático ao atingir 80.`;
-        topSummary.innerText = `Agenda: ~${projected}/mês (pausa automática em 80)`;
+        noteEl.innerText = `Atenção: projeção (${projected}) ultrapassa a reserva de 80/100; o automático pausará ao chegar em 80.`;
       }
     }
 
@@ -1161,33 +1640,21 @@
       appState.settings.schedule_days = document.getElementById('schedDaysSelect').value;
       appState.settings.trafo2_enabled = document.getElementById('schedTrafosSelect').value === '2';
 
-      if (backendMode) {
+      if (connectedToServer) {
         const res = await fetch('/api/schedule', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(appState.settings)
         });
-        if (!res.ok) {
-          document.getElementById('schedSaveStatus').innerText = 'Erro ao salvar!';
-          return;
-        }
+        document.getElementById('schedSaveStatus').innerText = res.ok ? 'Agenda salva!' : 'Erro ao salvar';
       } else {
-        persistLocalPreviewState();
+        persistSavedState();
+        document.getElementById('schedSaveStatus').innerText = 'Agenda salva!';
       }
-      document.getElementById('schedSaveStatus').innerText = 'Agenda salva!';
       setTimeout(() => { document.getElementById('schedSaveStatus').innerText = ''; }, 2500);
     }
 
-    // === MODAL ENVIO MANUAL ===
-    function openSyncModal() {
-      document.getElementById('syncModal').classList.remove('hidden');
-      updateSyncCostPreview();
-    }
-
-    function closeSyncModal() {
-      document.getElementById('syncModal').classList.add('hidden');
-    }
-
+    // === ENVIO MANUAL ===
     function pickReason(txt) {
       document.getElementById('syncReasonInput').value = txt;
     }
@@ -1204,16 +1671,14 @@
       const overLimit = (q.todayUsed + cost > q.dailyLimit) || (q.monthUsed + cost > q.monthlyLimit);
       const btn = document.getElementById('btnConfirmSync');
       btn.disabled = overLimit;
-      btn.className = overLimit
-        ? "px-4 py-2 rounded-lg bg-slate-700 text-slate-400 text-xs font-semibold cursor-not-allowed flex items-center gap-1.5"
-        : "px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5";
+      btn.style.opacity = overLimit ? '0.5' : '1';
 
-      const modeNote = document.getElementById('syncPreviewModeNote');
-      if (!backendMode) {
-        modeNote.classList.remove('hidden');
-        modeNote.innerText = 'Modo Preview (GitHub Pages): simula o registro no histórico local sem chamar a API real da ISSO (os tokens ficam protegidos apenas no Cloudflare Worker).';
+      const noteEl = document.getElementById('syncPreviewModeNote');
+      if (!connectedToServer) {
+        noteEl.classList.remove('hidden');
+        noteEl.innerText = 'Ambiente de Demonstração: simulação de consulta para conferência visual (não consome a franquia real da conta ISSO).';
       } else {
-        modeNote.classList.add('hidden');
+        noteEl.classList.add('hidden');
       }
     }
 
@@ -1223,10 +1688,10 @@
       const reason = document.getElementById('syncReasonInput').value.trim() || 'Consulta manual pelo painel';
       const trafos = target === 'both' ? [1, 2] : [Number(target)];
 
-      if (backendMode) {
+      if (connectedToServer) {
         const btn = document.getElementById('btnConfirmSync');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Consultando ISSO...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Consultando ISSO...';
         try {
           const resp = await fetch('/api/sync', {
             method: 'POST',
@@ -1234,74 +1699,75 @@
             body: JSON.stringify({ trafos, queryType, reason })
           });
           const data = await resp.json();
-          if (!resp.ok) {
-            alert(data.error || 'Falha na sincronização');
-          } else {
-            await loadBackendState();
-            setDataSource('real');
-          }
+          if (!resp.ok) alert(data.error || 'Não foi possível consultar.');
+          else { await loadServerState(); setDataSource('real'); }
         } finally {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Confirmar e Enviar';
-          closeSyncModal();
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Confirmar e Consultar';
+          closeDialog('syncDialog');
         }
         return;
       }
 
-      // Simulação do envio no Preview Estático (sem gastar cota real)
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
       const brtStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
       for (const tId of trafos) {
         const code = tId === 1 ? '308AD713C046' : '308A3849D67A';
-        const paramsUsed = queryType === 'ultimo_registro' ? '?UltimoRegistro=1&JSON=1' : '?Periodo=24h&Grupo=m&JSON=1';
         appState.logs.unshift({
           id: Date.now() + tId,
           created_at_brt: brtStr,
           trafo_id: tId,
           device_code: code,
           query_type: queryType,
-          params_used: paramsUsed,
           trigger_source: 'manual',
-          reason: `[Preview] ${reason}`,
+          reason: `[Simulação] ${reason}`,
           http_status: 204,
-          records_count: 0,
           translated_summary: tId === 2
-            ? 'Serraria 2 (308A3849D67A): aguardando instalação do 2º roteador e cadastro do token de API.'
-            : 'Nenhum dado novo nos últimos minutos (HTTP 204 — simulado no Preview do GitHub Pages sem gastar cota real).',
+            ? 'Serraria 2 (308A3849D67A): aguardando instalação em campo para iniciar envios.'
+            : 'Nenhum dado novo nos últimos minutos (simulação local de conferência, sem gasto de franquia real).',
           raw_json: null
         });
         appState.quota.todayUsed += 1;
         appState.quota.monthUsed += 1;
       }
 
-      persistLocalPreviewState();
+      persistSavedState();
       renderQuotaAndLogs();
-      closeSyncModal();
-      if (document.getElementById('quotaDrawer').classList.contains('hidden')) {
-        toggleQuotaDrawer();
-      }
+      closeDialog('syncDialog');
+      openQuotaDialog();
     }
 
-    function openJsonModal(idx) {
+    function openDetailsModal(idx) {
       const log = appState.logs[idx];
-      if (!log) return;
-      document.getElementById('jsonModalTitle').innerText = `JSON Técnico — Trafo ${log.trafo_id} (${log.created_at_brt})`;
-      let formatted = log.raw_json || '';
-      try { formatted = JSON.stringify(JSON.parse(log.raw_json), null, 2); } catch {}
-      document.getElementById('jsonModalPre').innerText = formatted;
-      document.getElementById('jsonModal').classList.remove('hidden');
+      if (!log || !log.raw_json) return;
+      document.getElementById('detailsDialogTitle').innerText = `Detalhes da Leitura — Trafo ${log.trafo_id} (${log.created_at_brt})`;
+
+      let parsed = {};
+      try {
+        const arr = JSON.parse(log.raw_json);
+        parsed = Array.isArray(arr) ? (arr[arr.length - 1] || {}) : arr;
+      } catch {}
+
+      document.getElementById('detailsSummaryBody').innerHTML = `
+        <div class="grid grid-cols-2 gap-2">
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Horário do Medidor</span><strong class="text-main">${escapeHtml(parsed.envio || '—')}</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Temperatura Interna</span><strong class="text-main">${parsed.temperatura ?? '—'} °C</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Tensões Entre Fases</span><strong class="text-main">${parsed.tensao_fase_ab ?? 0} / ${parsed.tensao_fase_bc ?? 0} / ${parsed.tensao_fase_ca ?? 0} V</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Correntes (R / S / T)</span><strong class="text-main">${parsed.corrente_fase_a ?? 0} / ${parsed.corrente_fase_b ?? 0} / ${parsed.corrente_fase_c ?? 0} A</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Potência Ativa / Aparente</span><strong class="text-main">${parsed.potencia_ativa_total ?? 0} / ${parsed.potencia_aparente_total_vetorial ?? 0}</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Fator de Potência Médio</span><strong class="text-main">${parsed.fator_medio_vetor ?? 0}</strong></div>
+        </div>
+        <details class="surface-elevated rounded-lg p-2.5">
+          <summary class="cursor-pointer font-semibold text-sec">Visualizar registro completo recebido do analisador</summary>
+          <pre class="mt-2 text-[11px] font-mono overflow-auto max-h-48 text-main">${escapeHtml(JSON.stringify(parsed, null, 2))}</pre>
+        </details>
+      `;
+      document.getElementById('detailsDialog').showModal();
     }
 
-    function resetDemoLogs() {
-      if (backendMode) return;
-      localStorage.removeItem('vjrauber_free_preview_v1');
-      appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
-      renderQuotaAndLogs();
-    }
-
-    // === LOGIN E CARREGAMENTO BACKEND CLOUDFLARE ===
+    // === LOGIN & SERVIDOR ===
     async function submitLogin(e) {
       e.preventDefault();
       const pw = document.getElementById('loginPassword').value;
@@ -1317,24 +1783,20 @@
         errEl.classList.remove('hidden');
         return;
       }
-      document.getElementById('loginModal').classList.add('hidden');
-      await loadBackendState();
+      closeDialog('loginDialog');
+      await loadServerState();
     }
 
-    async function loadBackendState() {
+    async function loadServerState() {
       const res = await fetch('/api/state?hours=24');
       if (res.status === 401) {
-        backendMode = true;
-        document.getElementById('loginModal').classList.remove('hidden');
+        connectedToServer = true;
+        document.getElementById('loginDialog').showModal();
         return;
       }
       if (!res.ok) return;
-      const data = await res.json();
-      backendMode = true;
-      appState = data;
-      document.getElementById('runtimeEnvBadge').innerText = 'Nuvem Cloudflare • D1 Ativo';
-      document.getElementById('runtimeEnvBadge').className = 'text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-      document.getElementById('btnResetDemoLogs').classList.add('hidden');
+      appState = await res.json();
+      connectedToServer = true;
       renderQuotaAndLogs();
     }
 
@@ -1369,9 +1831,11 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // Chart 1: FP Global
-      const ctxFp = document.getElementById('fpChart').getContext('2d');
-      fpChartInstance = new Chart(ctxFp, {
+      const cs = getComputedStyle(document.documentElement);
+      const gridColor = cs.getPropertyValue('--grid-chart').trim() || 'rgba(148, 163, 184, 0.25)';
+      const tickColor = cs.getPropertyValue('--tick-chart').trim() || '#94a3b8';
+
+      fpChartInstance = new Chart(document.getElementById('fpChart').getContext('2d'), {
         type: 'line',
         data: {
           labels: ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'],
@@ -1380,7 +1844,7 @@
               label: 'FP Global',
               data: [0.84, 0.80, 0.82, 0.93, 0.95, 0.94, 0.93, 0.95, 0.94, 0.93, 0.94, 0.91],
               borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              backgroundColor: 'rgba(16, 185, 129, 0.10)',
               borderWidth: 2.5,
               fill: true,
               tension: 0.35
@@ -1401,15 +1865,13 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 0.70, max: 1.00, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+            y: { min: 0.70, max: 1.00, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+            x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
           }
         }
       });
 
-      // Chart 2: Comparativo de Tensões 380 V T1 vs T2
-      const ctxV = document.getElementById('voltageChart').getContext('2d');
-      voltageChartInstance = new Chart(ctxV, {
+      voltageChartInstance = new Chart(document.getElementById('voltageChart').getContext('2d'), {
         type: 'line',
         data: {
           labels: ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'],
@@ -1437,22 +1899,20 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 355, max: 400, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+            y: { min: 355, max: 400, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+            x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
           }
         }
       });
 
+      renderAppearanceControls();
       renderQuotaAndLogs();
       setDataSource('sim');
 
-      // Detecta automaticamente se ha backend Cloudflare Worker ativo
       try {
         const health = await fetch('/api/health');
-        if (health.ok) {
-          await loadBackendState();
-        }
-      } catch { /* Mantém Preview Estático (GitHub Pages) */ }
+        if (health.ok) await loadServerState();
+      } catch {}
     });
   </script>
 </body>
