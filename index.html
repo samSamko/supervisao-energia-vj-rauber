@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Supervisão Elétrica Global - Serraria VJ Rauber</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,6 +24,32 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
+  <!-- LOGIN MODAL (Exibido apenas quando conectado ao backend protegido por senha) -->
+  <div id="loginModal" class="hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-white">Acesso Restrito — VJ Rauber</h2>
+          <p class="text-xs text-slate-400">Supervisão Elétrica Global • Sessão de 30 dias</p>
+        </div>
+      </div>
+      <form onsubmit="submitLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-300 mb-1">Senha do Painel</label>
+          <input id="loginPassword" type="password" required placeholder="Digite a senha..."
+                 class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <p id="loginError" class="hidden text-xs text-red-400"></p>
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition">
+          Entrar no Painel
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- TOP NAVIGATION / HEADER -->
   <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
@@ -34,7 +61,10 @@
           <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-lg font-bold text-white tracking-wide">Serraria VJ Rauber</h1>
             <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Tela Global • T1 + T2
+              Tela Global • T1 + T2 (380/220 V)
+            </span>
+            <span id="runtimeEnvBadge" class="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              Preview + Dados Reais (23/11)
             </span>
           </div>
           <p class="text-xs text-slate-400">
@@ -43,18 +73,18 @@
         </div>
       </div>
 
-      <!-- MENU DE NAVEGAÇÃO UNIFICADO + STATUS -->
+      <!-- MENU DE NAVEGAÇÃO UNIFICADO + FONTE + STATUS -->
       <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
         <!-- Atalhos para as 3 telas -->
         <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
           <span class="px-2.5 py-1.5 rounded bg-emerald-600 text-white font-semibold flex items-center gap-1.5">
             <i class="fa-solid fa-layer-group"></i> Global
           </span>
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" title="Abrir painel individual na Whitebox"
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer" title="Abrir painel individual na Whitebox"
              class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
             Trafo 1 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
           </a>
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" title="Abrir painel individual na Whitebox"
+          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer" title="Abrir painel individual na Whitebox"
              class="px-2.5 py-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center gap-1">
             Trafo 2 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-500"></i>
           </a>
@@ -65,22 +95,187 @@
           <span id="commDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <div>
             <div id="commText" class="font-medium text-emerald-400 leading-tight">Whitebox Online</div>
-            <div class="text-[10px] text-slate-400 leading-tight">Ciclo 15m (amostras 1m)</div>
+            <div id="commSub" class="text-[10px] text-slate-400 leading-tight">Modo Grátis Híbrido</div>
           </div>
         </div>
 
-        <!-- Botões de Simulação -->
-        <div class="flex items-center gap-1.5">
-          <button onclick="setMode('day')" id="btnDay" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition">Dia</button>
-          <button onclick="setMode('night')" id="btnNight" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">Madrugada</button>
-          <button onclick="setMode('offline')" id="btnOffline" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition" title="Simular falha de comunicação">Falha</button>
+        <!-- Alternância Dados Reais vs Simulação 380V -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs gap-1">
+          <button onclick="setDataSource('real')" id="btnSourceReal"
+                  class="px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-database text-[10px]"></i> Dados Reais
+          </button>
+          <button onclick="setDataSource('sim')" id="btnSourceSim"
+                  class="px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-blue-600 text-white">
+            <i class="fa-solid fa-flask text-[10px]"></i> Simulação 380V
+          </button>
         </div>
+
+        <!-- Cenários da Simulação -->
+        <div id="simButtonsGroup" class="flex items-center gap-1">
+          <button onclick="setSimMode('day')" id="btnDay" class="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition">Dia</button>
+          <button onclick="setSimMode('night')" id="btnNight" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition">Madrugada</button>
+          <button onclick="setSimMode('offline')" id="btnOffline" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition" title="Simular falha de comunicação">Falha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARRA DE TRANSPARÊNCIA DE COTA (SEMPRE VISÍVEL NO TOPO) -->
+    <div class="max-w-7xl mx-auto mt-3 pt-2.5 border-t border-slate-800/80 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3 text-xs w-full lg:w-auto">
+        <span class="px-2 py-1 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-shield-halved"></i> Plano Grátis ISSO (10/dia • 100/mês)
+        </span>
+
+        <!-- Barra Hoje -->
+        <div class="flex items-center gap-2 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800">
+          <span class="text-slate-400">Hoje:</span>
+          <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="quotaDayBar" class="h-full bg-emerald-400 transition-all" style="width: 30%"></div>
+          </div>
+          <strong id="quotaDayText" class="text-white font-mono">3/10</strong>
+        </div>
+
+        <!-- Barra Mês com indicador de reserva 80% -->
+        <div class="flex items-center gap-2 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800" title="Ao atingir 80/100 no mês, o automático pausa para reservar 20 req manuais">
+          <span class="text-slate-400">Mês:</span>
+          <div class="relative w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="quotaMonthBar" class="h-full bg-sky-400 transition-all" style="width: 3%"></div>
+            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-400/90" style="left: 80%" title="Trava de reserva automática: 80/100"></div>
+          </div>
+          <strong id="quotaMonthText" class="text-white font-mono">3/100</strong>
+          <span class="text-[10px] text-amber-300 hidden sm:inline">(reserva auto: 80)</span>
+        </div>
+
+        <!-- Resumo da Agenda -->
+        <div class="flex items-center gap-1.5 text-slate-300 bg-slate-950/60 px-2.5 py-1 rounded-lg border border-slate-800">
+          <i class="fa-regular fa-clock text-emerald-400"></i>
+          <span id="topScheduleSummary">Agenda: 1x/dia útil (17:00) • Proj: ~22 req/mês</span>
+        </div>
+      </div>
+
+      <!-- Ações Manuais e Drawer -->
+      <div class="flex items-center gap-2 w-full lg:w-auto justify-end">
+        <button onclick="openSyncModal()"
+                class="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-rotate"></i> Sincronizar Agora (Manual)
+        </button>
+        <button onclick="toggleQuotaDrawer()" id="btnToggleDrawer"
+                class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Histórico & Agenda (<span id="logCountBadge">3</span>)</span>
+          <i id="drawerChevron" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+        </button>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- PAINEL EXPANSÍVEL: CONTROLE DE COTA, AGENDAMENTO & MINI-HISTÓRICO -->
+    <section id="quotaDrawer" class="hidden bg-slate-900 border border-sky-500/30 rounded-xl p-5 shadow-2xl space-y-5">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-gauge text-sky-400"></i>
+            Controle de Cota da API ISSO, Agendamento Automático & Mini-Histórico
+          </h2>
+          <p class="text-xs text-slate-400">
+            Transparência total no plano gratuito (10 req/dia • 100 req/mês). Cada consulta busca até 24h de dados minuto a minuto em 1 única requisição por trafo.
+          </p>
+        </div>
+        <button onclick="toggleQuotaDrawer()" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800">
+          Fechar <i class="fa-solid fa-xmark ml-1"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- EDITOR DE AGENDAMENTO AUTOMÁTICO (5 COLS) -->
+        <div class="lg:col-span-5 bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-calendar-check"></i> Agendamento Automático (Nuvem)
+            </h3>
+            <span id="schedSaveStatus" class="text-[11px] text-emerald-400"></span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Frequência de Dias</label>
+              <select id="schedDaysSelect" onchange="recalcScheduleProjection()"
+                      class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-2">
+                <option value="weekdays">Dias Úteis (Seg–Sex • ~22 dias)</option>
+                <option value="mon_sat">Seg a Sáb (~26 dias)</option>
+                <option value="everyday">Todos os dias (~30 dias)</option>
+                <option value="disabled">Desativado (100% Manual)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Trafos na Coleta Automática</label>
+              <select id="schedTrafosSelect" onchange="recalcScheduleProjection()"
+                      class="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-2">
+                <option value="1">Só Trafo 1 (1 req/coleta)</option>
+                <option value="2">Trafo 1 + Trafo 2 (2 req/coleta)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Horarios Configuraveis -->
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-400">Horários configurados (Brasília):</label>
+              <div class="flex items-center gap-1.5">
+                <input id="newScheduleTime" type="time" value="11:30"
+                       class="bg-slate-900 border border-slate-700 text-slate-100 rounded px-2 py-1 text-xs">
+                <button onclick="addScheduleTime()" type="button"
+                        class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-medium">
+                  + Horário
+                </button>
+              </div>
+            </div>
+            <div id="scheduleTimesList" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- Projeção Mensal em Tempo Real -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-lg p-3 space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Projeção Mensal Automática:</span>
+              <strong id="schedProjectedText" class="text-emerald-400">22 req/mês (22%)</strong>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden flex relative">
+              <div id="schedProjectedBar" class="h-full bg-emerald-500 transition-all" style="width: 22%"></div>
+              <div class="absolute top-0 bottom-0 w-0.5 bg-amber-400" style="left: 80%" title="Trava de reserva em 80/100"></div>
+            </div>
+            <p id="schedProjectedNote" class="text-[11px] text-slate-400">
+              Restam ~78 requisições no mês livres para cliques manuais. Coletas automáticas pausam automaticamente se o mês atingir 80/100.
+            </p>
+          </div>
+
+          <button onclick="saveScheduleConfig()" type="button"
+                  class="w-full py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i> Salvar Configuração da Agenda
+          </button>
+        </div>
+
+        <!-- MINI-HISTÓRICO DE REQUISIÇÕES COM RETORNO TRADUZIDO (7 COLS) -->
+        <div class="lg:col-span-7 bg-slate-950/70 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check"></i> Mini-Histórico de Requisições (Retorno Traduzido)
+              </h3>
+              <p class="text-[11px] text-slate-400">Cada linha registra uma chamada real à API da ISSO, o motivo e o diagnóstico em português.</p>
+            </div>
+            <button onclick="resetDemoLogs()" id="btnResetDemoLogs" class="text-[11px] text-slate-400 hover:text-slate-200 underline">
+              Restaurar log inicial (3 req)
+            </button>
+          </div>
+
+          <div id="auditLogList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
 
     <!-- ALERT BANNER -->
     <div id="alertBanner" class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-start sm:items-center justify-between gap-4 transition-all">
@@ -184,24 +379,24 @@
           <span class="text-xs font-semibold text-slate-400">kW (15m)</span>
         </div>
         <div class="mt-3 text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-          <span>Máx: <strong class="text-amber-300">485 kW</strong></span>
-          <span>Hoje: <strong class="text-emerald-400">4.820 kWh</strong></span>
+          <span>Máx: <strong id="demandMaxVal" class="text-amber-300">485 kW</strong></span>
+          <span>Hoje: <strong id="kwhTodayVal" class="text-emerald-400">4.820 kWh</strong></span>
         </div>
       </div>
 
     </div>
 
-    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 (TENSÕES ENTRE FASES R-S, S-T, T-R) -->
+    <!-- DETALHAMENTO COMPARATIVO: TRAFO 01 VS TRAFO 02 (TENSÕES ENTRE FASES R-S, S-T, T-R ~380 V) -->
     <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
       <div class="px-5 py-4 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
           <h3 class="text-sm font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-server text-blue-400"></i>
-            Medições Individuais por Transformador (Tensões Entre Fases R-S, S-T, T-R)
+            Medições Individuais por Transformador (Tensões Entre Fases R-S, S-T, T-R • 380 V)
           </h3>
           <p class="text-xs text-slate-400">Última leitura efetiva e status de cada analisador ISSO Blue Box D1000A</p>
         </div>
-        <div class="flex items-center gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-2 text-xs">
           <span class="text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
             <i class="fa-solid fa-circle text-[8px] text-emerald-400 mr-1" id="t1SyncDot"></i> T1: <span id="t1LastSync">17:15:02</span>
           </span>
@@ -232,16 +427,16 @@
                   <span id="t1StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                   <div>
                     <div class="font-bold text-white">Trafo 01 (500 kVA)</div>
-                    <div class="text-[10px] text-slate-500">ISSO D1000A • 3x 1000A</div>
+                    <div class="text-[10px] text-slate-500">Serraria 1 • 308AD713C046</div>
                   </div>
                 </div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
-                <span id="t1Vrs">221.4</span> / <span id="t1Vst">219.8</span> / <span id="t1Vtr">222.1</span> V
-                <div class="text-[10px] text-slate-400">Média: <strong id="t1Vavg" class="text-slate-200">221.1 V</strong></div>
+                <span id="t1Vrs">381.4</span> / <span id="t1Vst">379.8</span> / <span id="t1Vtr">382.1</span> V
+                <div class="text-[10px] text-slate-400">Média: <strong id="t1Vavg" class="text-slate-200">381.1 V</strong></div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
-                <span id="t1Ir">580</span> / <span id="t1Is">592</span> / <span id="t1It">583</span> A
+                <span id="t1Ir">358</span> / <span id="t1Is">364</span> / <span id="t1It">361</span> A
               </td>
               <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t1P">224.2</span> kW</td>
               <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t1Q">81.0</span> kvar</td>
@@ -260,16 +455,16 @@
                   <span id="t2StatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                   <div>
                     <div class="font-bold text-white">Trafo 02 (500 kVA)</div>
-                    <div class="text-[10px] text-slate-500">ISSO D1000A • 3x 1000A</div>
+                    <div class="text-[10px] text-slate-500">Serraria 2 • 308A3849D67A</div>
                   </div>
                 </div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
-                <span id="t2Vrs">218.2</span> / <span id="t2Vst">220.5</span> / <span id="t2Vtr">221.0</span> V
-                <div class="text-[10px] text-slate-400">Média: <strong id="t2Vavg" class="text-slate-200">219.9 V</strong></div>
+                <span id="t2Vrs">378.2</span> / <span id="t2Vst">380.5</span> / <span id="t2Vtr">381.0</span> V
+                <div class="text-[10px] text-slate-400">Média: <strong id="t2Vavg" class="text-slate-200">379.9 V</strong></div>
               </td>
               <td class="px-4 py-3.5 font-mono text-[11px]">
-                <span id="t2Ir">501</span> / <span id="t2Is">512</span> / <span id="t2It">509</span> A
+                <span id="t2Ir">310</span> / <span id="t2Is">316</span> / <span id="t2It">313</span> A
               </td>
               <td class="px-4 py-3.5 font-bold text-blue-400"><span id="t2P">194.3</span> kW</td>
               <td class="px-4 py-3.5 font-bold text-amber-400"><span id="t2Q">68.2</span> kvar</td>
@@ -281,19 +476,21 @@
               </td>
             </tr>
 
-            <!-- LINHA TOTAL CONSOLIDADO -->
+            <!-- LINHA TOTAL CONSOLIDADO (SEM SOMA DE CORRENTES CONFORME SOLICITADO PELO BETO) -->
             <tr class="bg-slate-950/80 font-bold border-t-2 border-slate-700">
               <td class="px-4 py-3.5 text-emerald-400 flex items-center gap-2">
                 <i class="fa-solid fa-calculator"></i> TOTAL GLOBAL
               </td>
-              <td class="px-4 py-3.5 text-slate-400 text-[11px]">Acompanhar comparativo abaixo ↓</td>
-              <td class="px-4 py-3.5 text-slate-300 font-mono text-[11px]">Soma: <span id="totI">3.261</span> A</td>
+              <td class="px-4 py-3.5 text-slate-400 text-[11px] font-normal">Comparativo de 380 V abaixo ↓</td>
+              <td class="px-4 py-3.5 text-slate-500 font-mono text-[11px] font-normal" title="Correntes exibidas apenas individualmente por transformador">
+                — <span class="text-[10px]">(por trafo)</span>
+              </td>
               <td class="px-4 py-3.5 text-blue-300 text-sm"><span id="tableTotP">418.5</span> kW</td>
               <td class="px-4 py-3.5 text-amber-300 text-sm"><span id="tableTotQ">149.2</span> kvar</td>
               <td class="px-4 py-3.5 text-purple-300 text-sm"><span id="tableTotS">444.3</span> kVA</td>
               <td class="px-4 py-3.5">
                 <span id="tableFpBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500 text-slate-950 shadow">
-                  <span id="tableTotFp">0.942</span> IND
+                  <span id="tableTotFp">0.942 IND</span>
                 </span>
               </td>
             </tr>
@@ -302,7 +499,7 @@
       </div>
     </div>
 
-    <!-- GRÁFICOS HISTÓRICOS: FATOR DE POTÊNCIA + COMPARATIVO DE TENSÕES ENTRE FASES -->
+    <!-- GRÁFICOS HISTÓRICOS: FATOR DE POTÊNCIA + COMPARATIVO DE TENSÕES ENTRE FASES (380 V) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- GRÁFICO 1: FATOR DE POTÊNCIA GLOBAL -->
@@ -311,7 +508,7 @@
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-chart-area text-emerald-400"></i>
-              Histórico de Fator de Potência Global (24h)
+              Histórico de Fator de Potência Global
             </h3>
             <p class="text-xs text-slate-400">Identificação de desvios na madrugada e horário de ponta</p>
           </div>
@@ -332,13 +529,13 @@
         </div>
       </div>
 
-      <!-- GRÁFICO 2: COMPARATIVO DE TENSÕES ENTRE FASES (TRAFO 1 VS TRAFO 2) -->
+      <!-- GRÁFICO 2: COMPARATIVO DE TENSÕES ENTRE FASES (TRAFO 1 VS TRAFO 2 - 380 V) -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-wave-square text-blue-400"></i>
-              Comparativo de Tensão Média Entre Fases (T1 vs T2)
+              Comparativo de Tensão Média Entre Fases (380 V • T1 vs T2)
             </h3>
             <p class="text-xs text-slate-400">Amostragem de 1 min para detectar quedas simultâneas ou isoladas</p>
           </div>
@@ -354,11 +551,11 @@
         <div class="mt-3 pt-2.5 border-t border-slate-800 grid grid-cols-2 gap-2 text-[11px]">
           <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
             <span class="text-slate-400">Mínima Registrada:</span>
-            <span class="text-red-400 font-semibold">208.4 V <span class="text-slate-500 font-normal">(T2 • 14:12)</span></span>
+            <span id="vMinText" class="text-red-400 font-semibold">362.8 V <span class="text-slate-500 font-normal">(T2 • 14:12)</span></span>
           </div>
           <div class="bg-slate-950/60 px-2.5 py-1.5 rounded border border-slate-800 flex justify-between items-center">
             <span class="text-slate-400">Máxima Registrada:</span>
-            <span class="text-emerald-400 font-semibold">227.8 V <span class="text-slate-500 font-normal">(T1 • 03:45)</span></span>
+            <span id="vMaxText" class="text-emerald-400 font-semibold">389.4 V <span class="text-slate-500 font-normal">(T1 • 03:45)</span></span>
           </div>
         </div>
       </div>
@@ -367,56 +564,303 @@
 
   </main>
 
+  <!-- MODAL DE CONFIRMAÇÃO: SINCRONIZAR AGORA (MANUAL) -->
+  <div id="syncModal" class="hidden fixed inset-0 z-[90] bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-rotate text-emerald-400"></i>
+            Confirmar Envio Manual de Requisição
+          </h3>
+          <p class="text-xs text-slate-400">Consulta direta à API ISSO Whitebox (energiamedicaov2)</p>
+        </div>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Escolha de Equipamentos -->
+      <div class="space-y-1.5 text-xs">
+        <label class="block text-slate-300 font-semibold">1. Qual analisador consultar?</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+            <input type="radio" name="syncTarget" value="1" checked onchange="updateSyncCostPreview()" class="accent-emerald-500">
+            <div>
+              <div class="font-semibold text-white">Trafo 1</div>
+              <div class="text-[10px] text-slate-400">308AD713C046 • 1 req</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+            <input type="radio" name="syncTarget" value="2" onchange="updateSyncCostPreview()" class="accent-emerald-500">
+            <div>
+              <div class="font-semibold text-white">Trafo 2</div>
+              <div class="text-[10px] text-slate-400">308A3849D67A • 1 req</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30">
+            <input type="radio" name="syncTarget" value="both" onchange="updateSyncCostPreview()" class="accent-emerald-500">
+            <div>
+              <div class="font-semibold text-white">Ambos</div>
+              <div class="text-[10px] text-slate-400">T1 + T2 • 2 req</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Tipo de Busca -->
+      <div class="space-y-1.5 text-xs">
+        <label class="block text-slate-300 font-semibold">2. Tipo de consulta:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="flex items-start gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-sky-500">
+            <input type="radio" name="syncQueryType" value="janela_24h_minuto" checked class="mt-0.5 accent-sky-500">
+            <div>
+              <div class="font-semibold text-white">Histórico 24h (minuto a minuto)</div>
+              <div class="text-[10px] text-slate-400">Preenche gráficos e última leitura de uma só vez.</div>
+            </div>
+          </label>
+          <label class="flex items-start gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 cursor-pointer has-[:checked]:border-sky-500">
+            <input type="radio" name="syncQueryType" value="ultimo_registro" class="mt-0.5 accent-sky-500">
+            <div>
+              <div class="font-semibold text-white">Apenas Último Registro</div>
+              <div class="text-[10px] text-slate-400">Mais leve; ideal para testar comunicação rápida.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Motivo -->
+      <div class="space-y-2 text-xs">
+        <label class="block text-slate-300 font-semibold">3. Motivo da requisição (registrado no histórico):</label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="pickReason('Atualização de rotina')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Atualização de rotina</button>
+          <button type="button" onclick="pickReason('Conferência de instalação em campo')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Conferência em campo</button>
+          <button type="button" onclick="pickReason('Verificação de queda de tensão')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Queda de tensão</button>
+          <button type="button" onclick="pickReason('Teste de comunicação Wi-Fi')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Teste comunicação</button>
+        </div>
+        <input id="syncReasonInput" type="text" value="Atualização de rotina" placeholder="Descreva o motivo..."
+               class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
+      </div>
+
+      <!-- Aviso de Consumo / Limite -->
+      <div id="syncQuotaWarningBox" class="p-3 rounded-lg bg-amber-950/40 border border-amber-500/40 text-xs space-y-1">
+        <div class="font-bold text-amber-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Esta ação vai consumir <span id="syncCostNum">1</span> requisição da cota ISSO
+        </div>
+        <div class="text-slate-300 flex justify-between pt-1">
+          <span>Saldo Hoje: <strong id="syncPreviewDay" class="text-white">3 → 4 / 10</strong></span>
+          <span>Saldo Mês: <strong id="syncPreviewMonth" class="text-white">3 → 4 / 100</strong></span>
+        </div>
+        <p id="syncPreviewModeNote" class="text-[11px] text-sky-300 pt-1 hidden"></p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+        <button onclick="closeSyncModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Cancelar</button>
+        <button id="btnConfirmSync" onclick="executeManualSync()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-paper-plane"></i> Confirmar e Enviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VER JSON TÉCNICO -->
+  <div id="jsonModal" class="hidden fixed inset-0 z-[95] bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-3">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+        <h3 id="jsonModalTitle" class="text-sm font-bold text-white">Retorno JSON Técnico</h3>
+        <button onclick="document.getElementById('jsonModal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <pre id="jsonModalPre" class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] text-emerald-300 font-mono max-h-96 overflow-auto whitespace-pre-wrap"></pre>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT -->
   <script>
     let fpChartInstance = null;
     let voltageChartInstance = null;
+    let backendMode = false; // true quando rodando sobre Cloudflare Worker (/api/state), false no preview estático
+    let dataSource = 'sim';  // inicia na Simulação 380V para visualização imediata; alternável para 'real' em 1 clique
+    let currentSimMode = 'day';
 
+    // Os 3 registros reais executados em 23/11/2026 19:09 (sem tokens expostos)
+    const INITIAL_REAL_LOGS = [
+      {
+        id: 3,
+        created_at_brt: '2026-11-23 19:09:14',
+        trafo_id: 1,
+        device_code: '308AD713C046',
+        query_type: 'consumo_1h',
+        params_used: '?Periodo=1h&Consumo=1&JSON=1',
+        trigger_source: 'seed',
+        reason: 'Teste inicial v2 — validar retorno de consumo e demanda (1h)',
+        http_status: 204,
+        records_count: 0,
+        translated_summary: 'Nenhum registro de consumo na última hora (HTTP 204 — aparelho sem comunicação recente após as 15:14).',
+        raw_json: null
+      },
+      {
+        id: 2,
+        created_at_brt: '2026-11-23 19:09:12',
+        trafo_id: 1,
+        device_code: '308AD713C046',
+        query_type: 'janela_15m_minuto',
+        params_used: '?Periodo=15m&Grupo=m&JSON=1',
+        trigger_source: 'seed',
+        reason: 'Teste inicial v2 — validar agrupamento minuto a minuto (15 min)',
+        http_status: 204,
+        records_count: 0,
+        translated_summary: 'Nenhum dado novo enviado nos últimos 15 minutos (HTTP 204 — equipamento desligado após os testes de bancada às 15:14).',
+        raw_json: null
+      },
+      {
+        id: 1,
+        created_at_brt: '2026-11-23 19:09:10',
+        trafo_id: 1,
+        device_code: '308AD713C046',
+        query_type: 'ultimo_registro',
+        params_used: '?UltimoRegistro=1&JSON=1',
+        trigger_source: 'seed',
+        reason: 'Teste inicial v2 — validar campos reais da Serraria 1',
+        http_status: 200,
+        records_count: 1,
+        translated_summary: 'Registro recebido de 23/11/2026 às 15:14 (Temp. 33 °C), porém com 0 V, 0 A e 0 kW — equipamento em bancada/desenergizado fora do quadro.',
+        raw_json: JSON.stringify([{
+          envio: "2026-11-23 15:14:00", fuso: -180, duracaoperiodo: 5, frequencia: 0,
+          tensao_fase_a: 0, tensao_fase_b: 0, tensao_fase_c: 0,
+          tensao_fase_ab: 0, tensao_fase_bc: 0, tensao_fase_ca: 0,
+          corrente_fase_a: 0, corrente_fase_b: 0, corrente_fase_c: 0,
+          potencia_ativa_total: 0, potencia_aparente_total_vetorial: 0, potencia_reativa_total_vetor: 0,
+          fator_medio_vetor: 0, cosphi_medio: 0, circuito_indutivo: 0,
+          kwh_direto_a: 0, kwh_direto_b: 0, kwh_direto_c: 0,
+          temperatura: 33, kvarh_direto_a: 0, kvarh_direto_b: 0, kvarh_direto_c: 0
+        }], null, 2)
+      }
+    ];
+
+    const DEFAULT_STATE = {
+      quota: { todayUsed: 3, monthUsed: 3, dailyLimit: 10, monthlyLimit: 100, autoReserveLimit: 80 },
+      settings: { schedule_days: 'weekdays', schedule_times: ['17:00'], trafo1_enabled: true, trafo2_enabled: false },
+      tokensConfigured: { 1: true, 2: false },
+      latest: {
+        1: { ts_brt: '2026-11-23 15:14:00', v_ab: 0, v_bc: 0, v_ca: 0, i_a: 0, i_b: 0, i_c: 0, p_kw: 0, q_kvar_signed: 0, s_kva: 0, fp: 0, inductive: 0, kwh_total: 0, temp_c: 33 },
+        2: null
+      },
+      readings: [],
+      logs: INITIAL_REAL_LOGS
+    };
+
+    let appState = loadLocalPreviewState();
+
+    function loadLocalPreviewState() {
+      try {
+        const saved = localStorage.getItem('vjrauber_free_preview_v1');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function persistLocalPreviewState() {
+      if (backendMode) return;
+      try {
+        localStorage.setItem('vjrauber_free_preview_v1', JSON.stringify(appState));
+      } catch {}
+    }
+
+    // Cenários simulados em 380/220 V com coerência S = sqrt(3)*V*I
     const scenarios = {
       day: {
         offline: false,
         night: false,
-        t1: { vrs: 221.4, vst: 219.8, vtr: 222.1, ir: 580, is: 592, it: 583, p: 224.2, q: 81.0, fp: 0.940, sync: '17:15:02' },
-        t2: { vrs: 218.2, vst: 220.5, vtr: 221.0, ir: 501, is: 512, it: 509, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
-        demand: 432
+        realBench: false,
+        t1: { vrs: 381.4, vst: 379.8, vtr: 382.1, ir: 358, is: 364, it: 361, p: 224.2, q: 81.0, fp: 0.940, sync: '17:15:02' },
+        t2: { vrs: 378.2, vst: 380.5, vtr: 381.0, ir: 310, is: 316, it: 313, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
+        demand: 432, demandMax: 485, kwhToday: '4.820'
       },
       night: {
         offline: false,
         night: true,
-        t1: { vrs: 225.4, vst: 226.1, vtr: 225.8, ir: 108, is: 112, it: 110, p: 14.5, q: -32.0, fp: 0.413, sync: '03:15:02' },
-        t2: { vrs: 224.9, vst: 225.3, vtr: 225.0, ir: 94, is: 97, it: 96, p: 12.0, q: -26.5, fp: 0.412, sync: '03:15:04' },
-        demand: 28
+        realBench: false,
+        t1: { vrs: 388.4, vst: 389.1, vtr: 388.8, ir: 51, is: 53, it: 52, p: 14.5, q: -32.0, fp: 0.413, sync: '03:15:02' },
+        t2: { vrs: 387.9, vst: 388.3, vtr: 388.0, ir: 42, is: 44, it: 43, p: 12.0, q: -26.5, fp: 0.412, sync: '03:15:04' },
+        demand: 28, demandMax: 485, kwhToday: '4.820'
       },
       offline: {
         offline: true,
         night: false,
-        t1: { vrs: 221.4, vst: 219.8, vtr: 222.1, ir: 580, is: 592, it: 583, p: 224.2, q: 81.0, fp: 0.940, sync: '16:15:02 (Atrasado)' },
-        t2: { vrs: 218.2, vst: 220.5, vtr: 221.0, ir: 501, is: 512, it: 509, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
-        demand: 432
+        realBench: false,
+        t1: { vrs: 381.4, vst: 379.8, vtr: 382.1, ir: 358, is: 364, it: 361, p: 224.2, q: 81.0, fp: 0.940, sync: '16:15:02 (Atrasado)' },
+        t2: { vrs: 378.2, vst: 380.5, vtr: 381.0, ir: 310, is: 316, it: 313, p: 194.3, q: 68.2, fp: 0.944, sync: '17:15:04' },
+        demand: 432, demandMax: 485, kwhToday: '4.820'
       }
     };
 
-    function setMode(mode) {
+    function buildRealDataView() {
+      const l1 = appState.latest[1];
+      const l2 = appState.latest[2];
+      const t1 = l1 ? {
+        vrs: l1.v_ab || 0, vst: l1.v_bc || 0, vtr: l1.v_ca || 0,
+        ir: Math.round(l1.i_a || 0), is: Math.round(l1.i_b || 0), it: Math.round(l1.i_c || 0),
+        p: l1.p_kw || 0, q: l1.q_kvar_signed || 0, fp: l1.fp || 0,
+        sync: l1.ts_brt ? `${l1.ts_brt.slice(5, 16)} (${l1.temp_c || 0}°C)` : 'Sem registro'
+      } : { vrs: 0, vst: 0, vtr: 0, ir: 0, is: 0, it: 0, p: 0, q: 0, fp: 0, sync: 'Sem registro' };
+
+      const t2 = l2 ? {
+        vrs: l2.v_ab || 0, vst: l2.v_bc || 0, vtr: l2.v_ca || 0,
+        ir: Math.round(l2.i_a || 0), is: Math.round(l2.i_b || 0), it: Math.round(l2.i_c || 0),
+        p: l2.p_kw || 0, q: l2.q_kvar_signed || 0, fp: l2.fp || 0,
+        sync: l2.ts_brt ? l2.ts_brt.slice(5, 16) : 'Sem registro'
+      } : { vrs: 0, vst: 0, vtr: 0, ir: 0, is: 0, it: 0, p: 0, q: 0, fp: 0, sync: 'Aguardando 4ª-feira' };
+
+      const zeroCircuit = (t1.vrs + t2.vrs) < 10;
+      return {
+        offline: false,
+        night: false,
+        realBench: zeroCircuit,
+        t1, t2,
+        demand: Math.round(t1.p + t2.p),
+        demandMax: Math.round(t1.p + t2.p),
+        kwhToday: (((l1?.kwh_total || 0) + (l2?.kwh_total || 0))).toFixed(1)
+      };
+    }
+
+    function setDataSource(src) {
+      dataSource = src;
+      document.getElementById('btnSourceReal').className = src === 'real'
+        ? "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-emerald-600 text-white"
+        : "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white";
+      document.getElementById('btnSourceSim').className = src === 'sim'
+        ? "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-blue-600 text-white"
+        : "px-2.5 py-1.5 rounded font-medium transition flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white";
+      document.getElementById('simButtonsGroup').classList.toggle('hidden', src !== 'sim');
+
+      if (src === 'real') {
+        updateUI(buildRealDataView());
+      } else {
+        setSimMode(currentSimMode);
+      }
+    }
+
+    function setSimMode(mode) {
+      currentSimMode = mode;
       ['btnDay', 'btnNight', 'btnOffline'].forEach(id => {
         document.getElementById(id).className = "text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium transition";
       });
       const activeBtn = mode === 'day' ? 'btnDay' : (mode === 'night' ? 'btnNight' : 'btnOffline');
-      document.getElementById(activeBtn).className = "text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition";
-      if (mode === 'offline') document.getElementById(activeBtn).className = "text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white font-medium transition";
+      document.getElementById(activeBtn).className = mode === 'offline'
+        ? "text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white font-medium transition"
+        : "text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white font-medium transition";
 
-      const d = scenarios[mode];
-      updateUI(d);
+      updateUI(scenarios[mode]);
     }
 
     function updateUI(data) {
       const pTot = data.t1.p + data.t2.p;
       const qTot = data.t1.q + data.t2.q;
       const sTot = Math.sqrt(pTot * pTot + qTot * qTot);
-      const fpTot = pTot / sTot;
+      const fpTot = sTot > 0.01 ? (pTot / sTot) : 0;
       const isInductive = qTot >= 0;
 
       // Cards
-      document.getElementById('fpValue').innerText = fpTot.toFixed(3);
+      document.getElementById('fpValue').innerText = sTot > 0.01 ? fpTot.toFixed(3) : '—';
       document.getElementById('pTotalValue').innerText = pTot.toFixed(1);
       document.getElementById('qTotalValue').innerText = Math.abs(qTot).toFixed(1);
       document.getElementById('sTotalValue').innerText = sTot.toFixed(1);
@@ -426,6 +870,8 @@
       document.getElementById('qT2Val').innerText = Math.abs(data.t2.q).toFixed(1);
       document.getElementById('loadPct').innerText = ((sTot / 1000) * 100).toFixed(1) + '%';
       document.getElementById('demandVal').innerText = data.demand;
+      document.getElementById('demandMaxVal').innerText = data.demandMax + ' kW';
+      document.getElementById('kwhTodayVal').innerText = data.kwhToday + ' kWh';
 
       // Table T1 & T2
       const t1Vavg = (data.t1.vrs + data.t1.vst + data.t1.vtr) / 3;
@@ -443,7 +889,7 @@
       document.getElementById('t1P').innerText = data.t1.p.toFixed(1);
       document.getElementById('t1Q').innerText = data.t1.q.toFixed(1);
       document.getElementById('t1S').innerText = t1S.toFixed(1);
-      document.getElementById('t1Fp').innerText = data.t1.fp.toFixed(3);
+      document.getElementById('t1Fp').innerText = t1S > 0.01 ? data.t1.fp.toFixed(3) : '—';
       document.getElementById('t1LastSync').innerText = data.t1.sync;
 
       document.getElementById('t2Vrs').innerText = data.t2.vrs.toFixed(1);
@@ -456,21 +902,21 @@
       document.getElementById('t2P').innerText = data.t2.p.toFixed(1);
       document.getElementById('t2Q').innerText = data.t2.q.toFixed(1);
       document.getElementById('t2S').innerText = t2S.toFixed(1);
-      document.getElementById('t2Fp').innerText = data.t2.fp.toFixed(3);
+      document.getElementById('t2Fp').innerText = t2S > 0.01 ? data.t2.fp.toFixed(3) : '—';
       document.getElementById('t2LastSync').innerText = data.t2.sync;
 
-      const sumI = data.t1.ir + data.t1.is + data.t1.it + data.t2.ir + data.t2.is + data.t2.it;
-      document.getElementById('totI').innerText = sumI.toLocaleString('pt-BR');
       document.getElementById('tableTotP').innerText = pTot.toFixed(1);
       document.getElementById('tableTotQ').innerText = qTot.toFixed(1);
       document.getElementById('tableTotS').innerText = sTot.toFixed(1);
-      document.getElementById('tableTotFp').innerText = fpTot.toFixed(3);
+      document.getElementById('tableTotFp').innerText = sTot > 0.01 ? `${fpTot.toFixed(3)} ${isInductive ? 'IND' : 'CAP'}` : 'SEM CARGA';
 
-      // Status Comunicação (Online Verde vs Offline Vermelho)
+      // Status Comunicação
       const commDot = document.getElementById('commDot');
       const commText = document.getElementById('commText');
       const t1SyncDot = document.getElementById('t1SyncDot');
       const t1StatusDot = document.getElementById('t1StatusDot');
+      const t2SyncDot = document.getElementById('t2SyncDot');
+      const t2StatusDot = document.getElementById('t2StatusDot');
 
       if (data.offline) {
         commDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
@@ -478,12 +924,24 @@
         commText.innerText = "Falha Trafo 1 (Offline)";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-red-500 mr-1";
         t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
+        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+      } else if (data.realBench) {
+        commDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
+        commText.className = "font-medium text-amber-300 leading-tight";
+        commText.innerText = "Em Bancada / Aguardando";
+        t1SyncDot.className = "fa-solid fa-circle text-[8px] text-amber-400 mr-1";
+        t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-slate-500 mr-1";
+        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
       } else {
         commDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
         commText.className = "font-medium text-emerald-400 leading-tight";
         commText.innerText = "Whitebox Online";
         t1SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
         t1StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        t2SyncDot.className = "fa-solid fa-circle text-[8px] text-emerald-400 mr-1";
+        t2StatusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
       }
 
       // Banner e FP Status
@@ -495,11 +953,25 @@
       const alertDesc = document.getElementById('alertDesc');
       const alertIcon = document.getElementById('alertIcon');
 
-      if (data.offline) {
+      if (data.realBench) {
+        fpBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        fpBadge.innerText = "SEM CARGA";
+        fpBar.className = "bg-slate-600 h-full rounded-full transition-all duration-500";
+        fpBar.style.width = "0%";
+        fpStatus.className = "text-amber-300 font-medium";
+        fpStatus.innerText = "Aguardando";
+
+        alertBanner.className = "p-4 rounded-xl bg-amber-950/30 border border-amber-500/40 flex items-start sm:items-center justify-between gap-4";
+        alertTitle.className = "text-sm font-semibold text-amber-300";
+        alertTitle.innerText = "Dados Reais de Bancada — Aguardando Instalação na Fábrica (4ª-feira)";
+        alertDesc.innerText = "Serraria 1 (308AD713C046) registrou último ponto em 23/11 às 15:14 (Temp. 33 °C, 0 V / 0 A fora do quadro). Serraria 2 aguarda roteador. Use o botão 'Simulação 380V' acima para visualizar o painel em carga.";
+        alertIcon.className = "w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center flex-shrink-0";
+        alertIcon.innerHTML = '<i class="fa-solid fa-plug-circle-exclamation text-lg"></i>';
+      } else if (data.offline) {
         alertBanner.className = "p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start sm:items-center justify-between gap-4";
         alertTitle.className = "text-sm font-semibold text-red-300";
         alertTitle.innerText = "ALERTA DE COMUNICAÇÃO: Analisador Trafo 01 sem resposta há > 60 min";
-        alertDesc.innerText = "O cálculo global está utilizando o último valor válido em cache. Verifique a conexão de internet do D1000A do Trafo 1.";
+        alertDesc.innerText = "O cálculo global está utilizando o último valor válido em cache. Verifique a conexão Wi-Fi do D1000A do Trafo 1.";
         alertIcon.className = "w-9 h-9 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0";
         alertIcon.innerHTML = '<i class="fa-solid fa-wifi text-lg"></i>';
       } else if (fpTot >= 0.920 && !data.night) {
@@ -533,15 +1005,348 @@
       }
     }
 
+    // === CONTROLE DE COTA, AGENDAMENTO E HISTÓRICO ===
+    function toggleQuotaDrawer() {
+      const drawer = document.getElementById('quotaDrawer');
+      const chev = document.getElementById('drawerChevron');
+      const isHidden = drawer.classList.contains('hidden');
+      drawer.classList.toggle('hidden');
+      chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    function renderQuotaAndLogs() {
+      const q = appState.quota;
+      const dayPct = Math.min(100, (q.todayUsed / q.dailyLimit) * 100);
+      const monthPct = Math.min(100, (q.monthUsed / q.monthlyLimit) * 100);
+
+      document.getElementById('quotaDayText').innerText = `${q.todayUsed}/${q.dailyLimit}`;
+      document.getElementById('quotaMonthText').innerText = `${q.monthUsed}/${q.monthlyLimit}`;
+      document.getElementById('quotaDayBar').style.width = `${dayPct}%`;
+      document.getElementById('quotaMonthBar').style.width = `${monthPct}%`;
+      document.getElementById('quotaDayBar').className = `h-full transition-all ${q.todayUsed >= q.dailyLimit ? 'bg-red-500' : (q.todayUsed >= 7 ? 'bg-amber-400' : 'bg-emerald-400')}`;
+      document.getElementById('quotaMonthBar').className = `h-full transition-all ${q.monthUsed >= q.autoReserveLimit ? 'bg-amber-400' : 'bg-sky-400'}`;
+
+      document.getElementById('logCountBadge').innerText = appState.logs.length;
+
+      // Renderizar editor de agenda
+      document.getElementById('schedDaysSelect').value = appState.settings.schedule_days || 'weekdays';
+      document.getElementById('schedTrafosSelect').value = appState.settings.trafo2_enabled ? '2' : '1';
+      renderScheduleTimes();
+      recalcScheduleProjection();
+
+      // Renderizar Audit Log
+      const list = document.getElementById('auditLogList');
+      list.innerHTML = appState.logs.map((log, idx) => {
+        const statusBadge = log.http_status === 200
+          ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[10px]">HTTP 200 OK</span>`
+          : (log.http_status === 204
+            ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px]">HTTP 204 Vazio</span>`
+            : `<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 font-mono text-[10px]">HTTP ${log.http_status}</span>`);
+
+        const srcLabel = log.trigger_source === 'seed'
+          ? 'Teste Real'
+          : (log.trigger_source === 'auto' ? 'Automático' : 'Manual');
+        const srcBadge = log.trigger_source === 'auto'
+          ? 'bg-sky-500/20 text-sky-300'
+          : (log.trigger_source === 'seed' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-200');
+
+        const jsonBtn = log.raw_json
+          ? `<button onclick="openJsonModal(${idx})" class="text-[11px] text-sky-400 hover:text-sky-300 underline flex items-center gap-1"><i class="fa-solid fa-code"></i> Ver JSON técnico</button>`
+          : `<span class="text-[10px] text-slate-500 italic">Sem corpo JSON (204)</span>`;
+
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-1.5 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="font-mono text-[11px] text-slate-400">${log.created_at_brt}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${srcBadge}">${srcLabel}</span>
+                <span class="font-semibold text-white">Trafo ${log.trafo_id} (${log.device_code})</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-[10px] text-slate-400">${log.params_used}</span>
+                ${statusBadge}
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              <strong class="text-slate-300">Motivo:</strong> ${escapeHtml(log.reason)}
+            </div>
+            <div class="bg-slate-950/90 border border-slate-800 rounded px-2.5 py-2 text-slate-200 flex items-start gap-2">
+              <i class="fa-solid fa-comment-dots text-emerald-400 mt-0.5 text-xs"></i>
+              <span>${escapeHtml(log.translated_summary)}</span>
+            </div>
+            <div class="flex justify-end">${jsonBtn}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]));
+    }
+
+    function renderScheduleTimes() {
+      const times = appState.settings.schedule_times || ['17:00'];
+      const container = document.getElementById('scheduleTimesList');
+      if (times.length === 0) {
+        container.innerHTML = `<span class="text-[11px] text-slate-500 italic">Nenhum horário configurado (apenas manual).</span>`;
+        return;
+      }
+      container.innerHTML = times.map((t, i) => `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-slate-200 font-mono text-xs">
+          ${t}
+          <button onclick="removeScheduleTime(${i})" type="button" class="text-slate-500 hover:text-red-400" title="Remover horário">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      `).join('');
+    }
+
+    function addScheduleTime() {
+      const val = document.getElementById('newScheduleTime').value;
+      if (!val) return;
+      const times = appState.settings.schedule_times || [];
+      if (!times.includes(val)) {
+        times.push(val);
+        times.sort();
+      }
+      appState.settings.schedule_times = times;
+      renderScheduleTimes();
+      recalcScheduleProjection();
+    }
+
+    function removeScheduleTime(idx) {
+      appState.settings.schedule_times.splice(idx, 1);
+      renderScheduleTimes();
+      recalcScheduleProjection();
+    }
+
+    function recalcScheduleProjection() {
+      const daysVal = document.getElementById('schedDaysSelect').value;
+      const trafosCount = Number(document.getElementById('schedTrafosSelect').value || 1);
+      const timesCount = (appState.settings.schedule_times || []).length;
+      const daysPerMonth = daysVal === 'weekdays' ? 22 : (daysVal === 'mon_sat' ? 26 : (daysVal === 'everyday' ? 30 : 0));
+
+      const projected = daysPerMonth * timesCount * trafosCount;
+      const limit = appState.quota.monthlyLimit || 100;
+      const pct = Math.min(100, Math.round((projected / limit) * 100));
+
+      const textEl = document.getElementById('schedProjectedText');
+      const barEl = document.getElementById('schedProjectedBar');
+      const noteEl = document.getElementById('schedProjectedNote');
+      const topSummary = document.getElementById('topScheduleSummary');
+
+      textEl.innerText = `${projected} req/mês (${pct}%)`;
+      barEl.style.width = `${pct}%`;
+
+      if (projected === 0) {
+        textEl.className = 'text-sky-300 font-bold';
+        barEl.className = 'h-full bg-sky-500 transition-all';
+        noteEl.innerText = 'Modo 100% Manual: nenhuma requisição será disparada automaticamente.';
+        topSummary.innerText = 'Agenda: Desativada (100% Manual)';
+      } else if (projected <= 80) {
+        textEl.className = 'text-emerald-400 font-bold';
+        barEl.className = 'h-full bg-emerald-500 transition-all';
+        noteEl.innerText = `Saudável: sobram ~${limit - projected} req/mês para consultas manuais. Trava automática em 80/100.`;
+        const daysTxt = daysVal === 'weekdays' ? 'dia útil' : (daysVal === 'mon_sat' ? 'Seg–Sáb' : 'dia');
+        topSummary.innerText = `Agenda: ${timesCount}x/${daysTxt} (${appState.settings.schedule_times.join(', ')}) • Proj: ~${projected}/mês`;
+      } else {
+        textEl.className = 'text-red-400 font-bold';
+        barEl.className = 'h-full bg-red-500 transition-all';
+        noteEl.innerText = `Atenção: projeção (${projected}) ultrapassa a reserva de 80/100! O sistema pausará o automático ao atingir 80.`;
+        topSummary.innerText = `Agenda: ~${projected}/mês (pausa automática em 80)`;
+      }
+    }
+
+    async function saveScheduleConfig() {
+      appState.settings.schedule_days = document.getElementById('schedDaysSelect').value;
+      appState.settings.trafo2_enabled = document.getElementById('schedTrafosSelect').value === '2';
+
+      if (backendMode) {
+        const res = await fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(appState.settings)
+        });
+        if (!res.ok) {
+          document.getElementById('schedSaveStatus').innerText = 'Erro ao salvar!';
+          return;
+        }
+      } else {
+        persistLocalPreviewState();
+      }
+      document.getElementById('schedSaveStatus').innerText = 'Agenda salva!';
+      setTimeout(() => { document.getElementById('schedSaveStatus').innerText = ''; }, 2500);
+    }
+
+    // === MODAL ENVIO MANUAL ===
+    function openSyncModal() {
+      document.getElementById('syncModal').classList.remove('hidden');
+      updateSyncCostPreview();
+    }
+
+    function closeSyncModal() {
+      document.getElementById('syncModal').classList.add('hidden');
+    }
+
+    function pickReason(txt) {
+      document.getElementById('syncReasonInput').value = txt;
+    }
+
+    function updateSyncCostPreview() {
+      const target = document.querySelector('input[name="syncTarget"]:checked').value;
+      const cost = target === 'both' ? 2 : 1;
+      const q = appState.quota;
+
+      document.getElementById('syncCostNum').innerText = cost;
+      document.getElementById('syncPreviewDay').innerText = `${q.todayUsed} → ${q.todayUsed + cost} / ${q.dailyLimit}`;
+      document.getElementById('syncPreviewMonth').innerText = `${q.monthUsed} → ${q.monthUsed + cost} / ${q.monthlyLimit}`;
+
+      const overLimit = (q.todayUsed + cost > q.dailyLimit) || (q.monthUsed + cost > q.monthlyLimit);
+      const btn = document.getElementById('btnConfirmSync');
+      btn.disabled = overLimit;
+      btn.className = overLimit
+        ? "px-4 py-2 rounded-lg bg-slate-700 text-slate-400 text-xs font-semibold cursor-not-allowed flex items-center gap-1.5"
+        : "px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5";
+
+      const modeNote = document.getElementById('syncPreviewModeNote');
+      if (!backendMode) {
+        modeNote.classList.remove('hidden');
+        modeNote.innerText = 'Modo Preview (GitHub Pages): simula o registro no histórico local sem chamar a API real da ISSO (os tokens ficam protegidos apenas no Cloudflare Worker).';
+      } else {
+        modeNote.classList.add('hidden');
+      }
+    }
+
+    async function executeManualSync() {
+      const target = document.querySelector('input[name="syncTarget"]:checked').value;
+      const queryType = document.querySelector('input[name="syncQueryType"]:checked').value;
+      const reason = document.getElementById('syncReasonInput').value.trim() || 'Consulta manual pelo painel';
+      const trafos = target === 'both' ? [1, 2] : [Number(target)];
+
+      if (backendMode) {
+        const btn = document.getElementById('btnConfirmSync');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Consultando ISSO...';
+        try {
+          const resp = await fetch('/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trafos, queryType, reason })
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            alert(data.error || 'Falha na sincronização');
+          } else {
+            await loadBackendState();
+            setDataSource('real');
+          }
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Confirmar e Enviar';
+          closeSyncModal();
+        }
+        return;
+      }
+
+      // Simulação do envio no Preview Estático (sem gastar cota real)
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const brtStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      for (const tId of trafos) {
+        const code = tId === 1 ? '308AD713C046' : '308A3849D67A';
+        const paramsUsed = queryType === 'ultimo_registro' ? '?UltimoRegistro=1&JSON=1' : '?Periodo=24h&Grupo=m&JSON=1';
+        appState.logs.unshift({
+          id: Date.now() + tId,
+          created_at_brt: brtStr,
+          trafo_id: tId,
+          device_code: code,
+          query_type: queryType,
+          params_used: paramsUsed,
+          trigger_source: 'manual',
+          reason: `[Preview] ${reason}`,
+          http_status: 204,
+          records_count: 0,
+          translated_summary: tId === 2
+            ? 'Serraria 2 (308A3849D67A): aguardando instalação do 2º roteador e cadastro do token de API.'
+            : 'Nenhum dado novo nos últimos minutos (HTTP 204 — simulado no Preview do GitHub Pages sem gastar cota real).',
+          raw_json: null
+        });
+        appState.quota.todayUsed += 1;
+        appState.quota.monthUsed += 1;
+      }
+
+      persistLocalPreviewState();
+      renderQuotaAndLogs();
+      closeSyncModal();
+      if (document.getElementById('quotaDrawer').classList.contains('hidden')) {
+        toggleQuotaDrawer();
+      }
+    }
+
+    function openJsonModal(idx) {
+      const log = appState.logs[idx];
+      if (!log) return;
+      document.getElementById('jsonModalTitle').innerText = `JSON Técnico — Trafo ${log.trafo_id} (${log.created_at_brt})`;
+      let formatted = log.raw_json || '';
+      try { formatted = JSON.stringify(JSON.parse(log.raw_json), null, 2); } catch {}
+      document.getElementById('jsonModalPre').innerText = formatted;
+      document.getElementById('jsonModal').classList.remove('hidden');
+    }
+
+    function resetDemoLogs() {
+      if (backendMode) return;
+      localStorage.removeItem('vjrauber_free_preview_v1');
+      appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      renderQuotaAndLogs();
+    }
+
+    // === LOGIN E CARREGAMENTO BACKEND CLOUDFLARE ===
+    async function submitLogin(e) {
+      e.preventDefault();
+      const pw = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      errEl.classList.add('hidden');
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) {
+        errEl.innerText = 'Senha incorreta.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      document.getElementById('loginModal').classList.add('hidden');
+      await loadBackendState();
+    }
+
+    async function loadBackendState() {
+      const res = await fetch('/api/state?hours=24');
+      if (res.status === 401) {
+        backendMode = true;
+        document.getElementById('loginModal').classList.remove('hidden');
+        return;
+      }
+      if (!res.ok) return;
+      const data = await res.json();
+      backendMode = true;
+      appState = data;
+      document.getElementById('runtimeEnvBadge').innerText = 'Nuvem Cloudflare • D1 Ativo';
+      document.getElementById('runtimeEnvBadge').className = 'text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+      document.getElementById('btnResetDemoLogs').classList.add('hidden');
+      renderQuotaAndLogs();
+    }
+
     function downloadCSV() {
-      const csvContent = "data:text/csv;charset=utf-8," 
+      const csvContent = "data:text/csv;charset=utf-8,"
         + "DataHora,T1_Vmedia_LL,T2_Vmedia_LL,P_Total_kW,Q_Total_kvar,S_Total_kVA,FP_Global\n"
-        + "2026-11-12 03:00,225.7,225.1,26.5,-58.5,64.2,0.413\n"
-        + "2026-11-12 10:00,221.1,219.9,418.5,149.2,444.3,0.942\n"
-        + "2026-11-12 14:12,216.0,208.4,448.2,152.3,473.4,0.946\n";
+        + "2026-11-23 03:00,388.8,388.1,26.5,-58.5,64.2,0.413\n"
+        + "2026-11-23 10:00,381.1,379.9,418.5,149.2,444.3,0.942\n"
+        + "2026-11-23 14:12,374.2,362.8,448.2,152.3,473.4,0.946\n";
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", "historico_vj_rauber_tensao_fp.csv");
+      link.setAttribute("download", "historico_vj_rauber_380v_fp.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -563,7 +1368,7 @@
       fpChartInstance.update();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       // Chart 1: FP Global
       const ctxFp = document.getElementById('fpChart').getContext('2d');
       fpChartInstance = new Chart(ctxFp, {
@@ -602,7 +1407,7 @@
         }
       });
 
-      // Chart 2: Comparativo de Tensões T1 vs T2
+      // Chart 2: Comparativo de Tensões 380 V T1 vs T2
       const ctxV = document.getElementById('voltageChart').getContext('2d');
       voltageChartInstance = new Chart(ctxV, {
         type: 'line',
@@ -610,16 +1415,16 @@
           labels: ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'],
           datasets: [
             {
-              label: 'Trafo 1 (Média LL)',
-              data: [225.5, 226.8, 227.8, 223.1, 221.4, 221.1, 220.5, 219.8, 216.0, 220.4, 221.9, 223.0, 224.2],
+              label: 'Trafo 1 (Média 380V)',
+              data: [385.5, 387.8, 389.4, 383.1, 381.4, 381.1, 380.5, 379.8, 374.2, 380.4, 381.9, 383.0, 384.2],
               borderColor: '#3b82f6',
               borderWidth: 2,
               tension: 0.3,
               pointRadius: 2.5
             },
             {
-              label: 'Trafo 2 (Média LL)',
-              data: [225.0, 226.1, 227.0, 222.5, 220.2, 219.9, 218.7, 217.5, 208.4, 218.9, 220.5, 222.1, 223.8],
+              label: 'Trafo 2 (Média 380V)',
+              data: [385.0, 387.1, 388.6, 382.5, 380.2, 379.9, 378.7, 377.5, 362.8, 378.9, 380.5, 382.1, 383.8],
               borderColor: '#f59e0b',
               borderWidth: 2,
               tension: 0.3,
@@ -632,13 +1437,22 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 200, max: 235, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { min: 355, max: 400, grid: { color: 'rgba(51, 65, 85, 0.4)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
             x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
 
-      setMode('day');
+      renderQuotaAndLogs();
+      setDataSource('sim');
+
+      // Detecta automaticamente se ha backend Cloudflare Worker ativo
+      try {
+        const health = await fetch('/api/health');
+        if (health.ok) {
+          await loadBackendState();
+        }
+      } catch { /* Mantém Preview Estático (GitHub Pages) */ }
     });
   </script>
 </body>
