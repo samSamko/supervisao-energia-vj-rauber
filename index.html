@@ -823,35 +823,75 @@
         </button>
       </div>
 
+      <!-- Aviso de Simulador de API no modo demonstração -->
+      <div id="mockModeBanner" class="p-3 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+           style="background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info-text);">
+        <div class="flex items-start gap-2">
+          <i class="fa-solid fa-flask mt-0.5 flex-shrink-0" aria-hidden="true"></i>
+          <span>
+            <strong>Simulador de API ativo (Modo de Teste):</strong> os limites reais (10/dia e 100/mês) funcionam aqui com leituras realistas levemente aleatórias para você testar e se familiarizar sem consumir sua franquia real.
+          </span>
+        </div>
+        <button type="button" onclick="resetMockQuota()"
+                class="px-2.5 py-1.5 rounded-lg font-semibold surface-card text-main flex-shrink-0 hover:opacity-90">
+          Reiniciar Teste (3/10)
+        </button>
+      </div>
+
       <!-- Barras de Progresso de Cota -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
         <div class="surface-elevated p-3 rounded-xl space-y-1.5">
-          <div class="flex justify-between">
-            <span class="text-sec font-semibold">Consultas Hoje</span>
+          <div class="flex justify-between items-center gap-2">
+            <span class="text-sec font-semibold">Consultas Hoje <span class="text-[11px] font-normal text-muted-token">(rec.: até 3/dia)</span></span>
             <strong id="quotaDayText" class="font-mono text-main">3 / 10</strong>
           </div>
-          <div class="w-full h-2 rounded-full overflow-hidden surface-card">
+          <div class="relative w-full h-2.5 rounded-full overflow-hidden surface-card">
             <div id="quotaDayBar" class="h-full bg-emerald-500 transition-all" style="width: 30%"></div>
+            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-500" style="left: 30%" title="Limite diário recomendado: 3/10"></div>
           </div>
+          <p id="dailyRecWarning" class="hidden text-[11px] font-medium pt-0.5" style="color: var(--warn-text);">
+            <i class="fa-solid fa-triangle-exclamation mr-1" aria-hidden="true"></i>
+            Acima do recomendado diário (3/dia): o limite diário máximo é 10, mas manter até 3/dia evita esgotar as 100 do mês.
+          </p>
         </div>
         <div class="surface-elevated p-3 rounded-xl space-y-1.5">
-          <div class="flex justify-between">
-            <span class="text-sec font-semibold">Consultas no Mês (reserva automática: 80)</span>
+          <div class="flex justify-between items-center gap-2">
+            <span class="text-sec font-semibold">Consultas no Mês <span class="text-[11px] font-normal text-muted-token">(reserva auto: 80)</span></span>
             <strong id="quotaMonthText" class="font-mono text-main">3 / 100</strong>
           </div>
-          <div class="relative w-full h-2 rounded-full overflow-hidden surface-card">
+          <div class="relative w-full h-2.5 rounded-full overflow-hidden surface-card">
             <div id="quotaMonthBar" class="h-full bg-blue-500 transition-all" style="width: 3%"></div>
-            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-500" style="left: 80%"></div>
+            <div class="absolute top-0 bottom-0 w-0.5 bg-amber-500" style="left: 80%" title="Pausa automática em 80/100"></div>
           </div>
+          <p class="text-[11px] text-muted-token">
+            Reserva de 20 consultas protegidas para uso manual após atingir 80/100.
+          </p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <!-- EDITOR DE AGENDAMENTO AUTOMÁTICO -->
         <div class="lg:col-span-5 surface-elevated rounded-xl p-4 space-y-3 text-xs">
-          <div class="flex items-center justify-between">
-            <h3 class="font-bold uppercase tracking-wider text-main">Agendamento Automático</h3>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold uppercase tracking-wider text-main">Agendamento Automático</h3>
+              <button type="button" id="btnQuotaHelp" aria-expanded="false" aria-controls="quotaHelpBox"
+                      aria-label="Como funcionam o limite recomendado e o agendamento"
+                      onclick="toggleHelpNote('quotaHelpBox', this)"
+                      class="w-6 h-6 rounded-full surface-card text-accent-token font-bold text-xs flex items-center justify-center border border-token hover:opacity-90"
+                      style="min-height: 24px;">?</button>
+            </div>
             <span id="schedSaveStatus" class="text-[11px] font-semibold text-accent-token"></span>
+          </div>
+
+          <!-- Explicação acionada pelo botão "?" -->
+          <div id="quotaHelpBox" class="hidden surface-card rounded-lg p-3 space-y-1.5 text-[11px] text-sec">
+            <div class="font-bold text-main">Por que recomendamos até 3 consultas/dia?</div>
+            <ul class="list-disc pl-4 space-y-1">
+              <li><strong>Regra da conta gratuita:</strong> permite até <strong>10/dia</strong>, mas o teto mensal é de apenas <strong>100/mês</strong> (~3,3 por dia).</li>
+              <li><strong>1 coleta por dia basta:</strong> cada consulta busca as <strong>últimas 24 horas minuto a minuto</strong> de uma só vez, mantendo o gráfico completo sem gastar cota.</li>
+              <li><strong>Agenda inteligente:</strong> o padrão de 1x/dia útil às 17:00 gasta ~22/mês (1 trafo) ou ~44/mês (2 trafos) e pausa sozinho se o mês bater 80/100.</li>
+            </ul>
           </div>
 
           <div class="space-y-2.5">
@@ -925,16 +965,28 @@
   <!-- MODAL DE CONFIRMAÇÃO: SINCRONIZAR AGORA (MANUAL) -->
   <dialog id="syncDialog" class="app-dialog" style="width: min(94vw, 34rem);" aria-labelledby="syncDialogTitle">
     <div class="p-4 sm:p-5 space-y-4">
-      <div class="flex items-start justify-between border-b border-token pb-3">
+      <div class="flex items-start justify-between border-b border-token pb-3 gap-2">
         <div>
-          <h2 id="syncDialogTitle" class="text-base font-bold text-main flex items-center gap-2">
-            <i class="fa-solid fa-rotate text-emerald-500" aria-hidden="true"></i>
-            Confirmar Consulta Manual
-          </h2>
+          <div class="flex items-center gap-2">
+            <h2 id="syncDialogTitle" class="text-base font-bold text-main flex items-center gap-2">
+              <i class="fa-solid fa-rotate text-emerald-500" aria-hidden="true"></i>
+              Confirmar Consulta Manual
+            </h2>
+            <button type="button" id="btnSyncHelp" aria-expanded="false" aria-controls="syncHelpBox"
+                    aria-label="Como funcionam as consultas manuais e o limite recomendado"
+                    onclick="toggleHelpNote('syncHelpBox', this)"
+                    class="w-6 h-6 rounded-full surface-elevated text-accent-token font-bold text-xs flex items-center justify-center border border-token hover:opacity-90"
+                    style="min-height: 24px;">?</button>
+          </div>
           <p class="text-xs text-muted-token">Busca imediata de leituras nos analisadores ISSO D1000A</p>
         </div>
         <button type="button" onclick="closeDialog('syncDialog')" aria-label="Fechar janela de consulta"
                 class="surface-elevated px-2.5 py-1 rounded-lg text-xs font-semibold text-main">Fechar</button>
+      </div>
+
+      <div id="syncHelpBox" class="hidden surface-elevated rounded-lg p-3 text-[11px] text-sec space-y-1">
+        <div class="font-bold text-main">Resumo rápido da consulta manual:</div>
+        <p>Use o <strong>Histórico 24h</strong> no fim do turno para baixar todos os minutos do dia com apenas 1 requisição por transformador. Tente manter até <strong>3 consultas/dia</strong> na média para que as 100 consultas mensais durem o mês inteiro.</p>
       </div>
 
       <fieldset class="space-y-1.5 text-xs">
@@ -996,16 +1048,22 @@
                class="w-full px-3 py-2 rounded-lg surface-elevated text-main text-xs">
       </div>
 
-      <div class="p-3 rounded-lg text-xs space-y-1" style="background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text);">
+      <div class="p-3 rounded-lg text-xs space-y-1.5" style="background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text);">
         <div class="font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
           Esta ação consome <span id="syncCostNum">1</span> requisição da franquia ISSO
         </div>
-        <div class="flex justify-between pt-1 text-main">
-          <span>Hoje: <strong id="syncPreviewDay">3 → 4 / 10</strong></span>
+        <div class="flex justify-between pt-0.5 text-main">
+          <span>Hoje: <strong id="syncPreviewDay">3 → 4 / 10</strong> <span class="text-[10px] text-muted-token">(rec.: ≤3)</span></span>
           <span>Mês: <strong id="syncPreviewMonth">3 → 4 / 100</strong></span>
         </div>
-        <p id="syncPreviewModeNote" class="text-[11px] text-sec pt-1 hidden"></p>
+        <p id="syncDailyRecWarn" class="hidden text-[11px] font-semibold">
+          ⚠️ Acima do recomendado diário (3/dia): o teto diário é 10, mas exceder 3/dia reduz o saldo para o restante do mês.
+        </p>
+        <p id="syncOverLimitErr" role="alert" class="hidden text-[11px] font-bold" style="color: var(--danger-text);">
+          🚫 Limite real da franquia atingido (máx. 10/dia ou 100/mês). Reinicie o simulador no painel de Cota para continuar testando.
+        </p>
+        <p id="syncPreviewModeNote" class="text-[11px] text-sec pt-0.5 hidden"></p>
       </div>
 
       <div class="flex justify-end gap-2 pt-2 border-t border-token">
@@ -1363,10 +1421,12 @@
       } : { vrs: 0, vst: 0, vtr: 0, ir: 0, is: 0, it: 0, p: 0, q: 0, fp: 0, sync: 'Aguardando 4ª-feira' };
 
       return {
-        offline: false, night: false, realBench: (t1.vrs + t2.vrs) < 10,
+        offline: false, night: false,
+        realBench: (t1.vrs + t2.vrs) < 10,
+        isMockFeed: Boolean(l1?.isMock || l2?.isMock),
         t1, t2,
         demand: Math.round(t1.p + t2.p),
-        demandMax: Math.round(t1.p + t2.p),
+        demandMax: Math.max(Math.round(t1.p + t2.p), (l1?.isMock || l2?.isMock) ? 485 : 0),
         kwhToday: ((l1?.kwh_total || 0) + (l2?.kwh_total || 0)).toFixed(1)
       };
     }
@@ -1376,10 +1436,15 @@
       styleOptionButton(document.getElementById('menuSourceReal'), src === 'real');
       styleOptionButton(document.getElementById('menuSourceSim'), src === 'sim');
       document.getElementById('menuSimSubgroup').classList.toggle('hidden', src !== 'sim');
-      document.getElementById('envModeTag').innerText = src === 'real' ? 'Dados Reais' : 'Simulação 380V';
 
-      if (src === 'real') updateUI(buildRealDataView());
-      else setSimMode(currentSimMode);
+      if (src === 'real') {
+        const view = buildRealDataView();
+        document.getElementById('envModeTag').innerText = view.isMockFeed ? 'Simulador API (Aleatório)' : 'Dados Reais';
+        updateUI(view);
+      } else {
+        document.getElementById('envModeTag').innerText = 'Simulação 380V';
+        setSimMode(currentSimMode);
+      }
     }
 
     function setSimMode(mode) {
@@ -1506,8 +1571,12 @@
         fpStatus.innerText = "+" + (fpTot - 0.92).toFixed(3);
         alertBanner.style.background = "var(--accent-soft)";
         alertBanner.style.borderColor = "var(--accent-border)";
-        alertTitle.innerText = "Instalação em Conformidade Regulamentar (ANEEL)";
-        alertDesc.innerText = "Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.";
+        alertTitle.innerText = data.isMockFeed
+          ? "Instalação em Conformidade (Simulador de API • Dados Aleatórios)"
+          : "Instalação em Conformidade Regulamentar (ANEEL)";
+        alertDesc.innerText = data.isMockFeed
+          ? "Leitura gerada pelo Simulador de API com valores realistas levemente aleatórios em 380 V (respeitando limites de 10/dia e 100/mês) para familiarização da equipe."
+          : "Fator de potência global calculado pela soma vetorial de P e Q acima de 0,920.";
         alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-lg" aria-hidden="true"></i>';
       } else {
         fpBadge.innerText = "CAPACITIVO (ATENÇÃO)";
@@ -1516,23 +1585,45 @@
         fpStatus.innerText = "-" + (0.92 - fpTot).toFixed(3);
         alertBanner.style.background = "var(--danger-bg)";
         alertBanner.style.borderColor = "var(--danger-border)";
-        alertTitle.innerText = "ALERTA: Excedente Reativo Capacitivo na Madrugada";
-        alertDesc.innerText = "Fator de potência global em " + fpTot.toFixed(3) + " capacitivo. Risco de cobrança de reativo excedente pela concessionária.";
+        alertTitle.innerText = data.isMockFeed
+          ? "ALERTA (Simulador de API): Fator de Potência Abaixo de 0,920"
+          : "ALERTA: Excedente Reativo Capacitivo na Madrugada";
+        alertDesc.innerText = (data.isMockFeed ? "[Simulador API • Dados Aleatórios] " : "") +
+          "Fator de potência global em " + fpTot.toFixed(3) + ". Risco de cobrança de reativo excedente pela concessionária.";
         alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg" aria-hidden="true"></i>';
       }
+    }
+
+    function toggleHelpNote(boxId, btn) {
+      const box = document.getElementById(boxId);
+      const willOpen = box.classList.contains('hidden');
+      box.classList.toggle('hidden');
+      if (btn) btn.setAttribute('aria-expanded', String(willOpen));
+    }
+
+    function resetMockQuota() {
+      if (connectedToServer) return;
+      try { localStorage.removeItem('vjrauber_free_preview_v2'); } catch {}
+      appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      renderQuotaAndLogs();
+      setDataSource('sim');
     }
 
     // === CONTROLE DE COTA, AGENDAMENTO E HISTÓRICO ===
     function renderQuotaAndLogs() {
       const q = appState.quota;
+      document.getElementById('mockModeBanner').classList.toggle('hidden', connectedToServer);
       document.getElementById('headerQuotaPill').innerText = `${q.todayUsed}/${q.dailyLimit}`;
       document.getElementById('drawerQuotaSummary').innerText = `${q.todayUsed}/${q.dailyLimit} hoje • ${q.monthUsed}/${q.monthlyLimit} mês`;
       document.getElementById('drawerLogCount').innerText = appState.logs.length;
 
       document.getElementById('quotaDayText').innerText = `${q.todayUsed} / ${q.dailyLimit}`;
       document.getElementById('quotaMonthText').innerText = `${q.monthUsed} / ${q.monthlyLimit}`;
-      document.getElementById('quotaDayBar').style.width = `${Math.min(100, (q.todayUsed / q.dailyLimit) * 100)}%`;
+      const dayBar = document.getElementById('quotaDayBar');
+      dayBar.style.width = `${Math.min(100, (q.todayUsed / q.dailyLimit) * 100)}%`;
+      dayBar.className = `h-full transition-all ${q.todayUsed >= q.dailyLimit ? 'bg-red-500' : (q.todayUsed > 3 ? 'bg-amber-500' : 'bg-emerald-500')}`;
       document.getElementById('quotaMonthBar').style.width = `${Math.min(100, (q.monthUsed / q.monthlyLimit) * 100)}%`;
+      document.getElementById('dailyRecWarning').classList.toggle('hidden', q.todayUsed <= 3);
 
       document.getElementById('schedDaysSelect').value = appState.settings.schedule_days || 'weekdays';
       document.getElementById('schedTrafosSelect').value = appState.settings.trafo2_enabled ? '2' : '1';
@@ -1543,7 +1634,9 @@
       list.innerHTML = appState.logs.map((log, idx) => {
         const isOk = log.http_status === 200;
         const isEmpty = log.http_status === 204;
-        const statusTxt = isOk ? 'Leitura Recebida' : (isEmpty ? 'Sem Novos Dados' : 'Falha na Consulta');
+        const statusTxt = isOk
+          ? (log.is_mock ? 'Leitura Simulada' : 'Leitura Recebida')
+          : (isEmpty ? 'Sem Novos Dados' : 'Falha na Consulta');
         const statusStyle = isOk
           ? 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);'
           : (isEmpty ? 'background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);' : 'background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border);');
@@ -1669,17 +1762,55 @@
       document.getElementById('syncPreviewMonth').innerText = `${q.monthUsed} → ${q.monthUsed + cost} / ${q.monthlyLimit}`;
 
       const overLimit = (q.todayUsed + cost > q.dailyLimit) || (q.monthUsed + cost > q.monthlyLimit);
+      const overRecommended = !overLimit && (q.todayUsed + cost > 3);
+      document.getElementById('syncDailyRecWarn').classList.toggle('hidden', !overRecommended);
+      document.getElementById('syncOverLimitErr').classList.toggle('hidden', !overLimit);
+
       const btn = document.getElementById('btnConfirmSync');
       btn.disabled = overLimit;
-      btn.style.opacity = overLimit ? '0.5' : '1';
+      btn.style.opacity = overLimit ? '0.45' : '1';
+      btn.style.cursor = overLimit ? 'not-allowed' : 'pointer';
 
       const noteEl = document.getElementById('syncPreviewModeNote');
       if (!connectedToServer) {
         noteEl.classList.remove('hidden');
-        noteEl.innerText = 'Ambiente de Demonstração: simulação de consulta para conferência visual (não consome a franquia real da conta ISSO).';
+        noteEl.innerText = 'Simulador de API (Modo de Teste): gera medições realistas levemente aleatórias em 380 V respeitando exatamente os limites reais da conta (10/dia e 100/mês).';
       } else {
         noteEl.classList.add('hidden');
       }
+    }
+
+    function generateMockTrafoReading(tId, prevReading, brtStr) {
+      const rand = (min, max) => min + Math.random() * (max - min);
+      const vBase = rand(377.5, 384.5);
+      const v_ab = +(vBase + rand(-1.8, 1.8)).toFixed(1);
+      const v_bc = +(vBase + rand(-1.8, 1.8)).toFixed(1);
+      const v_ca = +(vBase + rand(-1.8, 1.8)).toFixed(1);
+      const vAvg = (v_ab + v_bc + v_ca) / 3;
+
+      const p_kw = +(tId === 1 ? rand(195, 252) : rand(162, 218)).toFixed(1);
+      const fp = +rand(0.922, 0.962).toFixed(3);
+      const s_kva = +(p_kw / fp).toFixed(1);
+      const qMag = Math.sqrt(Math.max(0, s_kva * s_kva - p_kw * p_kw));
+      const inductive = 1;
+      const q_kvar_signed = +qMag.toFixed(1);
+
+      const iAvg = (s_kva * 1000) / (Math.sqrt(3) * vAvg);
+      const i_a = Math.round(iAvg * rand(0.975, 1.025));
+      const i_b = Math.round(iAvg * rand(0.975, 1.025));
+      const i_c = Math.round(iAvg * rand(0.975, 1.025));
+      const temp_c = Math.round(rand(34, 41));
+      const prevKwh = prevReading?.kwh_total || (tId === 1 ? 2410 : 1980);
+      const kwh_total = +(prevKwh + rand(12, 48)).toFixed(1);
+
+      return {
+        isMock: true,
+        ts_brt: brtStr,
+        v_ab, v_bc, v_ca,
+        i_a, i_b, i_c,
+        p_kw, q_kvar_signed, s_kva, fp, inductive,
+        kwh_total, temp_c
+      };
     }
 
     async function executeManualSync() {
@@ -1709,12 +1840,36 @@
         return;
       }
 
+      // Simulador realista de API respeitando exatamente limites reais (10/dia e 100/mes)
+      const cost = trafos.length;
+      const q = appState.quota;
+      if (q.todayUsed + cost > q.dailyLimit || q.monthUsed + cost > q.monthlyLimit) {
+        updateSyncCostPreview();
+        return;
+      }
+
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
       const brtStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
       for (const tId of trafos) {
         const code = tId === 1 ? '308AD713C046' : '308A3849D67A';
+        const reading = generateMockTrafoReading(tId, appState.latest[tId], brtStr);
+        appState.latest[tId] = reading;
+        const vAvg = ((reading.v_ab + reading.v_bc + reading.v_ca) / 3).toFixed(1);
+
+        const rawPayload = [{
+          envio: brtStr,
+          tensao_fase_ab: reading.v_ab, tensao_fase_bc: reading.v_bc, tensao_fase_ca: reading.v_ca,
+          corrente_fase_a: reading.i_a, corrente_fase_b: reading.i_b, corrente_fase_c: reading.i_c,
+          potencia_ativa_total_kw: reading.p_kw,
+          potencia_reativa_total_kvar: reading.q_kvar_signed,
+          potencia_aparente_total_kva: reading.s_kva,
+          fator_medio_vetor: reading.fp,
+          temperatura: reading.temp_c,
+          origem_simulador: 'Leitura realista aleatória de teste (380 V)'
+        }];
+
         appState.logs.unshift({
           id: Date.now() + tId,
           created_at_brt: brtStr,
@@ -1722,19 +1877,41 @@
           device_code: code,
           query_type: queryType,
           trigger_source: 'manual',
-          reason: `[Simulação] ${reason}`,
-          http_status: 204,
-          translated_summary: tId === 2
-            ? 'Serraria 2 (308A3849D67A): aguardando instalação em campo para iniciar envios.'
-            : 'Nenhum dado novo nos últimos minutos (simulação local de conferência, sem gasto de franquia real).',
-          raw_json: null
+          is_mock: true,
+          reason: `[Teste API] ${reason}`,
+          http_status: 200,
+          translated_summary: `Leitura simulada (${brtStr.slice(11, 16)}): Tensão média ${vAvg} V • Potência ${reading.p_kw.toFixed(1)} kW • FP ${reading.fp.toFixed(3)} Ind • Temp. ${reading.temp_c} °C (valores levemente aleatórios).`,
+          raw_json: JSON.stringify(rawPayload)
         });
         appState.quota.todayUsed += 1;
         appState.quota.monthUsed += 1;
       }
 
+      // Atualiza último ponto dos gráficos para refletir a nova leitura do simulador
+      const l1 = appState.latest[1];
+      const l2 = appState.latest[2];
+      if (l1 && voltageChartInstance) {
+        const v1 = +((l1.v_ab + l1.v_bc + l1.v_ca) / 3).toFixed(1);
+        voltageChartInstance.data.datasets[0].data[voltageChartInstance.data.datasets[0].data.length - 1] = v1;
+      }
+      if (l2 && voltageChartInstance) {
+        const v2 = +((l2.v_ab + l2.v_bc + l2.v_ca) / 3).toFixed(1);
+        voltageChartInstance.data.datasets[1].data[voltageChartInstance.data.datasets[1].data.length - 1] = v2;
+      }
+      if (fpChartInstance && (l1 || l2)) {
+        const pSum = (l1?.p_kw || 0) + (l2?.p_kw || 0);
+        const qSum = (l1?.q_kvar_signed || 0) + (l2?.q_kvar_signed || 0);
+        const sSum = Math.sqrt(pSum * pSum + qSum * qSum);
+        if (sSum > 0) {
+          fpChartInstance.data.datasets[0].data[fpChartInstance.data.datasets[0].data.length - 1] = +(pSum / sSum).toFixed(3);
+        }
+      }
+      fpChartInstance?.update();
+      voltageChartInstance?.update();
+
       persistSavedState();
       renderQuotaAndLogs();
+      setDataSource('real');
       closeDialog('syncDialog');
       openQuotaDialog();
     }
@@ -1750,13 +1927,17 @@
         parsed = Array.isArray(arr) ? (arr[arr.length - 1] || {}) : arr;
       } catch {}
 
+      const pStr = parsed.potencia_ativa_total_kw !== undefined
+        ? `${parsed.potencia_ativa_total_kw} kW / ${parsed.potencia_aparente_total_kva} kVA`
+        : `${parsed.potencia_ativa_total ?? 0} / ${parsed.potencia_aparente_total_vetorial ?? 0}`;
+
       document.getElementById('detailsSummaryBody').innerHTML = `
         <div class="grid grid-cols-2 gap-2">
           <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Horário do Medidor</span><strong class="text-main">${escapeHtml(parsed.envio || '—')}</strong></div>
           <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Temperatura Interna</span><strong class="text-main">${parsed.temperatura ?? '—'} °C</strong></div>
           <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Tensões Entre Fases</span><strong class="text-main">${parsed.tensao_fase_ab ?? 0} / ${parsed.tensao_fase_bc ?? 0} / ${parsed.tensao_fase_ca ?? 0} V</strong></div>
           <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Correntes (R / S / T)</span><strong class="text-main">${parsed.corrente_fase_a ?? 0} / ${parsed.corrente_fase_b ?? 0} / ${parsed.corrente_fase_c ?? 0} A</strong></div>
-          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Potência Ativa / Aparente</span><strong class="text-main">${parsed.potencia_ativa_total ?? 0} / ${parsed.potencia_aparente_total_vetorial ?? 0}</strong></div>
+          <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Potência Ativa / Aparente</span><strong class="text-main">${pStr}</strong></div>
           <div class="surface-elevated p-2.5 rounded-lg"><span class="text-muted-token block">Fator de Potência Médio</span><strong class="text-main">${parsed.fator_medio_vetor ?? 0}</strong></div>
         </div>
         <details class="surface-elevated rounded-lg p-2.5">
