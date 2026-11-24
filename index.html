@@ -430,6 +430,29 @@
   <!-- MAIN CONTAINER -->
   <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5">
 
+    <!-- SELETOR UNIFICADO DAS 3 TELAS (GLOBAL / SERRARIA 1 / SERRARIA 2) -->
+    <div role="tablist" aria-label="Selecionar tela do supervisório"
+         class="surface-card p-1.5 rounded-xl grid grid-cols-3 gap-1.5 shadow-sm">
+      <button type="button" role="tab" id="tabGlobal" aria-selected="true" onclick="setActiveView('global')"
+              class="touch-target px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+        <span>Tela Global</span>
+      </button>
+      <button type="button" role="tab" id="tabT1" aria-selected="false" onclick="setActiveView('t1')"
+              class="touch-target px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-industry" aria-hidden="true"></i>
+        <span>Serraria 1</span>
+      </button>
+      <button type="button" role="tab" id="tabT2" aria-selected="false" onclick="setActiveView('t2')"
+              class="touch-target px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-industry" aria-hidden="true"></i>
+        <span>Serraria 2</span>
+      </button>
+    </div>
+
+    <!-- VISÃO 1: TELA GLOBAL (CONSOLIDADO T1 + T2) -->
+    <div id="globalView" class="space-y-5">
+
     <!-- ALERT BANNER -->
     <div id="alertBanner" class="p-3.5 sm:p-4 rounded-xl flex items-start sm:items-center justify-between gap-3 transition-all"
          style="background: var(--accent-soft); border: 1px solid var(--accent-border);">
@@ -834,6 +857,192 @@
 
     </section>
 
+    </div><!-- /globalView -->
+
+    <!-- VISÃO 2 e 3: TELA INDIVIDUAL (SERRARIA 1 OU SERRARIA 2) -->
+    <section id="singleTrafoView" class="hidden space-y-5" aria-labelledby="singleTitle">
+      <!-- Cabeçalho Individual do Transformador -->
+      <div class="surface-card rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+        <div class="flex items-start sm:items-center gap-3">
+          <span id="singleStatusDot" class="w-3 h-3 rounded-full bg-emerald-500 mt-1 sm:mt-0 flex-shrink-0" aria-hidden="true"></span>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 id="singleTitle" class="text-base sm:text-lg font-extrabold text-main">Serraria 1 — Trafo 01 (500 kVA)</h2>
+              <span id="singleStatusText" class="text-[11px] font-bold px-2 py-0.5 rounded"
+                    style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
+                Online
+              </span>
+            </div>
+            <p class="text-xs text-muted-token mt-0.5">
+              Analisador ISSO D1000A (<span id="singleDeviceCode" class="font-mono">308AD713C046</span>) • Última leitura: <strong id="singleLastSync" class="text-main">17:15:02</strong> • Temp.: <strong id="singleTemp" class="text-main">—</strong>
+            </p>
+          </div>
+        </div>
+        <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
+           class="surface-elevated touch-target px-3 py-2 rounded-lg text-xs font-semibold text-main inline-flex items-center justify-center gap-1.5 hover:opacity-90 flex-shrink-0">
+          <span>Whitebox ISSO</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <!-- 4 KPI Cards Individuais -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="surface-card rounded-xl p-4 shadow-sm">
+          <div class="flex justify-between items-start gap-2">
+            <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">FP Individual</span>
+            <span id="singleFpBadge" class="text-[10px] font-bold px-2 py-0.5 rounded"
+                  style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
+              INDUTIVO
+            </span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1.5">
+            <span id="singleFp" class="text-2xl font-extrabold text-main">0.940</span>
+            <span class="text-xs text-muted-token">/ 1.000</span>
+          </div>
+          <div class="mt-2.5 w-full h-2 rounded-full overflow-hidden surface-elevated">
+            <div id="singleFpBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 94%"></div>
+          </div>
+          <div class="mt-2 text-[11px] text-muted-token flex justify-between">
+            <span>Meta: 0.920</span>
+            <span id="singleFpStatus" class="font-semibold text-accent-token">+0.020</span>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-xl p-4 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Ativa</span>
+            <i class="fa-solid fa-bolt text-p-token text-xs" aria-hidden="true"></i>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1.5">
+            <span id="singleP" class="text-2xl font-extrabold text-p-token">224.2</span>
+            <span class="text-xs font-semibold text-muted-token">kW</span>
+          </div>
+          <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2">
+            Trafo nominal: <strong class="text-main">500 kVA</strong>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-xl p-4 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Reativa</span>
+            <i class="fa-solid fa-wave-square text-q-token text-xs" aria-hidden="true"></i>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1.5">
+            <span id="singleQ" class="text-2xl font-extrabold text-q-token">81.0</span>
+            <span class="text-xs font-semibold text-muted-token">kvar</span>
+          </div>
+          <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2">
+            Sentido: <strong id="singleQType" class="text-main">Indutivo</strong>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-xl p-4 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-[11px] font-semibold text-muted-token uppercase tracking-wider">Potência Aparente</span>
+            <i class="fa-solid fa-gauge-high text-s-token text-xs" aria-hidden="true"></i>
+          </div>
+          <div class="mt-2 flex items-baseline gap-1.5">
+            <span id="singleS" class="text-2xl font-extrabold text-s-token">238.4</span>
+            <span class="text-xs font-semibold text-muted-token">kVA</span>
+          </div>
+          <div class="mt-3 text-[11px] text-muted-token border-t border-token pt-2 flex justify-between">
+            <span>Utilização: <strong id="singleLoadPct" class="text-main">47.7%</strong></span>
+            <span>500 kVA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tensões Entre Fases & Correntes por Fase -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="surface-card rounded-xl p-4 space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-main">Tensões Entre Fases (380 V)</h3>
+            <span class="text-xs text-muted-token">Média: <strong id="singleVavg" class="text-main">381.1 V</strong></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase R–S</span>
+              <strong id="singleVrs" class="text-base font-mono font-bold text-main">381.4</strong>
+              <span class="text-[11px] text-muted-token">V</span>
+            </div>
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase S–T</span>
+              <strong id="singleVst" class="text-base font-mono font-bold text-main">379.8</strong>
+              <span class="text-[11px] text-muted-token">V</span>
+            </div>
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase T–R</span>
+              <strong id="singleVtr" class="text-base font-mono font-bold text-main">382.1</strong>
+              <span class="text-[11px] text-muted-token">V</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-xl p-4 space-y-3 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-main">Correntes por Fase (A)</h3>
+            <span class="text-xs text-muted-token">Média: <strong id="singleIavg" class="text-main">361 A</strong></span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase R</span>
+              <strong id="singleIr" class="text-base font-mono font-bold text-main">358</strong>
+              <span class="text-[11px] text-muted-token">A</span>
+            </div>
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase S</span>
+              <strong id="singleIs" class="text-base font-mono font-bold text-main">364</strong>
+              <span class="text-[11px] text-muted-token">A</span>
+            </div>
+            <div class="surface-elevated p-3 rounded-lg">
+              <span class="block text-[11px] text-muted-token">Fase T</span>
+              <strong id="singleIt" class="text-base font-mono font-bold text-main">361</strong>
+              <span class="text-[11px] text-muted-token">A</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 Gráficos Individuais do Transformador -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div class="surface-card rounded-xl p-4 sm:p-5 shadow-sm">
+          <div class="mb-3">
+            <h3 class="text-sm font-bold text-main flex items-center gap-2">
+              <i class="fa-solid fa-chart-area text-emerald-500" aria-hidden="true"></i>
+              Histórico de Fator de Potência Individual
+            </h3>
+            <p class="text-xs text-muted-token">Curva individual com referência regulatória 0,920</p>
+          </div>
+          <div class="h-60 w-full">
+            <canvas id="singleFpChart" role="img" aria-label="Gráfico de histórico do fator de potência deste transformador"></canvas>
+          </div>
+        </div>
+
+        <div class="surface-card rounded-xl p-4 sm:p-5 shadow-sm">
+          <div class="mb-3">
+            <h3 class="text-sm font-bold text-main flex items-center gap-2">
+              <i class="fa-solid fa-wave-square text-blue-500" aria-hidden="true"></i>
+              Tensão Média Entre Fases deste Transformador
+            </h3>
+            <p class="text-xs text-muted-token">Estabilidade da linha de 380 V ao longo do período</p>
+          </div>
+          <div class="h-60 w-full">
+            <canvas id="singleVoltageChart" role="img" aria-label="Gráfico de tensão média entre fases deste transformador"></canvas>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-token grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+            <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
+              <span class="text-muted-token">Mínima:</span>
+              <span id="singleVMin" class="font-bold text-min-token">—</span>
+            </div>
+            <div class="surface-elevated px-2.5 py-2 rounded flex justify-between items-center">
+              <span class="text-muted-token">Máxima:</span>
+              <span id="singleVMax" class="font-bold text-accent-token">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- GAVETA MOBILE-FIRST DE MENU / OPÇÕES -->
@@ -893,21 +1102,28 @@
         </button>
       </div>
 
-      <!-- 3. TELAS INDIVIDUAIS WHITEBOX -->
+      <!-- 3. NAVEGAÇÃO ENTRE AS 3 TELAS & WHITEBOX -->
       <div class="space-y-2 pt-3 border-t border-token">
-        <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Telas Individuais (Whitebox ISSO)</h3>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
-             class="touch-target surface-elevated px-3 py-2 rounded-lg font-semibold text-main flex items-center justify-between hover:opacity-90">
-            <span>Trafo 1</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
-          </a>
-          <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
-             class="touch-target surface-elevated px-3 py-2 rounded-lg font-semibold text-main flex items-center justify-between hover:opacity-90">
-            <span>Trafo 2</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
-          </a>
+        <h3 class="text-[11px] font-bold uppercase tracking-wider text-muted-token">Telas do Supervisório</h3>
+        <div class="grid grid-cols-3 gap-1.5 text-xs">
+          <button type="button" id="menuViewGlobal" onclick="setActiveView('global'); closeMenuDrawer();"
+                  class="touch-target px-2 py-2 rounded-lg font-semibold border transition">
+            Global
+          </button>
+          <button type="button" id="menuViewT1" onclick="setActiveView('t1'); closeMenuDrawer();"
+                  class="touch-target px-2 py-2 rounded-lg font-semibold border transition">
+            Serraria 1
+          </button>
+          <button type="button" id="menuViewT2" onclick="setActiveView('t2'); closeMenuDrawer();"
+                  class="touch-target px-2 py-2 rounded-lg font-semibold border transition">
+            Serraria 2
+          </button>
         </div>
+        <a href="https://painel.isso.digital/?p=Login" target="_blank" rel="noopener noreferrer"
+           class="touch-target surface-elevated px-3 py-2 rounded-lg font-semibold text-main text-xs flex items-center justify-between hover:opacity-90">
+          <span>Whitebox Oficial ISSO (Avançado)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-muted-token" aria-hidden="true"></i>
+        </a>
       </div>
 
       <!-- 4. APARÊNCIA & ACESSIBILIDADE -->
@@ -1332,9 +1548,13 @@
   <script>
     let fpChartInstance = null;
     let voltageChartInstance = null;
+    let singleFpChartInstance = null;
+    let singleVoltageChartInstance = null;
     let connectedToServer = false;
     let dataSource = 'sim';
     let currentSimMode = 'day';
+    let activeView = 'global';
+    let currentSnapshotData = null;
 
     // 3 testes reais de 23/11/2026 com retorno 100% traduzido para o usuário
     const INITIAL_REAL_LOGS = [
@@ -1558,7 +1778,7 @@
       const cs = getComputedStyle(document.documentElement);
       const gridColor = cs.getPropertyValue('--grid-chart').trim() || 'rgba(148, 163, 184, 0.25)';
       const tickColor = cs.getPropertyValue('--tick-chart').trim() || '#94a3b8';
-      [fpChartInstance, voltageChartInstance].forEach(chart => {
+      [fpChartInstance, voltageChartInstance, singleFpChartInstance, singleVoltageChartInstance].forEach(chart => {
         if (!chart) return;
         chart.options.scales.y.grid.color = gridColor;
         chart.options.scales.y.ticks.color = tickColor;
@@ -1667,7 +1887,108 @@
       updateUI(scenarios[mode]);
     }
 
+    function setActiveView(view) {
+      activeView = view;
+      document.getElementById('globalView').classList.toggle('hidden', view !== 'global');
+      document.getElementById('singleTrafoView').classList.toggle('hidden', view === 'global');
+
+      const tabMap = [
+        ['tabGlobal', 'menuViewGlobal', 'global'],
+        ['tabT1', 'menuViewT1', 't1'],
+        ['tabT2', 'menuViewT2', 't2'],
+      ];
+      for (const [tabId, menuId, key] of tabMap) {
+        const active = view === key;
+        const tabEl = document.getElementById(tabId);
+        const menuEl = document.getElementById(menuId);
+        tabEl.setAttribute('aria-selected', String(active));
+        styleOptionButton(tabEl, active);
+        if (menuEl) styleOptionButton(menuEl, active);
+      }
+
+      if (view !== 'global') {
+        renderSingleTrafoView();
+        syncSingleTrafoCharts();
+        requestAnimationFrame(() => {
+          singleFpChartInstance?.resize();
+          singleVoltageChartInstance?.resize();
+        });
+      } else {
+        requestAnimationFrame(() => {
+          fpChartInstance?.resize();
+          voltageChartInstance?.resize();
+        });
+      }
+    }
+
+    function renderSingleTrafoView() {
+      if (!currentSnapshotData || activeView === 'global') return;
+      const isT1 = activeView === 't1';
+      const tId = isT1 ? 1 : 2;
+      const t = isT1 ? currentSnapshotData.t1 : currentSnapshotData.t2;
+
+      document.getElementById('singleTitle').innerText = isT1
+        ? 'Serraria 1 — Trafo 01 (500 kVA)'
+        : 'Serraria 2 — Trafo 02 (500 kVA)';
+      document.getElementById('singleDeviceCode').innerText = isT1 ? '308AD713C046' : '308A3849D67A';
+      document.getElementById('singleLastSync').innerText = t.sync || '—';
+
+      const st = getActiveState();
+      const tempVal = st.latest[tId]?.temp_c ?? (dataSource === 'sim' ? (isT1 ? 37 : 35) : null);
+      document.getElementById('singleTemp').innerText = tempVal !== null ? `${tempVal} °C` : '—';
+
+      const vAvg = (t.vrs + t.vst + t.vtr) / 3;
+      const iAvg = Math.round((t.ir + t.is + t.it) / 3);
+      const sKva = Math.sqrt(t.p * t.p + t.q * t.q);
+      const hasLoad = sKva > 0.01;
+      const isInd = t.q >= 0;
+
+      // Status badge
+      const dotEl = document.getElementById('singleStatusDot');
+      const statusTxtEl = document.getElementById('singleStatusText');
+      if (isT1 && currentSnapshotData.offline) {
+        dotEl.className = 'w-3 h-3 rounded-full bg-red-500 animate-ping flex-shrink-0';
+        statusTxtEl.innerText = 'Falha Comunicação';
+        statusTxtEl.style.cssText = 'background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border);';
+      } else if (vAvg < 10) {
+        dotEl.className = 'w-3 h-3 rounded-full bg-amber-500 flex-shrink-0';
+        statusTxtEl.innerText = dataSource === 'real' && !isT1 ? 'Aguardando 4ª-feira' : 'Sem Carga';
+        statusTxtEl.style.cssText = 'background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border);';
+      } else {
+        dotEl.className = 'w-3 h-3 rounded-full bg-emerald-500 flex-shrink-0';
+        statusTxtEl.innerText = 'Online';
+        statusTxtEl.style.cssText = 'background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);';
+      }
+
+      // KPIs
+      document.getElementById('singleFp').innerText = hasLoad ? t.fp.toFixed(3) : '—';
+      document.getElementById('singleFpBadge').innerText = hasLoad ? (isInd ? 'INDUTIVO' : 'CAPACITIVO') : 'SEM CARGA';
+      const fpBar = document.getElementById('singleFpBar');
+      fpBar.style.width = hasLoad ? (t.fp * 100) + '%' : '0%';
+      fpBar.className = `h-full rounded-full transition-all duration-500 ${!hasLoad ? 'bg-slate-400' : (t.fp >= 0.92 && !currentSnapshotData.night ? 'bg-emerald-500' : 'bg-red-500')}`;
+      document.getElementById('singleFpStatus').innerText = hasLoad
+        ? ((t.fp >= 0.92 ? '+' : '') + (t.fp - 0.92).toFixed(3))
+        : 'Aguardando';
+
+      document.getElementById('singleP').innerText = t.p.toFixed(1);
+      document.getElementById('singleQ').innerText = Math.abs(t.q).toFixed(1);
+      document.getElementById('singleQType').innerText = hasLoad ? (isInd ? 'Indutivo' : 'Capacitivo') : '—';
+      document.getElementById('singleS').innerText = sKva.toFixed(1);
+      document.getElementById('singleLoadPct').innerText = ((sKva / 500) * 100).toFixed(1) + '%';
+
+      document.getElementById('singleVrs').innerText = t.vrs.toFixed(1);
+      document.getElementById('singleVst').innerText = t.vst.toFixed(1);
+      document.getElementById('singleVtr').innerText = t.vtr.toFixed(1);
+      document.getElementById('singleVavg').innerText = vAvg.toFixed(1) + ' V';
+
+      document.getElementById('singleIr').innerText = t.ir;
+      document.getElementById('singleIs').innerText = t.is;
+      document.getElementById('singleIt').innerText = t.it;
+      document.getElementById('singleIavg').innerText = iAvg + ' A';
+    }
+
     function updateUI(data) {
+      currentSnapshotData = data;
       const pTot = data.t1.p + data.t2.p;
       const qTot = data.t1.q + data.t2.q;
       const sTot = Math.sqrt(pTot * pTot + qTot * qTot);
@@ -1836,6 +2157,7 @@
           "Fator de potência global em " + fpTot.toFixed(3) + ". Risco de cobrança de reativo excedente pela concessionária.";
         alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-lg" aria-hidden="true"></i>';
       }
+      renderSingleTrafoView();
     }
 
     function toggleHelpNote(boxId, btn) {
@@ -2367,6 +2689,101 @@
 
       vMinBox.innerHTML = `${minV.toFixed(1)} V <span class="text-muted-token font-normal">(${minMeta})</span>`;
       vMaxBox.innerHTML = `${maxV.toFixed(1)} V <span class="text-muted-token font-normal">(${maxMeta})</span>`;
+      syncSingleTrafoCharts();
+    }
+
+    function syncSingleTrafoCharts() {
+      if (!singleFpChartInstance || !singleVoltageChartInstance) return;
+      const tId = activeView === 't2' ? 2 : 1;
+      const vMinEl = document.getElementById('singleVMin');
+      const vMaxEl = document.getElementById('singleVMax');
+      const colorLine = tId === 1 ? '#3b82f6' : '#f59e0b';
+      singleVoltageChartInstance.data.datasets[0].borderColor = colorLine;
+      singleVoltageChartInstance.data.datasets[0].label = `Trafo ${tId} (Média 380V)`;
+
+      if (dataSource === 'sim') {
+        const labels = ['00h','02h','04h','06h','08h','10h','12h','14h','14:12','16h','18h','20h','22h'];
+        const fpArr = tId === 1
+          ? [0.85, 0.81, 0.83, 0.93, 0.95, 0.94, 0.93, 0.95, 0.94, 0.93, 0.94, 0.92, 0.94]
+          : [0.83, 0.79, 0.81, 0.92, 0.94, 0.94, 0.93, 0.95, 0.94, 0.93, 0.94, 0.91, 0.94];
+        const vArr = tId === 1
+          ? [385.5, 387.8, 389.4, 383.1, 381.4, 381.1, 380.5, 379.8, 374.2, 380.4, 381.9, 383.0, 384.2]
+          : [385.0, 387.1, 388.6, 382.5, 380.2, 379.9, 378.7, 377.5, 362.8, 378.9, 380.5, 382.1, 383.8];
+
+        if (simState.latest[tId]) {
+          const r = simState.latest[tId];
+          fpArr[fpArr.length - 1] = +r.fp.toFixed(3);
+          vArr[vArr.length - 1] = +((r.v_ab + r.v_bc + r.v_ca) / 3).toFixed(1);
+        }
+
+        singleFpChartInstance.data.labels = labels;
+        singleFpChartInstance.data.datasets[0].data = fpArr;
+        singleFpChartInstance.data.datasets[1].data = Array(labels.length).fill(0.92);
+        singleFpChartInstance.update();
+
+        singleVoltageChartInstance.data.labels = labels;
+        singleVoltageChartInstance.data.datasets[0].data = vArr;
+        singleVoltageChartInstance.options.scales.y.min = 355;
+        singleVoltageChartInstance.options.scales.y.max = 400;
+        singleVoltageChartInstance.update();
+
+        vMinEl.innerText = tId === 1 ? '374.2 V (14:12)' : '362.8 V (14:12)';
+        vMaxEl.innerText = tId === 1 ? '389.4 V (03:45)' : '388.6 V (03:45)';
+        return;
+      }
+
+      // Modo Dados Reais: filtra apenas registros desse trafo
+      let pts = Array.isArray(realState.readings)
+        ? realState.readings.filter(r => r.trafo_id === tId)
+        : [];
+      if (pts.length === 0 && realState.latest[tId]) {
+        pts = [{ trafo_id: tId, ...realState.latest[tId] }];
+      }
+
+      const energized = pts.filter(r => ((Number(r.v_ab || 0) + Number(r.v_bc || 0) + Number(r.v_ca || 0)) / 3) > 10);
+      if (energized.length === 0) {
+        const lbl = pts[0]?.ts_brt ? `${pts[0].ts_brt.slice(8, 10)}/${pts[0].ts_brt.slice(5, 7)} ${pts[0].ts_brt.slice(11, 16)}` : 'Aguardando';
+        singleFpChartInstance.data.labels = [lbl];
+        singleFpChartInstance.data.datasets[0].data = [null];
+        singleFpChartInstance.data.datasets[1].data = [0.92];
+        singleFpChartInstance.update();
+
+        singleVoltageChartInstance.data.labels = [lbl];
+        singleVoltageChartInstance.data.datasets[0].data = [pts.length > 0 ? 0 : null];
+        singleVoltageChartInstance.options.scales.y.min = 0;
+        singleVoltageChartInstance.options.scales.y.max = 400;
+        singleVoltageChartInstance.update();
+
+        vMinEl.innerText = '— (aguardando energização)';
+        vMaxEl.innerText = '— (aguardando energização)';
+        return;
+      }
+
+      let minV = Infinity, minTime = '', maxV = -Infinity, maxTime = '';
+      const labels = [], fpArr = [], vArr = [];
+      for (const r of energized) {
+        const tsKey = (r.ts_brt || '').slice(0, 16);
+        const vAvg = (Number(r.v_ab || 0) + Number(r.v_bc || 0) + Number(r.v_ca || 0)) / 3;
+        labels.push(tsKey.slice(11, 16));
+        vArr.push(+vAvg.toFixed(1));
+        fpArr.push(r.fp ? +Number(r.fp).toFixed(3) : null);
+        if (vAvg < minV) { minV = vAvg; minTime = tsKey.slice(11, 16); }
+        if (vAvg > maxV) { maxV = vAvg; maxTime = tsKey.slice(11, 16); }
+      }
+
+      singleFpChartInstance.data.labels = labels;
+      singleFpChartInstance.data.datasets[0].data = fpArr;
+      singleFpChartInstance.data.datasets[1].data = Array(labels.length).fill(0.92);
+      singleFpChartInstance.update();
+
+      singleVoltageChartInstance.data.labels = labels;
+      singleVoltageChartInstance.data.datasets[0].data = vArr;
+      singleVoltageChartInstance.options.scales.y.min = 355;
+      singleVoltageChartInstance.options.scales.y.max = 400;
+      singleVoltageChartInstance.update();
+
+      vMinEl.innerText = `${minV.toFixed(1)} V (${minTime})`;
+      vMaxEl.innerText = `${maxV.toFixed(1)} V (${maxTime})`;
     }
 
     function downloadCSV() {
@@ -2474,9 +2891,49 @@
         }
       });
 
+      singleFpChartInstance = new Chart(document.getElementById('singleFpChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            { label: 'FP Individual', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.10)', borderWidth: 2.5, fill: true, tension: 0.35 },
+            { label: 'Limite ANEEL (0.92)', data: [], borderColor: '#ef4444', borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0.70, max: 1.00, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+            x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
+          }
+        }
+      });
+
+      singleVoltageChartInstance = new Chart(document.getElementById('singleVoltageChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            { label: 'Tensão Média 380V', data: [], borderColor: '#3b82f6', borderWidth: 2.5, tension: 0.3, pointRadius: 2.5 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 355, max: 400, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } },
+            x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
+          }
+        }
+      });
+
       renderAppearanceControls();
       renderQuotaAndLogs();
       setDataSource('sim');
+      setActiveView('global');
 
       try {
         const health = await fetch('/api/health');
