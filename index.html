@@ -1168,12 +1168,19 @@
         </div>
       </div>
 
-      <!-- 5. AJUDA & CONTATOS -->
-      <div class="pt-3 border-t border-token">
+      <!-- 5. AJUDA, CONTATOS & SESSÃO -->
+      <div class="pt-3 border-t border-token space-y-2">
         <button type="button" onclick="closeMenuDrawer(); openHelpDialog();"
                 class="w-full touch-target surface-elevated py-2.5 px-3 rounded-lg text-xs font-semibold text-main flex items-center justify-between hover:opacity-90">
           <span><i class="fa-solid fa-circle-question mr-2 text-amber-500" aria-hidden="true"></i> Ajuda & Contatos Técnicos</span>
           <i class="fa-solid fa-chevron-right text-[10px] text-muted-token" aria-hidden="true"></i>
+        </button>
+
+        <button type="button" onclick="logoutSession()"
+                class="w-full touch-target py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-between hover:opacity-90"
+                style="background: var(--danger-bg); color: var(--danger-text); border: 1px solid var(--danger-border);">
+          <span><i class="fa-solid fa-right-from-bracket mr-2" aria-hidden="true"></i> Sair (Encerrar Sessão)</span>
+          <span id="sessionUserTag" class="font-mono text-[10px] opacity-85">vjrauber</span>
         </button>
       </div>
     </nav>
@@ -1517,28 +1524,51 @@
     </div>
   </dialog>
 
-  <!-- LOGIN MODAL (Exibido apenas quando o painel exigir autenticação) -->
-  <dialog id="loginDialog" class="app-dialog" style="width: min(92vw, 24rem);" aria-labelledby="loginDialogTitle">
-    <div class="p-5 space-y-4">
+  <!-- LOGIN MODAL (Proteção de acesso e simulação de sessão real) -->
+  <dialog id="loginDialog" class="app-dialog" style="width: min(92vw, 25rem);" aria-labelledby="loginDialogTitle">
+    <div class="sawmill-strip w-full" aria-hidden="true"></div>
+    <div class="p-5 sm:p-6 space-y-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-             style="background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-border);">
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+             style="background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid #f59e0b;">
+          <svg viewBox="0 0 40 40" class="w-7 h-7" role="img" aria-label="Logo Serraria VJ Rauber">
+            <circle cx="20" cy="20" r="15" fill="none" stroke="#f59e0b" stroke-width="3.2" stroke-dasharray="5 2.5"/>
+            <circle cx="20" cy="20" r="10" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+            <path d="M22 9L14 21h6l-2 10 8-12h-6l2-10z" fill="#34d399"/>
+          </svg>
         </div>
         <div>
-          <h2 id="loginDialogTitle" class="text-base font-bold text-main">Acesso Restrito — VJ Rauber</h2>
-          <p class="text-xs text-muted-token">Supervisão Elétrica Global</p>
+          <h2 id="loginDialogTitle" class="text-base font-extrabold text-main">Serraria VJ Rauber</h2>
+          <p class="text-xs text-muted-token">Acesso Restrito • Supervisão Elétrica Global</p>
         </div>
       </div>
+
+      <div id="loginDemoHint" class="p-2.5 rounded-lg text-[11px] flex items-start gap-2"
+           style="background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info-text);">
+        <i class="fa-solid fa-key mt-0.5 flex-shrink-0" aria-hidden="true"></i>
+        <span>
+          <strong>Acesso de demonstração:</strong> utilize a senha <strong class="font-mono">vjrauber</strong> para simular uma sessão real salva no navegador.
+        </span>
+      </div>
+
       <form onsubmit="submitLogin(event)" class="space-y-3">
         <div>
-          <label for="loginPassword" class="block text-xs text-sec mb-1">Senha do Painel</label>
+          <label for="loginUsername" class="block text-xs text-sec font-medium mb-1">Usuário / Conta</label>
+          <input id="loginUsername" type="text" value="vjrauber" autocomplete="username"
+                 class="w-full px-3 py-2 rounded-lg surface-elevated text-sm text-main">
+        </div>
+        <div>
+          <label for="loginPassword" class="block text-xs text-sec font-medium mb-1">Senha do Painel</label>
           <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Digite a senha..."
                  class="w-full px-3 py-2 rounded-lg surface-elevated text-sm text-main">
         </div>
-        <p id="loginError" role="alert" class="hidden text-xs text-red-500 font-medium"></p>
-        <button type="submit" class="w-full touch-target py-2.5 rounded-lg text-white text-sm font-semibold" style="background: var(--accent);">
-          Entrar no Painel
+        <label class="flex items-center gap-2 text-xs text-sec cursor-pointer select-none">
+          <input id="loginRemember" type="checkbox" checked class="w-4 h-4">
+          <span>Manter conectado por 30 dias neste aparelho</span>
+        </label>
+        <p id="loginError" role="alert" class="hidden text-xs font-semibold" style="color: var(--danger-text);"></p>
+        <button type="submit" class="w-full touch-target py-2.5 rounded-lg text-white text-sm font-bold shadow-sm" style="background: var(--accent);">
+          <i class="fa-solid fa-right-to-bracket mr-1.5" aria-hidden="true"></i> Entrar no Supervisório
         </button>
       </form>
     </div>
@@ -1604,7 +1634,7 @@
 
     const DEFAULT_REAL_STATE = {
       quota: { todayUsed: 3, monthUsed: 3, dailyLimit: 10, monthlyLimit: 100, autoReserveLimit: 80 },
-      settings: { schedule_days: 'weekdays', schedule_times: ['17:00'], trafo1_enabled: true, trafo2_enabled: false },
+      settings: { schedule_days: 'disabled', schedule_times: [], trafo1_enabled: true, trafo2_enabled: false },
       latest: {
         1: { ts_brt: '2026-11-23 15:14:00', v_ab: 0, v_bc: 0, v_ca: 0, i_a: 0, i_b: 0, i_c: 0, p_kw: 0, q_kvar_signed: 0, s_kva: 0, fp: 0, inductive: 0, kwh_total: 0, temp_c: 33 },
         2: null
@@ -2523,30 +2553,92 @@
     }
 
     // === LOGIN & SERVIDOR ===
+    const DEMO_LOGIN_PASS = 'vjrauber';
+
+    function hasActiveMockSession() {
+      try {
+        const s = sessionStorage.getItem('vjr_mock_session_v1');
+        if (s) return true;
+        const l = localStorage.getItem('vjr_mock_session_v1');
+        if (!l) return false;
+        const parsed = JSON.parse(l);
+        return parsed && parsed.exp > Date.now();
+      } catch {
+        return false;
+      }
+    }
+
+    function openLoginGate() {
+      document.getElementById('loginDemoHint').classList.toggle('hidden', connectedToServer);
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').classList.add('hidden');
+      const dlg = document.getElementById('loginDialog');
+      if (!dlg.open) dlg.showModal();
+    }
+
+    // Impede fechar o login pelo teclado (Esc) sem autenticar
+    document.getElementById('loginDialog').addEventListener('cancel', (e) => {
+      e.preventDefault();
+    });
+
     async function submitLogin(e) {
       e.preventDefault();
-      const pw = document.getElementById('loginPassword').value;
+      const user = (document.getElementById('loginUsername').value || 'vjrauber').trim();
+      const pw = document.getElementById('loginPassword').value.trim();
+      const remember = document.getElementById('loginRemember').checked;
       const errEl = document.getElementById('loginError');
       errEl.classList.add('hidden');
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pw })
-      });
-      if (!res.ok) {
-        errEl.innerText = 'Senha incorreta.';
+
+      if (connectedToServer) {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw })
+        });
+        if (!res.ok) {
+          errEl.innerText = 'Senha incorreta.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        document.getElementById('sessionUserTag').innerText = user;
+        closeDialog('loginDialog');
+        await loadServerState();
+        return;
+      }
+
+      // Login mockup para simular uma sessão real
+      if (pw.toLowerCase() !== DEMO_LOGIN_PASS) {
+        errEl.innerText = 'Senha incorreta. Para demonstração, utilize: vjrauber';
         errEl.classList.remove('hidden');
         return;
       }
+
+      const payload = JSON.stringify({ user, exp: Date.now() + 30 * 24 * 60 * 60 * 1000 });
+      try {
+        if (remember) localStorage.setItem('vjr_mock_session_v1', payload);
+        else sessionStorage.setItem('vjr_mock_session_v1', payload);
+      } catch {}
+      document.getElementById('sessionUserTag').innerText = user;
       closeDialog('loginDialog');
-      await loadServerState();
+    }
+
+    async function logoutSession() {
+      closeMenuDrawer();
+      if (connectedToServer) {
+        try { await fetch('/api/logout', { method: 'POST' }); } catch {}
+      }
+      try {
+        localStorage.removeItem('vjr_mock_session_v1');
+        sessionStorage.removeItem('vjr_mock_session_v1');
+      } catch {}
+      openLoginGate();
     }
 
     async function loadServerState() {
       const res = await fetch('/api/state?hours=24');
       if (res.status === 401) {
         connectedToServer = true;
-        document.getElementById('loginDialog').showModal();
+        openLoginGate();
         return;
       }
       if (!res.ok) return;
@@ -2937,8 +3029,16 @@
 
       try {
         const health = await fetch('/api/health');
-        if (health.ok) await loadServerState();
+        if (health.ok) {
+          await loadServerState();
+          return;
+        }
       } catch {}
+
+      // No modo demonstração, exige o login mockup caso ainda não haja sessão ativa
+      if (!hasActiveMockSession()) {
+        openLoginGate();
+      }
     });
   </script>
 </body>
